@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {}
+    "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {}
   },
   "projects": {
-    "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {
+    "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+        "projectUniqueName": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
         "projectName": "inOfficeApplication",
-        "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
-        "packagesPath": "C:\\Users\\veeeco\\.nuget\\packages\\",
-        "outputPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\obj\\",
+        "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+        "packagesPath": "C:\\Users\\meti-\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\veeeco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\meti-\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
