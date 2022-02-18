@@ -12,6 +12,6 @@ namespace inOfficeApplication.Models
         public Reservation? Reservation { get; set; }
         public int OfficeId { get; set; }
         public Office? Office { get; set; }
-        public virtual ICollection<DeskMode>? DeskModes { get; set; }
+       // public virtual ICollection<Mode>? Modes { get; set; }
     }
 }

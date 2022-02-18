@@ -8,7 +8,7 @@
 
         public int OfficeId { get; set; }
         public Office? Office { get; set; }
-        public virtual ICollection<DeskMode>? DeskModes { get; set; }
-        public virtual ICollection<ConferenceRoomMode>? ConferenceRoomModes { get; set; }
+      /*  public virtual ICollection<Desk>? Desks { get; set; }
+        public virtual ICollection<ConferenceRoom>? ConferenceRooms { get; set; }*/
     }
 }

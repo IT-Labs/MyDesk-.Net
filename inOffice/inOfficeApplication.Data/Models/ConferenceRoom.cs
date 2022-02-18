@@ -13,7 +13,7 @@ namespace inOfficeApplication.Models
 
         public int OfficeId { get; set; }
         public Office? Office { get; set; }
-        public virtual ICollection<ConferenceRoomMode>? ConferenceRoomModes { get; set; }
+       // public virtual ICollection<Mode>? Modes { get; set; }
 
     }
 }

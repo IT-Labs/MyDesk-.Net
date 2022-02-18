@@ -811,6 +811,21 @@
             "rid": "win"
           }
         }
+      },
+      "inOfficeApplication.Data/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "EntityFramework": "6.4.4",
+          "Microsoft.EntityFrameworkCore": "6.0.2",
+          "Swashbuckle.AspNetCore": "6.2.3"
+        },
+        "compile": {
+          "bin/placeholder/inOfficeApplication.Data.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/inOfficeApplication.Data.dll": {}
+        }
       }
     }
   },
@@ -2453,6 +2468,11 @@
         "system.windows.extensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "inOfficeApplication.Data/1.0.0": {
+      "type": "project",
+      "path": "../inOfficeApplication.Data/inOfficeApplication.Data.csproj",
+      "msbuildProject": "../inOfficeApplication.Data/inOfficeApplication.Data.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -2463,7 +2483,8 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.2",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.2",
       "Swashbuckle.AspNetCore >= 6.2.3",
-      "System.Configuration.ConfigurationManager >= 6.0.0"
+      "System.Configuration.ConfigurationManager >= 6.0.0",
+      "inOfficeApplication.Data >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2497,7 +2518,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
+              "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
