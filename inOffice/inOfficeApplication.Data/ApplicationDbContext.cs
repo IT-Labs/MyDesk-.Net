@@ -18,8 +18,7 @@ namespace inOfficeApplication.Data
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Desk> Desks { get; set; }
         public virtual DbSet<ConferenceRoom> ConferenceRooms { get; set; }
-
-        /*public virtual DbSet<ConferenceRoomMode> ConferenceRoomModes { get; set; }*/
+        public virtual DbSet<ConferenceRoomMode> ConferenceRoomModes { get; set; }
         public virtual DbSet<DeskMode> DeskModes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
