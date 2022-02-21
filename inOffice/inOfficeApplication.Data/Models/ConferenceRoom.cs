@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using inOfficeApplication.Data.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace inOfficeApplication.Models
 {
@@ -13,7 +14,7 @@ namespace inOfficeApplication.Models
 
         public int OfficeId { get; set; }
         public Office? Office { get; set; }
-       // public virtual ICollection<Mode>? Modes { get; set; }
+        public virtual ICollection<ConferenceRoomMode>? ConferenceRoomModes { get; set; }
 
     }
 }

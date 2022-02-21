@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using inOfficeApplication.Data;
 
@@ -11,9 +12,10 @@ using inOfficeApplication.Data;
 namespace inOfficeApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220218145613_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +23,6 @@ namespace inOfficeApplication.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoomMode", b =>
-                {
-                    b.Property<int>("ConferenceRoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ConferenceRoomId", "ModeId");
-
-                    b.HasIndex("ModeId");
-
-                    b.ToTable("ConferenceRoomMode");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskMode", b =>
-                {
-                    b.Property<int>("DeskId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DeskId", "ModeId");
-
-                    b.HasIndex("ModeId");
-
-                    b.ToTable("DeskModes");
-                });
 
             modelBuilder.Entity("inOfficeApplication.Models.Admin", b =>
                 {
@@ -268,44 +240,6 @@ namespace inOfficeApplication.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoomMode", b =>
-                {
-                    b.HasOne("inOfficeApplication.Models.ConferenceRoom", "ConferenceRoom")
-                        .WithMany("ConferenceRoomModes")
-                        .HasForeignKey("ConferenceRoomId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("inOfficeApplication.Models.Mode", "Mode")
-                        .WithMany("ConferenceRoomModes")
-                        .HasForeignKey("ModeId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("ConferenceRoom");
-
-                    b.Navigation("Mode");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskMode", b =>
-                {
-                    b.HasOne("inOfficeApplication.Models.Desk", "Desk")
-                        .WithMany("DeskModes")
-                        .HasForeignKey("DeskId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("inOfficeApplication.Models.Mode", "Mode")
-                        .WithMany("DeskModes")
-                        .HasForeignKey("ModeId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("Desk");
-
-                    b.Navigation("Mode");
-                });
-
             modelBuilder.Entity("inOfficeApplication.Models.ConferenceRoom", b =>
                 {
                     b.HasOne("inOfficeApplication.Models.Office", "Office")
@@ -377,26 +311,9 @@ namespace inOfficeApplication.Migrations
                     b.Navigation("Reservation");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Models.ConferenceRoom", b =>
-                {
-                    b.Navigation("ConferenceRoomModes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Models.Desk", b =>
-                {
-                    b.Navigation("DeskModes");
-                });
-
             modelBuilder.Entity("inOfficeApplication.Models.Employee", b =>
                 {
                     b.Navigation("Reservations");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Models.Mode", b =>
-                {
-                    b.Navigation("ConferenceRoomModes");
-
-                    b.Navigation("DeskModes");
                 });
 
             modelBuilder.Entity("inOfficeApplication.Models.Office", b =>

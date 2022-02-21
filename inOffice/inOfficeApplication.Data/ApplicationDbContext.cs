@@ -1,4 +1,5 @@
-﻿using inOfficeApplication.Models;
+﻿using inOfficeApplication.Data.Models;
+using inOfficeApplication.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -18,8 +19,8 @@ namespace inOfficeApplication.Data
         public virtual DbSet<Desk> Desks { get; set; }
         public virtual DbSet<ConferenceRoom> ConferenceRooms { get; set; }
 
-        /*public virtual DbSet<ConferenceRoomMode> ConferenceRoomModes { get; set; }
-        public virtual DbSet<DeskMode> DeskModes { get; set; }*/
+        /*public virtual DbSet<ConferenceRoomMode> ConferenceRoomModes { get; set; }*/
+        public virtual DbSet<DeskMode> DeskModes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,8 +52,7 @@ namespace inOfficeApplication.Data
             builder.Entity<Reservation>()
                 .HasOne<Employee>(z => z.Employee)
                 .WithMany(z => z.Reservations)
-                .HasForeignKey(z => z.EmployeeId)
-                ;
+                .HasForeignKey(z => z.EmployeeId);
 
             //office - desk : 1-N
             builder.Entity<Desk>()
@@ -72,39 +72,69 @@ namespace inOfficeApplication.Data
                 .WithMany(z => z.ConferenceRooms)
                 .HasForeignKey(z => z.OfficeId);
 
+            builder.Entity<DeskMode>()
+                            .HasKey(z => new { z.DeskId, z.ModeId });
+
+            builder.Entity<DeskMode>()
+                           .HasOne(z => z.Desk)
+                           .WithMany(z => z.DeskModes)
+                           .HasForeignKey(z => z.DeskId)
+                           .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<DeskMode>()
+                           .HasOne(z => z.Mode)
+                           .WithMany(z => z.DeskModes)
+                           .HasForeignKey(z => z.ModeId)
+                           .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<ConferenceRoomMode>()
+                            .HasKey(z => new {z.ConferenceRoomId, z.ModeId});
+
+            builder.Entity<ConferenceRoomMode>()
+                            .HasOne(z => z.ConferenceRoom)
+                            .WithMany(z => z.ConferenceRoomModes)
+                            .HasForeignKey(z => z.ConferenceRoomId)
+                            .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<ConferenceRoomMode>()
+                            .HasOne(z => z.Mode)
+                            .WithMany(z => z.ConferenceRoomModes)
+                            .HasForeignKey(z => z.ModeId)
+                            .OnDelete(DeleteBehavior.ClientCascade);
+
 
 
             //MANY TO MANY
             //desk-mode : n-m
-/*            builder.Entity<DeskMode>()
-                 .HasKey(z => new { z.DeskId, z.ModeId });
+            /*            builder.Entity<DeskMode>()
+                             .HasKey(z => new { z.DeskId, z.ModeId });
 
-            builder.Entity<DeskMode>()
-                .HasOne(z => z.Desk)
-                .WithMany(z => z.DeskModes)
-                .HasForeignKey(z => z.DeskId);
+                        builder.Entity<DeskMode>()
+                            .HasOne(z => z.Desk)
+                            .WithMany(z => z.DeskModes)
+                            .HasForeignKey(z => z.DeskId);
 
-            builder.Entity<DeskMode>()
-                .HasOne(z => z.Mode)
-                .WithMany(z => z.DeskModes)
-                .HasForeignKey(z => z.ModeId);
+                        builder.Entity<DeskMode>()
+                            .HasOne(z => z.Mode)
+                            .WithMany(z => z.DeskModes)
+                            .HasForeignKey(z => z.ModeId);
 
 
-            //conf room-mode: n-m
-            builder.Entity<ConferenceRoomMode>()
-                .HasKey(z => new { z.ConferenceRoomId, z.ModeId });
+                        //conf room-mode: n-m
+                        builder.Entity<ConferenceRoomMode>()
+                            .HasKey(z => new { z.ConferenceRoomId, z.ModeId });
 
-            builder.Entity<ConferenceRoomMode>()
-                .HasOne(z => z.ConferenceRoom)
-                .WithMany(z => z.ConferenceRoomModes)
-                .HasForeignKey(z => z.ConferenceRoomId)
-                .OnDelete(DeleteBehavior.ClientCascade);
+                        builder.Entity<ConferenceRoomMode>()
+                            .HasOne(z => z.ConferenceRoom)
+                            .WithMany(z => z.ConferenceRoomModes)
+                            .HasForeignKey(z => z.ConferenceRoomId)
+                            .OnDelete(DeleteBehavior.ClientCascade);
 
-            builder.Entity<ConferenceRoomMode>()
-                .HasOne(z => z.Mode)
-                .WithMany(z => z.ConferenceRoomModes)
-                .HasForeignKey(z => z.ModeId)
-                .OnDelete(DeleteBehavior.ClientCascade);*/
+                        builder.Entity<ConferenceRoomMode>()
+                            .HasOne(z => z.Mode)
+                            .WithMany(z => z.ConferenceRoomModes)
+                            .HasForeignKey(z => z.ModeId)
+                            .OnDelete(DeleteBehavior.ClientCascade);*/
 
 
 
