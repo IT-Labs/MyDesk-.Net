@@ -448,6 +448,33 @@
           }
         }
       },
+      "Npgsql/6.0.3": {
+        "type": "package",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/Npgsql.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Npgsql.dll": {}
+        }
+      },
+      "Npgsql.EntityFrameworkCore.PostgreSQL/6.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "6.0.1",
+          "Microsoft.EntityFrameworkCore.Abstractions": "6.0.1",
+          "Microsoft.EntityFrameworkCore.Relational": "6.0.1",
+          "Npgsql": "6.0.3"
+        },
+        "compile": {
+          "lib/net6.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {}
+        }
+      },
       "runtime.native.System.Data.SqlClient.sni/4.7.0": {
         "type": "package",
         "dependencies": {
@@ -818,6 +845,8 @@
         "dependencies": {
           "EntityFramework": "6.4.4",
           "Microsoft.EntityFrameworkCore": "6.0.2",
+          "Npgsql": "6.0.3",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "6.0.3",
           "Swashbuckle.AspNetCore": "6.2.3"
         },
         "compile": {
@@ -1664,6 +1693,43 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Npgsql/6.0.3": {
+      "sha512": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
+      "type": "package",
+      "path": "npgsql/6.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net5.0/Npgsql.dll",
+        "lib/net5.0/Npgsql.xml",
+        "lib/net6.0/Npgsql.dll",
+        "lib/net6.0/Npgsql.xml",
+        "lib/netcoreapp3.1/Npgsql.dll",
+        "lib/netcoreapp3.1/Npgsql.xml",
+        "lib/netstandard2.0/Npgsql.dll",
+        "lib/netstandard2.0/Npgsql.xml",
+        "lib/netstandard2.1/Npgsql.dll",
+        "lib/netstandard2.1/Npgsql.xml",
+        "npgsql.6.0.3.nupkg.sha512",
+        "npgsql.nuspec",
+        "postgresql.png"
+      ]
+    },
+    "Npgsql.EntityFrameworkCore.PostgreSQL/6.0.3": {
+      "sha512": "4FJ4ww7EdMKlg0Bdug783V5+OVTczu7HF1ra7FOWin/3w1v/EplVGXUQlW/4JPVloe6nnsnvmfzKCY4JiHspHw==",
+      "type": "package",
+      "path": "npgsql.entityframeworkcore.postgresql/6.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net6.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll",
+        "npgsql.entityframeworkcore.postgresql.6.0.3.nupkg.sha512",
+        "npgsql.entityframeworkcore.postgresql.nuspec",
+        "postgresql.png"
+      ]
+    },
     "runtime.native.System.Data.SqlClient.sni/4.7.0": {
       "sha512": "9kyFSIdN3T0qjDQ2R0HRXYIhS3l5psBzQi6qqhdLz+SzFyEy4sVxNOke+yyYv8Cu8rPER12c3RDjLT8wF3WBYQ==",
       "type": "package",
@@ -2488,19 +2554,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\veeeco\\.nuget\\packages\\": {}
+    "C:\\Users\\meti-\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+      "projectUniqueName": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
       "projectName": "inOfficeApplication",
-      "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
-      "packagesPath": "C:\\Users\\veeeco\\.nuget\\packages\\",
-      "outputPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\obj\\",
+      "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+      "packagesPath": "C:\\Users\\meti-\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\veeeco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\meti-\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2514,8 +2585,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
-              "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj"
+            "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
+              "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj"
             }
           }
         }

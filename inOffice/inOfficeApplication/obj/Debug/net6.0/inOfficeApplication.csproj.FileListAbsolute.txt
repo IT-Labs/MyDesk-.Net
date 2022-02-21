@@ -169,3 +169,5 @@ C:\ProjectInternship\inOffice\inOffice\inOfficeApplication\obj\Debug\net6.0\refi
 C:\ProjectInternship\inOffice\inOffice\inOfficeApplication\obj\Debug\net6.0\inOfficeApplication.pdb
 C:\ProjectInternship\inOffice\inOffice\inOfficeApplication\obj\Debug\net6.0\inOfficeApplication.genruntimeconfig.cache
 C:\ProjectInternship\inOffice\inOffice\inOfficeApplication\obj\Debug\net6.0\ref\inOfficeApplication.dll
+C:\Users\meti-\source\repos\inOffice - .NET\inOffice\inOfficeApplication\bin\Debug\net6.0\Npgsql.dll
+C:\Users\meti-\source\repos\inOffice - .NET\inOffice\inOfficeApplication\bin\Debug\net6.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

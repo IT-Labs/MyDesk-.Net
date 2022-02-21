@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {}
+    "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {}
   },
   "projects": {
-    "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
+    "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj",
+        "projectUniqueName": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj",
         "projectName": "inOfficeApplication.Data",
-        "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj",
-        "packagesPath": "C:\\Users\\veeeco\\.nuget\\packages\\",
-        "outputPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\obj\\",
+        "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj",
+        "packagesPath": "C:\\Users\\meti-\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\veeeco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\meti-\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -60,6 +64,14 @@
               "target": "Package",
               "version": "[6.0.2, )"
             },
+            "Npgsql": {
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"
@@ -84,17 +96,21 @@
         }
       }
     },
-    "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {
+    "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+        "projectUniqueName": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
         "projectName": "inOfficeApplication",
-        "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
-        "packagesPath": "C:\\Users\\veeeco\\.nuget\\packages\\",
-        "outputPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication\\obj\\",
+        "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\inOfficeApplication.csproj",
+        "packagesPath": "C:\\Users\\meti-\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\veeeco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\meti-\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -108,8 +124,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
-                "projectPath": "C:\\ProjectInternship\\inOffice\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj"
+              "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj": {
+                "projectPath": "C:\\Users\\meti-\\source\\repos\\inOffice - .NET\\inOffice\\inOfficeApplication.Data\\inOfficeApplication.Data.csproj"
               }
             }
           }

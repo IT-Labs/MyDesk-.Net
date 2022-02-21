@@ -11,7 +11,7 @@ namespace inOfficeApplication.Data
             : base(options) { }
 
         public virtual DbSet<Admin> Admins { get; set; }
-        public virtual DbSet<Employee> Emplyoees { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Office> Offices { get; set; }
         public virtual DbSet<Mode> Modes { get; set; }
         public virtual DbSet<Reservation> Reservations { get; set; }
