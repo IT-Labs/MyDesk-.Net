@@ -4,11 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inOfficeApplication", "inOfficeApplication.csproj", "{18EBB948-10C8-47BE-A139-E6E8DE40A724}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3856B163-DAD4-4445-B071-2140F7EBD01B}"
-	ProjectSection(SolutionItems) = preProject
-		TextFile2.txt = TextFile2.txt
+	ProjectSection(ProjectDependencies) = postProject
+		{29E2A66C-4CDC-4736-8388-E48FBAF52971} = {29E2A66C-4CDC-4736-8388-E48FBAF52971}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inOfficeApplication.Data", "..\inOfficeApplication.Data\inOfficeApplication.Data.csproj", "{29E2A66C-4CDC-4736-8388-E48FBAF52971}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,10 @@ Global
 		{18EBB948-10C8-47BE-A139-E6E8DE40A724}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EBB948-10C8-47BE-A139-E6E8DE40A724}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18EBB948-10C8-47BE-A139-E6E8DE40A724}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29E2A66C-4CDC-4736-8388-E48FBAF52971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29E2A66C-4CDC-4736-8388-E48FBAF52971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29E2A66C-4CDC-4736-8388-E48FBAF52971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29E2A66C-4CDC-4736-8388-E48FBAF52971}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

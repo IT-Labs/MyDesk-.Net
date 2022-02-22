@@ -1,4 +1,6 @@
-﻿namespace inOfficeApplication.Models
+﻿using inOfficeApplication.Data.Models;
+
+namespace inOfficeApplication.Models
 {
     public class Mode
     {
