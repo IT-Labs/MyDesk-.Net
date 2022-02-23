@@ -39,9 +39,17 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+    {
+        using (var scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+        {
+            scope.Database.Migrate();
+        }
+    }
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 
