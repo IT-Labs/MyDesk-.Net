@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("inOfficeDb"), o=>o.MigrationsAssembly("inOfficeApplication")));
 
-await using var conn = new NpgsqlConnection("inOfficeDb");
+/*await using var conn = new NpgsqlConnection("inOfficeDb");
 
 await using (var cmd = new NpgsqlCommand("INSERT INTO Emplyoees (Email,FirstName,LastName,Password,JobTitle) VALUES ('vedrannuub@inoffice.com','Vedran','Nuub','Nuub123!','Dev')", conn))
 {
@@ -27,7 +27,7 @@ await using (var reader = await cmd.ExecuteReaderAsync())
 {
     while (await reader.ReadAsync())
         Console.WriteLine(reader.GetString(0));
-}
+}*/
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-
+ 
 app.UseAuthorization();
 
 app.MapControllers();
