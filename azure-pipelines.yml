@@ -16,3 +16,13 @@ variables:
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'ITLabs Microsoft Partner Network - Gold(92d723ce-1a28-4e77-b11b-c09eb55af60e)'
+    appType: 'webAppLinux'
+    appName: 'inOfficeApiDotNet'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
