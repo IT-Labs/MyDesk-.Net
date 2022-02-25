@@ -20,9 +20,11 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
-- task: AzureWebApp@1
+- task: AzureRmWebAppDeployment@4
   inputs:
-    azureSubscription: 'ITLabs Microsoft Partner Network - Gold(92d723ce-1a28-4e77-b11b-c09eb55af60e)'
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Service Connection - inOffice'
     appType: 'webAppLinux'
-    appName: 'inOfficeApiDotNet'
-    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    WebAppName: 'inofficeapinet'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|6.0'
