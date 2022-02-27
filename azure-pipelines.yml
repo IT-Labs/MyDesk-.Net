@@ -16,6 +16,28 @@ variables:
 steps:
 - script: ls && dotnet build ./inOffice/inOfficeApplication --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Init EF Core'
+  inputs:
+    command: custom
+    custom: tool
+    arguments: 'install --global dotnet-ef'
+
+- task: DownloadSecureFile@1
+  name: deploymentAppSettings
+  displayName: 'Download appsettings for Azure'
+  inputs:
+    secureFile: 'appsettings.Production.json'
+- task: CmdLine@2
+  displayName: 'Move prod app settings'
+  inputs:
+    script: |
+      ls
+      mv $(deploymentAppSettings.secureFilePath) ./inOffice/inOfficeApplication
+      ls
+      dotnet ef database update
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
