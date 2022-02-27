@@ -6,13 +6,13 @@ using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-/*builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),b=> b.MigrationsAssembly("inOfficeApplication")));
-*/
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("inOfficeDb"), o=>o.MigrationsAssembly("inOfficeApplication")));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("inOfficeDb"),b=> b.MigrationsAssembly("inOfficeApplication.Data")));
+
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//                options.UseNpgsql(builder.Configuration.GetConnectionString("inOfficeDb"), o=>o.MigrationsAssembly("inOfficeApplication")));
 
 /*await using var conn = new NpgsqlConnection("inOfficeDb");
 
@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
     {
         using (var scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
         {
-            scope.Database.Migrate();
+            scope?.Database.Migrate();
         }
     }
     app.UseSwagger();
