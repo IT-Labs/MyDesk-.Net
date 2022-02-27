@@ -35,8 +35,8 @@ steps:
     script: |
       ls
       mv $(deploymentAppSettings.secureFilePath) ./inOffice/inOfficeApplication
-      ls
-      dotnet ef database update
+      cd ./inOffice/inOfficeApplication && ls
+      cd ../inOfficeApplication.Data && dotnet ef database update
 
 - task: DotNetCoreCLI@2
   inputs:
