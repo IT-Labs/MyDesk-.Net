@@ -46,10 +46,10 @@ if (app.Environment.IsDevelopment())
             scope?.Database.Migrate();
         }
     }
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
  
