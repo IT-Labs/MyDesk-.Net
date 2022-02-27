@@ -34,18 +34,19 @@ steps:
   inputs:
     script: |
       ls
-      mv $(deploymentAppSettings.secureFilePath) .
-      
-      
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: true
-# - task: AzureRmWebAppDeployment@4
-#   inputs:
-#     ConnectionType: 'AzureRM'
-#     azureSubscription: 'Service Connection - inOffice'
-#     appType: 'webAppLinux'
-#     WebAppName: 'inofficeapinet'
-#     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
-#     RuntimeStack: 'DOTNETCORE|6.0'
+      mv $(deploymentAppSettings.secureFilePath) ./inOffice/inOfficeApplication
+      ls
+      dotnet ef database update
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Service Connection - inOffice'
+    appType: 'webAppLinux'
+    WebAppName: 'inofficeapinet'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|6.0'
