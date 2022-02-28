@@ -6,10 +6,10 @@ namespace inOfficeApplication.Models
     {
         public int Id { get; set; }
         [Required]
-        [MaxLength(55)]
+        //[MaxLength(55)]
         public string? Name { get; set; }
         [Required]
-        [MaxLength(50)]
+        //[MaxLength(50)]
      
         
         //  public string? CurrentMode { get; set; }
