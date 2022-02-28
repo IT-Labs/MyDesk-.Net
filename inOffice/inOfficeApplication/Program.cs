@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("inOfficeDb"),b=> b.MigrationsAssembly("inOfficeApplication.Data")));
-*/
+
 
  
 builder.Services.AddCors();
@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
     {
         using (var scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
             scope?.Database.Migrate();
-        }
+        
     }
 }
 
