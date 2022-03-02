@@ -1,4 +1,4 @@
-﻿namespace inOfficeApplication.Models
+﻿namespace inOfficeApplication.Data.Models
 {
     public class Employee : User 
     {

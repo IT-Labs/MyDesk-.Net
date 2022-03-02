@@ -3,8 +3,6 @@ using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,14 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
                     builder.Configuration.GetConnectionString("inOfficeDb"),b=> b.MigrationsAssembly("inOfficeApplication.Data")));
 
 
- 
 builder.Services.AddCors();
-
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//                options.UseNpgsql(builder.Configuration.GetConnectionString("inOfficeDb"), o=>o.MigrationsAssembly("inOfficeApplication")));
-//                options.UseNpgsql(builder.Configuration.GetConnectionString("inOfficeDb"), o=>o.MigrationsAssembly("inOfficeApplication")));
-
-
 
 builder.Services.AddControllers();
 
@@ -61,6 +52,7 @@ app.UseCors(options=>options
 );
  
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

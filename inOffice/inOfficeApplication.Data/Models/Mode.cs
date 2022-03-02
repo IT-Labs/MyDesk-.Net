@@ -1,6 +1,6 @@
 ﻿using inOfficeApplication.Data.Models;
 
-namespace inOfficeApplication.Models
+namespace inOfficeApplication.Data.Models
 {
     public class Mode
     {

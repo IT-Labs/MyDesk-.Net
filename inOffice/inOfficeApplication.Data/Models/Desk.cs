@@ -1,7 +1,7 @@
 ﻿using inOfficeApplication.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace inOfficeApplication.Models
+namespace inOfficeApplication.Data.Models
 {
     public class Desk
     {

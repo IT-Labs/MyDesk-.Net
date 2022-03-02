@@ -1,4 +1,5 @@
-﻿using inOfficeApplication.Models;
+﻿using inOfficeApplication.Data.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

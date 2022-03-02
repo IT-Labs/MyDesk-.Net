@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Models;
+using inOfficeApplication.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +26,7 @@ namespace inOffice.Repository.Implementation
             return admin;
         }
 
+
         public Admin GetByEmail(string email)
         {
             return _context.Admins.FirstOrDefault(a => a.Email == email);
@@ -35,5 +36,7 @@ namespace inOffice.Repository.Implementation
         {
             return _context.Admins.FirstOrDefault(a => a.Id == id);
         }
+
+       
     }
 }

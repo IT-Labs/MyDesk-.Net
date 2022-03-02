@@ -1,5 +1,4 @@
 ﻿using inOfficeApplication.Data.Models;
-using inOfficeApplication.Models;
 using Microsoft.EntityFrameworkCore;
 
 

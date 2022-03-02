@@ -8,7 +8,7 @@ namespace inOfficeApplication.Helpers
     public class JwtService
     {
         private string secureKey = "this is a very secure key";
-
+        
 
         public  string Generate(int id, string role)
         {
@@ -18,9 +18,7 @@ namespace inOfficeApplication.Helpers
 
             var header = new JwtHeader(credentials);
             
-
-            //or maybe add 1 day !
-            var payload = new JwtPayload(id.ToString(), null,null, null, DateTime.Now.AddHours(12));
+            var payload = new JwtPayload(id.ToString(), null,null, null, DateTime.Now.AddHours(24));
             payload.AddClaim(new Claim("role",role));
 
 

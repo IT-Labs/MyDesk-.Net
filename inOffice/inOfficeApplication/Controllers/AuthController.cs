@@ -1,8 +1,7 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
-using inOfficeApplication.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
@@ -35,89 +34,49 @@ namespace inOfficeApplication.Controllers
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password)
             };
 
-            //_adminRepository.Create(admin);
-
             return Created("Success", _employeeRepository.Create(employee));
 
         }
 
-        [HttpPost("/admin/register")]
-        public IActionResult AddAdmin(RegisterDto dto)
-        {
-            var admin = new Admin
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(dto.Password)
-            };
-
-            //_adminRepository.Create(admin);
-
-            return Created("Success", _adminRepository.Create(admin));
-
-        }
-/*
-        [HttpPost("/test/login")]
-        public IActionResult LoginTest(LoginDto dto)
-        {
-            var employee = _employeeRepository.GetByEmail(dto.Email);
-            if (employee == null)
-            {
-                return BadRequest();
-            }
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, employee.Password))
-            {
-                return BadRequest();
-            }
-            return Ok(new
-            {
-                message = "success"
-            });
-
-        }*/
-
-        [HttpPost("login")]
+        [HttpPost("/login")]
         public string Login(LoginDto dto)
         {
             var admin = _adminRepository.GetByEmail(dto.Email);
             var employee = _employeeRepository.GetByEmail(dto.Email);
-            
-            var s= "";
 
-            if (admin == null)
+            if (admin == null && employee==null)
             {
-                
-                 //return Json(new { Error = "Invalid Credentials" });
-                 //return "Invalid credentials";
-                 s= _jwtService.Generate(employee.Id,"EMPLOYEE");
-                 return s ;
+                 return "Invalid credentials";  
             }
 
+            if (admin != null) { 
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, admin.Password))
-            {
-                return "Invalid credentials";
+                if (BCrypt.Net.BCrypt.Verify(dto.Password, admin.Password))
+                {
+                    return _jwtService.Generate(admin.Id, "ADMIN");
+                }
+                else
+                {
+                    return "Invalid Credentials";
+                }
             }
-          /*  if (!BCrypt.Net.BCrypt.Verify(dto.Password, employee.Password))
+            if (employee != null)
             {
-                return "Invalid credentials";
+                if (BCrypt.Net.BCrypt.Verify(dto.Password, employee.Password))
+                {
+                    return _jwtService.Generate(employee.Id, "EMPLOYEE");
+                }
+                else
+                {
+                    return "Invalid Credentials";
+                }
             }
-*/
 
-            var jwt = _jwtService.Generate(admin.Id,"ADMIN");
-            
-            return jwt;
-
-           /* return Ok(new
-            {
-                message="success"
-            });*/ 
+            return "Invalid credentials";
+ 
         }
-
-
-
-        [HttpGet("admin")]
+ 
+        [HttpGet("admin/dashboard")]
         public IActionResult Admin()
         {
             try
@@ -139,30 +98,25 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
-        [HttpGet("admin/myaccount")]
-        public string TestFunc()
-        {
-            return "Shto i da bilo";
-        }
-
+        
         [HttpGet("employee/home")]
-        public string funcTest2()
+        public IActionResult Employee()
         {
-            return "Shto i da bilo2";
+            try
+            {
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+                var jwt = authHeader.Substring(7);
+                var token = _jwtService.Verify(jwt);
+                int employeeId = int.Parse(token.Issuer);
+                var employee = _employeeRepository.GetById(employeeId);
+
+                return Ok(employee);
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
         }
-
-        /* [HttpPost("logout")]
-         public IActionResult Logout()
-         {
-
-             Response.Cookies.Delete("jwt");
-             return Ok(new {
-
-                 message="Success"
-             });
-
-         }*/
 
     }
 }

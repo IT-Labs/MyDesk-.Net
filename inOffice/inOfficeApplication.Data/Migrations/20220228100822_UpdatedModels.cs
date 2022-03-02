@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace inOfficeApplication.Migrations
+namespace inOfficeApplication.Data.Migrations
 {
     public partial class UpdatedModels : Migration
     {
@@ -11,73 +11,73 @@ namespace inOfficeApplication.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "OfficeImage",
                 table: "Offices",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(50)",
+                oldType: "nvarchar(50)",
                 oldMaxLength: 50);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "Offices",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(55)",
+                oldType: "nvarchar(55)",
                 oldMaxLength: 55);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Password",
                 table: "Employees",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
 
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Employees",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
 
             migrationBuilder.AlterColumn<string>(
                 name: "FirstName",
                 table: "Employees",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Password",
                 table: "Admins",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
 
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Admins",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
 
             migrationBuilder.AlterColumn<string>(
                 name: "FirstName",
                 table: "Admins",
-                type: "text",
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "character varying(25)",
+                oldType: "nvarchar(25)",
                 oldMaxLength: 25);
         }
 
@@ -86,74 +86,74 @@ namespace inOfficeApplication.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "OfficeImage",
                 table: "Offices",
-                type: "character varying(50)",
+                type: "nvarchar(50)",
                 maxLength: 50,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "Offices",
-                type: "character varying(55)",
+                type: "nvarchar(55)",
                 maxLength: 55,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Password",
                 table: "Employees",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Employees",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "FirstName",
                 table: "Employees",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Password",
                 table: "Admins",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Admins",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "FirstName",
                 table: "Admins",
-                type: "character varying(25)",
+                type: "nvarchar(25)",
                 maxLength: 25,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "nvarchar(max)");
         }
     }
 }
