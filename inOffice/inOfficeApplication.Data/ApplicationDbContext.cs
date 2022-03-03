@@ -101,6 +101,27 @@ namespace inOfficeApplication.Data
                             .OnDelete(DeleteBehavior.ClientCascade);
 
 
+            builder.Entity<Admin>().HasData(
+                new Admin
+                {   
+                    FirstName = "Nekoj Admin",
+                    LastName = "Prezime Admin",
+                    Id = 2,
+                    Email = "admin@inoffice.com",
+                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23")
+                });
+
+            builder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    FirstName = "Nekoj Employee",
+                    LastName = "Prezime Employee",
+                    Id = 1,
+                    Email = "user@inoffice.com",
+                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23")
+
+                });
+
 
             //MANY TO MANY
             //desk-mode : n-m
