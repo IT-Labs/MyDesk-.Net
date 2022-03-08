@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace inOfficeApplication.Data.Models
 {
-    public class Desk
+    public class Desk : BaseEntity
     {
-        public int Id { get; set; }
-        // public List<string>? Categories { get; set; }
         [Required]
         public string? Categories { get; set; }
         public int ReservationId { get; set; }

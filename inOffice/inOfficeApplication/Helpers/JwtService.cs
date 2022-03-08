@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using inOffice.Repository.Interface;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -8,7 +9,16 @@ namespace inOfficeApplication.Helpers
     public class JwtService
     {
         private string secureKey = "this is a very secure key";
-        
+
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IAdminRepository _adminRepository;
+
+        public JwtService(IEmployeeRepository employeeRepository, IAdminRepository adminRepository)
+        {
+            _employeeRepository = employeeRepository;
+            _adminRepository = adminRepository;
+        }
+
 
         public  string Generate(int id, string role)
         {
@@ -21,9 +31,7 @@ namespace inOfficeApplication.Helpers
             var payload = new JwtPayload(id.ToString(), null,null, null, DateTime.Now.AddHours(24));
             payload.AddClaim(new Claim("role",role));
 
-
             var securityToken = new JwtSecurityToken(header, payload);
-
 
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
 
@@ -44,6 +52,28 @@ namespace inOfficeApplication.Helpers
             }, out SecurityToken validatenToken);
 
             return (JwtSecurityToken) validatenToken;
+        }
+
+        public object EmployeeRoleVerification(string authHeader)
+        {
+            var jwt = authHeader.Substring(7);
+            var token = Verify(jwt);
+            
+            int employeeId = int.Parse(token.Issuer);
+            var employee = _employeeRepository.GetById(employeeId);
+            
+            return employee;
+        }
+
+        public object AdminRoleVerification(string authHeader)
+        {
+            var jwt = authHeader.Substring(7);
+            var token = Verify(jwt);
+            
+            int adminId = int.Parse(token.Issuer);
+            var admin = _adminRepository.GetById(adminId);
+
+            return admin;
         }
 
     }

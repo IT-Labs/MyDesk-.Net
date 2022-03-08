@@ -1,0 +1,119 @@
+﻿using inOffice.BusinessLogicLayer;
+using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Responses;
+using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Models;
+using inOfficeApplication.Helpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+
+namespace inOfficeApplication.Controllers
+{
+    [Route("")]
+    [ApiController]
+    public class OfficeController : Controller
+    {
+        private readonly IOfficeService _officeService;
+        private readonly JwtService _jwtService;
+
+        public OfficeController(IOfficeService officeService, JwtService jwtService)
+        {
+            _officeService = officeService;
+            _jwtService = jwtService;
+        }
+
+        [HttpPost("admin/AddOffice")]
+        public ActionResult<OfficeResponse> AddNewOffice(OfficeRequest dto)
+        {
+            try
+            {
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+                var admin = _jwtService.AdminRoleVerification(authHeader);
+
+                if (admin != null)
+                {
+                    return Created("Success", _officeService.CreateNewOffice(dto));
+
+                }
+                else return Unauthorized();
+
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+
+        }
+        [HttpPut("admin/edit/{id}")]
+        public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
+        {
+            try
+            {
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+                var admin = _jwtService.AdminRoleVerification(authHeader);
+
+                if (admin != null)
+                {
+                    dto.Id = id;
+                    return Ok(_officeService.UpdateOffice(dto));
+                }
+                else return Unauthorized();
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+        [HttpGet("admin/Delete/{id}")]
+        public ActionResult<OfficeResponse> Delete(int id)
+        {
+            try
+            {
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+                var admin = _jwtService.AdminRoleVerification(authHeader);
+
+                if (admin != null)
+                {
+                    if (id == null)
+                    {
+                        return NotFound();
+                    }
+                    _officeService.DeleteOffice(id);
+
+                    return Ok(new
+                    {
+                        message = "success"
+                    });
+                }
+                else return Unauthorized();
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet("admin/GetAllOffices")]
+        public ActionResult<IEnumerable<Office>> GetAllOffices()
+        {
+            try
+            {
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+
+                var admin = _jwtService.AdminRoleVerification(authHeader);
+
+                if (admin != null)
+                {
+                    var offices = this._officeService.GetAllOffices(); 
+                    return Ok(offices.Offices);
+                }
+                else return Unauthorized();
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+    }
+}

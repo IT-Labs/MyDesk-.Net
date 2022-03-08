@@ -2,9 +2,8 @@
 
 namespace inOfficeApplication.Data.Models
 {
-    public class Mode
+    public class Mode : BaseEntity
     {
-        public int Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
 

@@ -2,11 +2,13 @@
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
 namespace inOfficeApplication.Controllers
 {
+
     [Route("")]
     [ApiController]
     public class AuthController : Controller
@@ -76,47 +78,7 @@ namespace inOfficeApplication.Controllers
  
         }
  
-        [HttpGet("admin/dashboard")]
-        public IActionResult Admin()
-        {
-            try
-            {
-                //var jwt = Request.Cookies["jwt"];
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-                var jwt = authHeader.Substring(7);
-                //Console.WriteLine("Error"+jwt);
-                var token = _jwtService.Verify(jwt);
-
-                int adminId = int.Parse(token.Issuer);
-
-                var admin = _adminRepository.GetById(adminId);
-
-                return Ok(admin);
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }
         
-        [HttpGet("employee/home")]
-        public IActionResult Employee()
-        {
-            try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-                var jwt = authHeader.Substring(7);
-                var token = _jwtService.Verify(jwt);
-                int employeeId = int.Parse(token.Issuer);
-                var employee = _employeeRepository.GetById(employeeId);
-
-                return Ok(employee);
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }
 
     }
 }

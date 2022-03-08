@@ -22,8 +22,8 @@ namespace inOfficeApplication.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            
             base.OnModelCreating(builder);
-
 
             //ONE TO ONE
             //reservation - review: 1-1
@@ -70,8 +70,9 @@ namespace inOfficeApplication.Data
                 .WithMany(z => z.ConferenceRooms)
                 .HasForeignKey(z => z.OfficeId);
 
-            builder.Entity<DeskMode>()
-                            .HasKey(z => new { z.DeskId, z.ModeId });
+
+
+
 
             builder.Entity<DeskMode>()
                            .HasOne(z => z.Desk)
@@ -85,8 +86,6 @@ namespace inOfficeApplication.Data
                            .HasForeignKey(z => z.ModeId)
                            .OnDelete(DeleteBehavior.ClientCascade);
 
-            builder.Entity<ConferenceRoomMode>()
-                            .HasKey(z => new {z.ConferenceRoomId, z.ModeId});
 
             builder.Entity<ConferenceRoomMode>()
                             .HasOne(z => z.ConferenceRoom)
@@ -103,13 +102,14 @@ namespace inOfficeApplication.Data
 
             builder.Entity<Admin>().HasData(
                 new Admin
-                {   
+                {
                     FirstName = "Nekoj Admin",
                     LastName = "Prezime Admin",
                     Id = 2,
                     Email = "admin@inoffice.com",
-                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23")
-                });
+                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
+                    IsDeleted = false
+                }) ;
 
             builder.Entity<Employee>().HasData(
                 new Employee
@@ -118,45 +118,10 @@ namespace inOfficeApplication.Data
                     LastName = "Prezime Employee",
                     Id = 1,
                     Email = "user@inoffice.com",
-                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23")
+                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
+                    IsDeleted = false
 
                 });
-
-
-            //MANY TO MANY
-            //desk-mode : n-m
-            /*            builder.Entity<DeskMode>()
-                             .HasKey(z => new { z.DeskId, z.ModeId });
-
-                        builder.Entity<DeskMode>()
-                            .HasOne(z => z.Desk)
-                            .WithMany(z => z.DeskModes)
-                            .HasForeignKey(z => z.DeskId);
-
-                        builder.Entity<DeskMode>()
-                            .HasOne(z => z.Mode)
-                            .WithMany(z => z.DeskModes)
-                            .HasForeignKey(z => z.ModeId);
-
-
-                        //conf room-mode: n-m
-                        builder.Entity<ConferenceRoomMode>()
-                            .HasKey(z => new { z.ConferenceRoomId, z.ModeId });
-
-                        builder.Entity<ConferenceRoomMode>()
-                            .HasOne(z => z.ConferenceRoom)
-                            .WithMany(z => z.ConferenceRoomModes)
-                            .HasForeignKey(z => z.ConferenceRoomId)
-                            .OnDelete(DeleteBehavior.ClientCascade);
-
-                        builder.Entity<ConferenceRoomMode>()
-                            .HasOne(z => z.Mode)
-                            .WithMany(z => z.ConferenceRoomModes)
-                            .HasForeignKey(z => z.ModeId)
-                            .OnDelete(DeleteBehavior.ClientCascade);*/
-
-
-
         }
     }
 }

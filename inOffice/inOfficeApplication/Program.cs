@@ -3,6 +3,8 @@ using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Helpers;
 using Microsoft.EntityFrameworkCore;
+using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<JwtService>();
+
+builder.Services.AddTransient<IOfficeService, OfficeService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -8,16 +8,18 @@ using System.Threading.Tasks;
 
 namespace inOfficeApplication.Data.Models
 {
-    public class DeskMode
+    public class DeskMode : BaseEntity
     {
         
         public int DeskId { get; set; }
        
-        public Desk? Desk { get; set; }
+        public virtual Desk? Desk { get; set; }
         
         public int ModeId { get; set; }
 
-        public Mode? Mode { get; set; }
+        public virtual Mode? Mode { get; set; }
+
+        
 
 
     }

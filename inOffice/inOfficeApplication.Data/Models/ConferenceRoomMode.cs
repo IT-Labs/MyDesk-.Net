@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 
 namespace inOfficeApplication.Data.Models
 {
-    public class ConferenceRoomMode
+    public class ConferenceRoomMode : BaseEntity
     {
         public int ConferenceRoomId { get; set; }
 
-        public ConferenceRoom? ConferenceRoom { get; set; }
+        public virtual ConferenceRoom? ConferenceRoom { get; set; }
 
         public int ModeId { get; set; }
 
-        public Mode? Mode { get; set; }
+        public virtual Mode? Mode { get; set; }
+       
     }
 }
