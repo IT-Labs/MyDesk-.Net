@@ -1,4 +1,5 @@
-﻿using inOffice.Repository.Interface;
+﻿using inOffice.BusinessLogicLayer.Responses;
+using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
@@ -26,18 +27,30 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto)
+        public string Register(RegisterDto dto)
         {
-            var employee = new Employee
+            try {
+                var email = dto.Email;
+                if (_employeeRepository.GetByEmail(email) == null)
+                {
+                    var employee = new Employee
+                    {
+                        FirstName = dto.FirstName,
+                        LastName = dto.LastName,
+                        Email = dto.Email,
+                        JobTitle = dto.JobTitle,
+                        Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                    };
+                    _employeeRepository.Create(employee);
+                    return "Success";
+                }
+                else return "Email already exist!";
+              
+            } 
+            catch(Exception _)
             {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(dto.Password)
-            };
-
-            return Created("Success", _employeeRepository.Create(employee));
-
+                return "Email already exist!";
+            }
         }
 
         [HttpPost("/login")]
