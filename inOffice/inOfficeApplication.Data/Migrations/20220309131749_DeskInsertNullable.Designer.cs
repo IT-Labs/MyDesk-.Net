@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using inOfficeApplication.Data;
 
@@ -11,9 +12,10 @@ using inOfficeApplication.Data;
 namespace inOfficeApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220309131749_DeskInsertNullable")]
+    partial class DeskInsertNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +63,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Admin",
                             IsDeleted = false,
                             LastName = "Prezime Admin",
-                            Password = "$2a$11$rYujnzLxeudGRY7bOqMRaewrcvzJOxk13U3ZaTaEw7tQARQNOTQpm"
+                            Password = "$2a$11$sk6hPno222fBITblqzURhuu92w.BpIDFgcG6Zjx4u.Ak6tRFC19m2"
                         });
                 });
 
@@ -82,7 +84,7 @@ namespace inOfficeApplication.Data.Migrations
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReservationId")
+                    b.Property<int>("ReservationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -90,8 +92,7 @@ namespace inOfficeApplication.Data.Migrations
                     b.HasIndex("OfficeId");
 
                     b.HasIndex("ReservationId")
-                        .IsUnique()
-                        .HasFilter("[ReservationId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("ConferenceRooms");
                 });
@@ -222,7 +223,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Employee",
                             IsDeleted = false,
                             LastName = "Prezime Employee",
-                            Password = "$2a$11$905PCW6R/YCUhLO7iT2CIeukMZA0QJQt6Ur55UcQPxLxoGoum2yu2"
+                            Password = "$2a$11$vyXLEo.Rk3ETcZfn2zVVluQCVJEPqFjt6wX622Wgg7WRNQjHBSkRK"
                         });
                 });
 
@@ -340,7 +341,9 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.HasOne("inOfficeApplication.Data.Models.Reservation", "Reservation")
                         .WithOne("ConferenceRoom")
-                        .HasForeignKey("inOfficeApplication.Data.Models.ConferenceRoom", "ReservationId");
+                        .HasForeignKey("inOfficeApplication.Data.Models.ConferenceRoom", "ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Office");
 

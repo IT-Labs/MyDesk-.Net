@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
-    public interface IOfficeService
+    public interface IEntitiesService
     {
-        OfficeListResponse GetAllOffices();
-        Office GetDetailsForOffice(int id);
-        OfficeResponse CreateNewOffice(NewOfficeRequest o);
-        OfficeResponse DeleteOffice(int id);
-        OfficeResponse UpdateOffice(OfficeRequest o);
+        EntitiesResponse CreateNewEntities(EntitiesRequest o);
+
+        ConferenceRoomsResponse ListAllConferenceRooms(int id);
+
+        DesksResponse ListAllDesks(int id);
+
+        EntitiesResponse UpdateEntities(UpdateRequest o);
 
     }
 }

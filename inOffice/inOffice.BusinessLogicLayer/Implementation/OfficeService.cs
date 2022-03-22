@@ -1,4 +1,5 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
@@ -20,11 +21,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _officeRepository = officeRepository;  
         }
 
-        public OfficeResponse CreateNewOffice(OfficeRequest o)
+        public OfficeResponse CreateNewOffice(NewOfficeRequest o)
         {
             Office office = new Office();
-            office.Name=o.Name;
-            office.OfficeImage = o.OfficeImage;
+            office.Name = o.OfficeName;
+            office.OfficeImage = "";
            
             OfficeResponse response = new OfficeResponse();
             try
@@ -44,12 +45,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             OfficeResponse response = new OfficeResponse();
             var office = GetDetailsForOffice(o.Id);
-            office.Name = o.Name;
-            office.OfficeImage=o.OfficeImage;
+            office.Name = o.OfficeName;
+            office.OfficeImage=o.OfficePlan;
             try
             {
                 this._officeRepository.Update(office);
                 response.Success = true;
+                
             }
             catch(Exception _)
             {

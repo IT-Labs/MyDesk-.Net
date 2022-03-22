@@ -90,8 +90,13 @@ namespace inOfficeApplication.Controllers
             return "Invalid credentials";
  
         }
- 
-        
+
+        [HttpGet("/myaccount")]
+        public string Reservations()
+        {
+            return "Success";
+        }
+
 
     }
 }

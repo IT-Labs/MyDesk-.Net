@@ -23,7 +23,10 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<JwtService>();
 
+
 builder.Services.AddTransient<IOfficeService, OfficeService>();
+builder.Services.AddTransient<IEntitiesService, EntitiesService>();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

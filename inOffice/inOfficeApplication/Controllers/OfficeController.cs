@@ -1,5 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
@@ -24,13 +25,15 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("admin/AddOffice")]
-        public ActionResult<OfficeResponse> AddNewOffice(OfficeRequest dto)
+        public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
             try
             {
                 string authHeader = Request.Headers[HeaderNames.Authorization];
                 var admin = _jwtService.AdminRoleVerification(authHeader);
 
+                
+                
                 if (admin != null)
                 {
                     return Created("Success", _officeService.CreateNewOffice(dto));
@@ -45,6 +48,30 @@ namespace inOfficeApplication.Controllers
             }
 
         }
+
+        [HttpGet("office/image/{id}")]
+        public ActionResult<OfficeResponse> ImageUrl(int id)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+            var admin = _jwtService.AdminRoleVerification(authHeader);
+            if(admin != null)
+            {
+                var office = _officeService.GetDetailsForOffice(id);
+                if (office.OfficeImage != null)
+                {
+                    return Ok(office.OfficeImage);
+                }
+                else
+                {
+                    return BadRequest("Image not found");
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         [HttpPut("admin/edit/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
@@ -94,7 +121,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [HttpGet("admin/GetAllOffices")]
+        [HttpGet("admin/getalloffices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
             try

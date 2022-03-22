@@ -7,7 +7,7 @@ namespace inOfficeApplication.Data.Models
     {
         [Required]
         public int Capacity { get; set; }
-        public int ReservationId { get; set; }
+        public int? ReservationId { get; set; }
         public Reservation? Reservation { get; set; }
 
         public int OfficeId { get; set; }
