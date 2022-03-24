@@ -23,16 +23,14 @@ namespace inOfficeApplication.Controllers
             _officeService = officeService;
             _jwtService = jwtService;
         }
-
-        [HttpPost("admin/AddOffice")]
+        //admin/addoffice
+        [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
             try
             {
                 string authHeader = Request.Headers[HeaderNames.Authorization];
                 var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                
                 
                 if (admin != null)
                 {
@@ -46,10 +44,9 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-
         }
-
-        [HttpGet("office/image/{id}")]
+        //admin/office/image/id
+        [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
@@ -71,8 +68,8 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
-        [HttpPut("admin/edit/{id}")]
+        //admin/edit/id
+        [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
             try
@@ -92,7 +89,8 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [HttpGet("admin/Delete/{id}")]
+        //HttpGet: admin/delete/id
+        [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
             try
@@ -120,8 +118,8 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
-        [HttpGet("admin/getalloffices")]
+        //admin/getalloffices
+        [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
             try

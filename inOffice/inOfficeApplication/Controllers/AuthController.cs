@@ -26,8 +26,8 @@ namespace inOfficeApplication.Controllers
             _employeeRepository = employeeRepository;  
         }
 
-        [HttpPost("register")]
-        public string Register(RegisterDto dto)
+        [HttpPost("/register")]
+        public ActionResult Register(RegisterDto dto)
         {
             try {
                 var email = dto.Email;
@@ -42,14 +42,14 @@ namespace inOfficeApplication.Controllers
                         Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     };
                     _employeeRepository.Create(employee);
-                    return "Success";
+                    return Ok("Success");
                 }
-                else return "Email already exist!";
+                else return BadRequest("Email already exist!");
               
             } 
             catch(Exception _)
             {
-                return "Email already exist!";
+                return BadRequest();
             }
         }
 
@@ -86,17 +86,8 @@ namespace inOfficeApplication.Controllers
                     return "Invalid Credentials";
                 }
             }
-
             return "Invalid credentials";
  
         }
-
-        [HttpGet("/myaccount")]
-        public string Reservations()
-        {
-            return "Success";
-        }
-
-
     }
 }
