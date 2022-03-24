@@ -23,7 +23,6 @@ namespace inOfficeApplication.Controllers
             _officeService = officeService;
             _jwtService = jwtService;
         }
-        //admin/addoffice
         [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
@@ -45,7 +44,6 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        //admin/office/image/id
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
@@ -68,7 +66,6 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        //admin/edit/id
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
@@ -89,7 +86,6 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        //HttpGet: admin/delete/id
         [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
@@ -118,7 +114,6 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        //admin/getalloffices
         [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
