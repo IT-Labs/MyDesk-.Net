@@ -27,7 +27,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("/register")]
-        public ActionResult Register(RegisterDto dto)
+        public string Register(RegisterDto dto)
         {
             try {
                 var email = dto.Email;
@@ -42,14 +42,14 @@ namespace inOfficeApplication.Controllers
                         Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     };
                     _employeeRepository.Create(employee);
-                    return Ok("Success");
+                    return "Success";
                 }
-                else return BadRequest("Email already exist!");
+                else return "Email already exist!";
               
             } 
             catch(Exception _)
             {
-                return BadRequest();
+                return "Bad Request!";
             }
         }
 
