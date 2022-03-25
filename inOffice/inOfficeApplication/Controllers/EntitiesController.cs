@@ -22,8 +22,7 @@ namespace inOfficeApplication.Controllers
             _entitiesService = entitiesService;
             _jwtService = jwtservice;
         }
-
-        [HttpPost("admin/edit/{id}")]
+        [HttpPost("admin/office-entities/{id}")]
         public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
@@ -48,8 +47,7 @@ namespace inOfficeApplication.Controllers
 
             else return Unauthorized();
         }
-
-        [HttpGet("admin/desks/{id}")]
+        [HttpGet("admin/office-desks/{id}")]
         public ActionResult<IEnumerable<Desk>> GetAllDesks(int id)
         {
 
@@ -73,8 +71,7 @@ namespace inOfficeApplication.Controllers
             }
 
         }
-
-        [HttpPut("admin/offices/update")]
+        [HttpPut("admin/office-entities")]
         public ActionResult<EntitiesResponse> UpdateEntities(UpdateRequest dto)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
@@ -104,8 +101,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
-        [HttpGet("admin/conferencerooms/{id}")]
+        [HttpGet("admin/office-conferencerooms/{id}")]
         public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRooms(int id)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];

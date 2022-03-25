@@ -85,9 +85,5 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
-
-        
-
     }
 }

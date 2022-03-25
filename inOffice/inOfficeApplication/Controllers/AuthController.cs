@@ -26,7 +26,7 @@ namespace inOfficeApplication.Controllers
             _employeeRepository = employeeRepository;  
         }
 
-        [HttpPost("register")]
+        [HttpPost("/register")]
         public string Register(RegisterDto dto)
         {
             try {
@@ -49,7 +49,7 @@ namespace inOfficeApplication.Controllers
             } 
             catch(Exception _)
             {
-                return "Email already exist!";
+                return "Bad Request!";
             }
         }
 
@@ -86,17 +86,8 @@ namespace inOfficeApplication.Controllers
                     return "Invalid Credentials";
                 }
             }
-
             return "Invalid credentials";
  
         }
-
-        [HttpGet("/myaccount")]
-        public string Reservations()
-        {
-            return "Success";
-        }
-
-
     }
 }

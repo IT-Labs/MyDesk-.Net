@@ -1,5 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -12,11 +13,9 @@ namespace inOfficeApplication.Controllers
     {
         private readonly JwtService _jwtService;
 
-        public EmployeeController(JwtService jwtService, IEmployeeRepository employeeRepository)
+        public EmployeeController(JwtService jwtService)
         {
-      
             _jwtService = jwtService;
-
         }
 
         [HttpGet("employee/home")]
@@ -44,7 +43,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [HttpGet("employee/informations")]
+        [HttpGet("employee/my-account/informations")]
         public IActionResult Informations()
         {
             try
@@ -68,7 +67,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [HttpGet("employee/reservations")]
+        [HttpGet("employee/my-account/reservations")]
         public IActionResult Reservations()
         {
             try
@@ -85,7 +84,6 @@ namespace inOfficeApplication.Controllers
                 {
                     return Unauthorized();
                 }
-
             }
             catch (Exception _)
             {
