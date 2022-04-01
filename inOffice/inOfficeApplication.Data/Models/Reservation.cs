@@ -6,7 +6,10 @@ namespace inOfficeApplication.Data.Models
     {
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime Date { get; set; }
+        public DateTime StartDate { get; set; }
+        [Required]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime EndDate { get; set; }
         public int EmployeeId { get; set;}
         public Employee? Employee { get; set; }
         public Desk? Desk { get; set; }

@@ -48,6 +48,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
+
         [HttpGet("employee/my-account/informations")]
         public IActionResult Informations()
         {

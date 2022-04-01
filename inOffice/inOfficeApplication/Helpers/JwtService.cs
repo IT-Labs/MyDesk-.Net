@@ -1,4 +1,5 @@
 ﻿using inOffice.Repository.Interface;
+using inOfficeApplication.Data.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -54,13 +55,13 @@ namespace inOfficeApplication.Helpers
             return (JwtSecurityToken) validatenToken;
         }
 
-        public object EmployeeRoleVerification(string authHeader)
+        public Employee EmployeeRoleVerification(string authHeader)
         {
             var jwt = authHeader.Substring(7);
             var token = Verify(jwt);
             
             int employeeId = int.Parse(token.Issuer);
-            var employee = _employeeRepository.GetById(employeeId);
+            Employee employee = _employeeRepository.GetById(employeeId);
             
             return employee;
         }

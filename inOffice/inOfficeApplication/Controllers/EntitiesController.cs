@@ -124,5 +124,57 @@ namespace inOfficeApplication.Controllers
             }
           
         }
+
+        [HttpGet("employee/office-conferencerooms/{id}")]
+        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRoomsForEmployee(int id)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+            var employee = _jwtService.EmployeeRoleVerification(authHeader);
+            if (employee != null)
+            {
+
+                var conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                if (conferenceRoomList.Sucess == true)
+                {
+                    return Ok(conferenceRoomList.ConferenceRoomsList);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+        }
+
+        [HttpGet("employee/office-desks/{id}")]
+        public ActionResult<IEnumerable<Desk>> GetAllDesksForEmployee(int id)
+        {
+
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+            var employee = _jwtService.EmployeeRoleVerification(authHeader);
+            if (employee != null)
+            {
+                var deskList = _entitiesService.ListAllDesks(id);
+                if (deskList.sucess == true)
+                {
+                    return Ok(deskList.DeskList);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+        }
+
+
     }
 }

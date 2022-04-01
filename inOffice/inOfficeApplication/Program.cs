@@ -27,6 +27,7 @@ builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
 
 
 
