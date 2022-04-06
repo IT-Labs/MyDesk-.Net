@@ -8,6 +8,6 @@ namespace inOfficeApplication.Data.Models
         public string? Reviews { get; set; }
         public string? ReviewOutput { get; set; }
         public int ReservationId { get; set; }
-        public Reservation? Reservation { get; set; }
+        public virtual Reservation? Reservation { get; set; }
     }
 }

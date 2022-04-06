@@ -71,6 +71,32 @@ namespace inOfficeApplication.Controllers
             }
 
         }
+
+        [HttpDelete("admin/entity")]
+        public ActionResult<DeleteResponse> DeleteEntity(DeleteRequest dto)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+            var admin = _jwtService.AdminRoleVerification(authHeader);
+
+            if(admin != null)
+            {
+                var deleteResponse = _entitiesService.DeleteEntity(dto);
+
+                if(deleteResponse.Success == true)
+                {
+                    return Ok();
+                }
+                else
+                {
+                  return NotFound();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+        }
         [HttpPut("admin/office-entities")]
         public ActionResult<EntitiesResponse> UpdateEntities(UpdateRequest dto)
         {

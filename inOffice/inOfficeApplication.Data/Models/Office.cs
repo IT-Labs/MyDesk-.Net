@@ -9,8 +9,8 @@ namespace inOfficeApplication.Data.Models
         public string? Name { get; set; }
         [Required]
         public string? OfficeImage { get; set; }
-        public ICollection<Desk>? Desks { get; set; }
-        public ICollection<Mode>? Modes { get; set; }
-        public ICollection<ConferenceRoom>? ConferenceRooms { get; set; }
+        public virtual ICollection<Desk>? Desks { get; set; }
+        public virtual ICollection<Mode>? Modes { get; set; }
+        public virtual ICollection<ConferenceRoom>? ConferenceRooms { get; set; }
     }
 }

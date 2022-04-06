@@ -21,7 +21,6 @@ namespace inOffice.Repository.Implementation
             this.context = context;
             entities = context.Set<T>();
         }
-
         public void Delete(T entity)
         {
             if (entity == null)
@@ -33,16 +32,14 @@ namespace inOffice.Repository.Implementation
             context.SaveChanges();
         }
 
-        public T Get(int id)
+        public T Get(int? id)
         {
              return entities.Where(z => z.Id == id && !z.IsDeleted).FirstOrDefault();
-            //return entities.SingleOrDefault(a => a.Id == id);
         }
 
         public IEnumerable<T> GetAll()
         {
             return entities.Where(z => !z.IsDeleted).AsEnumerable();
-           // return entities.AsEnumerable();
         }
 
         public void Insert(T entity)

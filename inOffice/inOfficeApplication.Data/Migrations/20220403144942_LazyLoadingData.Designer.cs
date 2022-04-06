@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using inOfficeApplication.Data;
 
@@ -11,9 +12,10 @@ using inOfficeApplication.Data;
 namespace inOfficeApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220403144942_LazyLoadingData")]
+    partial class LazyLoadingData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +63,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Admin",
                             IsDeleted = false,
                             LastName = "Prezime Admin",
-                            Password = "$2a$11$gR9BmBM4Egj.OCQK3xU.iOF5SuYrG7xQPY0Pf/WEFjkVvU8Uplur2"
+                            Password = "$2a$11$IfNiAMlgRgvqOyW5mEfvK.Cy14MdL29J8HMCfUpOwObS7UUB40cLG"
                         });
                 });
 
@@ -74,9 +76,6 @@ namespace inOfficeApplication.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("Capacity")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("IndexForOffice")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -136,9 +135,6 @@ namespace inOfficeApplication.Data.Migrations
                     b.Property<string>("Categories")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("IndexForOffice")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -228,7 +224,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Employee",
                             IsDeleted = false,
                             LastName = "Prezime Employee",
-                            Password = "$2a$11$SpHiYycg6TPqsEYp8takzewxiXrRrM56a/I9NZWdkcg1BvNvEbruK"
+                            Password = "$2a$11$QXL4GkT7FXcGDnLpMdoMteQa3Ku6hF91B5745Jn1kps4zTrjiWORi"
                         });
                 });
 
@@ -291,12 +287,6 @@ namespace inOfficeApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("ConferenceRoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeskId")
-                        .HasColumnType("int");
-
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
@@ -305,9 +295,6 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");

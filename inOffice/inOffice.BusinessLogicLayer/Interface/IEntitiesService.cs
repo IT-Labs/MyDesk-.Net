@@ -19,5 +19,7 @@ namespace inOffice.BusinessLogicLayer.Interface
 
         EntitiesResponse UpdateEntities(UpdateRequest o);
 
+        DeleteResponse DeleteEntity(DeleteRequest o);
+
     }
 }

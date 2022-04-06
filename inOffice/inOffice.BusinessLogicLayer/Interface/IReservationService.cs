@@ -12,5 +12,10 @@ namespace inOffice.BusinessLogicLayer.Interface
     public interface IReservationService
     {
        ReservationResponse Reserve(ReservationRequest o, Employee employee);
+       EmployeeReservationsResponse EmployeeReservations(Employee employee);
+       CancelReservationResponse CancelReservation(int id);
+       EmployeeReservationsResponse PastReservations(Employee employee);
+
+
     }
 }

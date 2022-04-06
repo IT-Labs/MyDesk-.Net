@@ -27,7 +27,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
 
             EntitiesResponse response = new EntitiesResponse();
-            
+            var indexForDesk = this._deskRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
+            var indexForConferenceRoom = this._conferenceRoomRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
 
             try
             {
@@ -37,7 +38,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                     desk.OfficeId = o.Id;
                     desk.IsDeleted = false;
-                    desk.Categories = "normal";
+                    desk.Categories = "regular";
+                    desk.IndexForOffice = indexForDesk + i + 1;
 
                     this._deskRepository.Insert(desk);
 
@@ -49,6 +51,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                     conferenceRoom.OfficeId = o.Id;
                     conferenceRoom.IsDeleted = false;
+                    conferenceRoom.IndexForOffice = indexForConferenceRoom + i + 1;
 
                     this._conferenceRoomRepository.Insert(conferenceRoom);
 
@@ -86,6 +89,38 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
         }
 
+        public DeleteResponse DeleteEntity(DeleteRequest o)
+        {
+            DeleteResponse deleteResponse = new DeleteResponse();
+
+            try {
+
+                if(o.TypeOfEntity == "D")
+                {
+                    var desk = _deskRepository.Get(o.IdOfEntity);
+                    this._deskRepository.Delete(desk);
+                    deleteResponse.Success = true;
+
+                }
+                else
+                {
+                    var conferenceRoomToDelete = _conferenceRoomRepository.Get(o.IdOfEntity);
+                    this._conferenceRoomRepository.Delete(conferenceRoomToDelete);
+                    deleteResponse.Success = true;
+
+                }
+
+                return deleteResponse;
+                
+            }
+            catch(Exception _)
+            {   
+                deleteResponse.Success = false;
+                return deleteResponse;
+
+            }
+
+        }
         public ConferenceRoomsResponse ListAllConferenceRooms(int id)
         {
             ConferenceRoomsResponse responseConferenceRoom = new ConferenceRoomsResponse();
@@ -128,7 +163,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 for (int i = 0; i < uncheckedDesks.Count; i++)
                 {
                     var desk = _deskRepository.Get(uncheckedDesks[i]);
-                    desk.Categories = "normal";
+                    desk.Categories = "regular";
                     this._deskRepository.Update(desk);
                 }
                 foreach (var room in conferenceRooms)

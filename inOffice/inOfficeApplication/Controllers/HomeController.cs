@@ -57,5 +57,111 @@ namespace inOfficeApplication.Controllers
 
         }
 
+        [HttpGet("employee/reserve")]
+        public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+
+            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+
+            try
+            {
+                if (employee != null)
+                {
+
+                    var response = _reservationService.EmployeeReservations(employee);
+                   
+                    if (response.Success == true)
+                    {
+                        return Ok(response.CustomReservationResponses);
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+        [HttpGet("employee/past-reservations")]
+        public ActionResult<EmployeeReservationsResponse> PastReservations()
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+
+            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+
+            try
+            {
+                if (employee != null)
+                {
+
+                    var response = _reservationService.PastReservations(employee);
+
+                    if (response.Success == true)
+                    {
+                        return Ok(response.CustomReservationResponses);
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete("employee/reserve/{id}")]
+        public ActionResult<CancelReservationResponse> CancelReservation(int id)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+
+            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+
+            try
+            {
+                if (employee != null)
+                {
+                   
+                    var response = _reservationService.CancelReservation(id);
+                    if (response.Success == true)
+                    {
+                        return Ok(new
+                        {
+                            message = "success"
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
     }
 }
