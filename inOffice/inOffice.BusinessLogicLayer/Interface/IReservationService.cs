@@ -15,7 +15,8 @@ namespace inOffice.BusinessLogicLayer.Interface
        EmployeeReservationsResponse EmployeeReservations(Employee employee);
        CancelReservationResponse CancelReservation(int id);
        EmployeeReservationsResponse PastReservations(Employee employee);
-
+       CreateReviewResponse CreateReview(CreateReviewRequest createReviewRequest);
+       ReviewResponse ShowReview(int id);
 
     }
 }

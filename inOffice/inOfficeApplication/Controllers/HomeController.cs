@@ -126,6 +126,75 @@ namespace inOfficeApplication.Controllers
             }
         }
 
+        [HttpGet("employee/review/{id}")]
+        public ActionResult<ReviewResponse> ShowReview(int id)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+
+            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+            try
+            {
+                if(employee != null)
+                {
+                    var ReviewForGivenEntity = _reservationService.ShowReview(id);
+
+                    if(ReviewForGivenEntity.Sucess == true)
+                    {
+                        return Ok(ReviewForGivenEntity.Review);
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            catch(Exception _)
+            {
+                return Unauthorized();
+
+            }
+
+        }
+
+        [HttpPost("employee/review")]
+        public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
+        {
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+
+            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+
+            try
+            {
+                if (employee != null)
+                {
+
+
+                    var response = _reservationService.CreateReview(dto);
+                    if (response.Success == true)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
         [HttpDelete("employee/reserve/{id}")]
         public ActionResult<CancelReservationResponse> CancelReservation(int id)
         {

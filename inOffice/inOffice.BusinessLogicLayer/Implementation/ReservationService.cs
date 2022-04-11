@@ -13,17 +13,20 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<Desk> _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IRepository<Office> _officeRepository;
+        private readonly IRepository<Review> _reviewRepository;
 
 
         public ReservationService(IRepository<Reservation> reservation, 
             IRepository<Desk> desk, 
             IRepository<ConferenceRoom> conferenceRoomRepository,
-            IRepository<Office> officeRepository) 
+            IRepository<Office> officeRepository,
+            IRepository<Review> reviewRepository) 
         { 
             _reservationRepository = reservation;
             _deskRepository = desk;
             _conferenceRoomRepository = conferenceRoomRepository;
             _officeRepository = officeRepository;
+            _reviewRepository = reviewRepository;
         }
 
         public CancelReservationResponse CancelReservation(int id)
@@ -56,6 +59,48 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 cancelReservationResponse.Success = false;
             }
             return cancelReservationResponse;
+        }
+
+        public CreateReviewResponse CreateReview(CreateReviewRequest createReviewRequest)
+        {
+            CreateReviewResponse response = new CreateReviewResponse();
+
+            var reservation = _reservationRepository.Get(createReviewRequest.ReservationId);
+
+            try
+            {
+                Review review = new Review();
+                review.Reviews = createReviewRequest.Review;
+                review.ReservationId=createReviewRequest.ReservationId;
+
+                _reviewRepository.Insert(review);
+
+                reservation.ReviewId = review.Id;
+                _reservationRepository.Update(reservation);
+
+                response.Success = true;
+            }
+            catch(Exception _)
+            {
+                response.Success = false;
+            }
+
+            return response;
+
+        }
+
+        public ReviewResponse ShowReview(int id)
+        {
+            var review = _reviewRepository.Get(id);
+
+            ReviewResponse reviewForGivenEntity = new ReviewResponse();
+
+            reviewForGivenEntity.Review = review.Reviews;
+            reviewForGivenEntity.Sucess = true;
+
+            return reviewForGivenEntity;
+
+
         }
 
         public EmployeeReservationsResponse EmployeeReservations(Employee employee)
@@ -122,13 +167,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
                             var confroom = _conferenceRoomRepository.Get(item.ConferenceRoomId);
 
                             var office = _officeRepository.Get(confroom.OfficeId);
-                            var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate=item.EndDate ,OfficeName = office.Name };
+                            var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate=item.EndDate ,OfficeName = office.Name, ConfRoomIndex = confroom.IndexForOffice };
                             employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                         }
                         else
                         {
                             var office = _officeRepository.Get(desk.OfficeId);
-                            var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate = item.EndDate, OfficeName = office.Name };
+                            var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate = item.EndDate, OfficeName = office.Name, DeskIndex = desk.IndexForOffice };
                             employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                         }
 

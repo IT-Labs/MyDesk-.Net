@@ -15,11 +15,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IRepository<Desk> _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
+        private readonly IRepository<Reservation> _reservationRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository)
+        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
+            _reservationRepository = reservationRepository; 
 
         }
 
@@ -75,7 +77,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
 
                 responseDeskList.DeskList = this._deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
-
+                foreach (var item in responseDeskList.DeskList)
+                {
+                    if (item.ReservationId != null)
+                    {
+                        var reservation = _reservationRepository.Get(item.ReservationId);
+                        if(DateTime.Compare(reservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(reservation.EndDate, DateTime.Now) < 0)
+                        {
+                            item.ReservationId = null;
+                            _deskRepository.Update(item);
+                        }
+                    }
+                }
                 responseDeskList.sucess = true;
 
                 return responseDeskList;
@@ -129,6 +142,19 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
 
                 responseConferenceRoom.ConferenceRoomsList = this._conferenceRoomRepository.GetAll().Where(x => x.OfficeId == id).ToList();
+
+                foreach (var item in responseConferenceRoom.ConferenceRoomsList)
+                {
+                    if (item.ReservationId != null)
+                    {
+                        var reservation = _reservationRepository.Get(item.ReservationId);
+                        if (DateTime.Compare(reservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(reservation.EndDate, DateTime.Now) < 0)
+                        {
+                            item.ReservationId = null;
+                            _conferenceRoomRepository.Update(item);
+                        }
+                    }
+                }
 
                 responseConferenceRoom.Sucess = true;
 
