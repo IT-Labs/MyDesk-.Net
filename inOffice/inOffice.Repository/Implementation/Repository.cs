@@ -4,7 +4,6 @@ using inOfficeApplication.Data.Models;
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-//using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,8 +26,7 @@ namespace inOffice.Repository.Implementation
             {
                 throw new ArgumentNullException("entity");
             }
-            entity.IsDeleted = true;
-            entities.Update(entity);
+            entities.Remove(entity);
             context.SaveChanges();
         }
 
@@ -49,6 +47,17 @@ namespace inOffice.Repository.Implementation
                 throw new ArgumentNullException("entity");
             }
             entities.Add(entity);
+            context.SaveChanges();
+        }
+
+        public void SoftDelete(T entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+            entity.IsDeleted = true;
+            entities.Update(entity);
             context.SaveChanges();
         }
 
