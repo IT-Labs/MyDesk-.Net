@@ -1,8 +1,10 @@
-﻿using inOffice.BusinessLogicLayer.Responses;
+﻿using inOffice.BusinessLogicLayer.Requests;
+using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -16,17 +18,38 @@ namespace inOfficeApplication.Controllers
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly JwtService _jwtService;
        
 
-        public AuthController(IAdminRepository adminRepository, JwtService jwtService, IEmployeeRepository employeeRepository)
+        public AuthController(IAdminRepository adminRepository, IEmployeeRepository employeeRepository)
         {
             _adminRepository = adminRepository; 
-            _jwtService = jwtService;   
             _employeeRepository = employeeRepository;  
         }
 
-        [HttpPost("/register")]
+        [AllowAnonymous]
+        [HttpPost("/authentication")]
+        public string Authentication(MicrosoftUser user)
+        {
+
+            if (_employeeRepository.GetByEmail(user.Email) != null)
+            {
+                return "User exist";
+            }
+
+            var microsoftuser = new Employee
+            {
+                FirstName = user.Firstname,
+                LastName = user.Surname,
+                Email = user.Email,
+                JobTitle = user.JobTitle,
+                Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
+            };
+            _employeeRepository.Create(microsoftuser);
+
+            return "Oke";
+        }
+
+        /*[HttpPost("/register")]
         public string Register(RegisterDto dto)
         {
             try {
@@ -51,43 +74,6 @@ namespace inOfficeApplication.Controllers
             {
                 return "Bad Request!";
             }
-        }
-
-        [HttpPost("/login")]
-        public string Login(LoginDto dto)
-        {
-            var admin = _adminRepository.GetByEmail(dto.Email);
-            var employee = _employeeRepository.GetByEmail(dto.Email);
-
-            if (admin == null && employee==null)
-            {
-                 return "Invalid credentials";  
-            }
-
-            if (admin != null) { 
-
-                if (BCrypt.Net.BCrypt.Verify(dto.Password, admin.Password))
-                {
-                    return _jwtService.Generate(admin.Id, "ADMIN");
-                }
-                else
-                {
-                    return "Invalid Credentials";
-                }
-            }
-            if (employee != null)
-            {
-                if (BCrypt.Net.BCrypt.Verify(dto.Password, employee.Password))
-                {
-                    return _jwtService.Generate(employee.Id, "EMPLOYEE");
-                }
-                else
-                {
-                    return "Invalid Credentials";
-                }
-            }
-            return "Invalid credentials";
- 
-        }
+        }*/
     }
 }

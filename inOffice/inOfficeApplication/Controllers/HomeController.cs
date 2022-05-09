@@ -1,11 +1,13 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
+using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
-using inOfficeApplication.Helpers;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace inOfficeApplication.Controllers
 {
@@ -13,27 +15,30 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
-        private readonly JwtService _jwtService;
         private readonly IReservationService _reservationService;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public HomeController(JwtService jwtService, IReservationService reservationService)
+
+        public HomeController(IReservationService reservationService, IEmployeeRepository employeeRepository)
         {
-            _jwtService = jwtService;
             _reservationService = reservationService;
+            _employeeRepository = employeeRepository;   
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpPost("employee/reserve")]
         public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)
         {
-            string authHeader = Request.Headers[HeaderNames.Authorization];
 
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
-            
+            string authHeader = Request.Headers[HeaderNames.Authorization];
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email); ;
+
             try
             {                
-                if (employee != null)
-                {
-                    
+ 
                     var response =_reservationService.Reserve(dto, employee);
                     if (response.Success == true)
                     {
@@ -43,31 +48,26 @@ namespace inOfficeApplication.Controllers
                     {
                        return BadRequest();
                     }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
 
             }
             catch (Exception _)
             {
                 return Unauthorized();
             }
-
         }
-
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpGet("employee/reserve")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
-
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email); ;
 
             try
             {
-                if (employee != null)
-                {
+               
 
                     var response = _reservationService.EmployeeReservations(employee);
                    
@@ -79,11 +79,8 @@ namespace inOfficeApplication.Controllers
                     {
                         return BadRequest();
                     }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
+                
+                
 
             }
             catch (Exception _)
@@ -91,12 +88,16 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+
         [HttpGet("employee/past-reservations")]
         public ActionResult<EmployeeReservationsResponse> PastReservations()
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
-
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email);
 
             try
             {
@@ -125,13 +126,17 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
 
         [HttpGet("employee/review/{id}")]
         public ActionResult<ReviewResponse> ShowReview(int id)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email);
 
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
             try
             {
                 if(employee != null)
@@ -160,12 +165,16 @@ namespace inOfficeApplication.Controllers
 
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+
         [HttpPost("employee/review")]
         public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
-
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email);
 
             try
             {
@@ -194,13 +203,15 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpDelete("employee/reserve/{id}")]
         public ActionResult<CancelReservationResponse> CancelReservation(int id)
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
-
-            Employee employee = _jwtService.EmployeeRoleVerification(authHeader);
+            var jwt = authHeader.Substring(7);
+            var JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            var email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            Employee employee = _employeeRepository.GetByEmail(email); ;
 
             try
             {

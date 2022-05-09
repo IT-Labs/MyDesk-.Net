@@ -1,12 +1,16 @@
 using inOffice.Repository.Implementation;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Helpers;
 using Microsoft.EntityFrameworkCore;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Implementation;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,14 +28,28 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<JwtService>();
 
+IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 
+var configManager = new ConfigurationManager<OpenIdConnectConfiguration>("https://login.microsoftonline.com/9a433611-0c81-4f7b-abae-891364ddda17/v2.0/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
 
+var openIdConfig = await configManager.GetConfigurationAsync();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+options.TokenValidationParameters = new TokenValidationParameters
+{
+    ValidateAudience = true,
+    ValidateIssuer = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    ValidIssuer = configuration["JwtInfo:Issuer"],
+    ValidAudience = configuration["JwtInfo:Audience"],
+    IssuerSigningKeys = openIdConfig.SigningKeys,
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

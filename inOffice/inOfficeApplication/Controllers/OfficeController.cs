@@ -1,11 +1,10 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
@@ -16,41 +15,33 @@ namespace inOfficeApplication.Controllers
     public class OfficeController : Controller
     {
         private readonly IOfficeService _officeService;
-        private readonly JwtService _jwtService;
+        private readonly IConfiguration _configuration;
 
-        public OfficeController(IOfficeService officeService, JwtService jwtService)
+        public OfficeController(IOfficeService officeService, IConfiguration configuration)
         {
             _officeService = officeService;
-            _jwtService = jwtService;
+            _configuration = configuration;
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
             try
             {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-                
-                if (admin != null)
-                {
-                    return Created("Success", _officeService.CreateNewOffice(dto));
-
-                }
-                else return Unauthorized();
-
+                return Created("Success", _officeService.CreateNewOffice(dto));
             }
             catch (Exception _)
             {
                 return Unauthorized();
             }
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
-            string authHeader = Request.Headers[HeaderNames.Authorization];
-            var admin = _jwtService.AdminRoleVerification(authHeader);
-            if(admin != null)
-            {
+            
+            try { 
                 var office = _officeService.GetDetailsForOffice(id);
                 if (office.OfficeImage != null)
                 {
@@ -61,74 +52,60 @@ namespace inOfficeApplication.Controllers
                     return BadRequest("Image not found");
                 }
             }
-            else
+            catch
             {
                 return Unauthorized();
             }
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
             try
             {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                if (admin != null)
-                {
-                    dto.Id = id;
-                    return Ok(_officeService.UpdateOffice(dto));
-                }
-                else return Unauthorized();
+                dto.Id = id;
+                return Ok(_officeService.UpdateOffice(dto));   
             }
             catch (Exception _)
             {
                 return Unauthorized();
             }
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
+           
             try
             {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                if (admin != null)
-                {
                     if (id == null)
                     {
                         return NotFound();
-                    }
+                }
+                else
+                {
                     _officeService.DeleteOffice(id);
-
                     return Ok(new
                     {
                         message = "success"
                     });
                 }
-                else return Unauthorized();
+                    
             }
             catch (Exception _)
             {
                 return Unauthorized();
             }
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
         [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
             try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                if (admin != null)
-                {
-                    var offices = this._officeService.GetAllOffices(); 
-                    return Ok(offices.Offices);
-                }
-                else return Unauthorized();
+            {  
+                var offices = this._officeService.GetAllOffices(); 
+                return Ok(offices.Offices);    
             }
             catch (Exception _)
             {
