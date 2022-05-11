@@ -4,6 +4,7 @@ using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,27 +27,33 @@ namespace inOfficeApplication.Controllers
             _employeeRepository = employeeRepository;  
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpPost("/authentication")]
-        public string Authentication(MicrosoftUser user)
+        public ActionResult Authentication(MicrosoftUser user)
         {
 
-            if (_employeeRepository.GetByEmail(user.Email) != null)
+            if (!user.Email.Contains("@it-labs.com"))
             {
-                return "User exist";
+                return BadRequest("Invalid email adress");
             }
-
-            var microsoftuser = new Employee
+            else if (_employeeRepository.GetByEmail(user.Email) != null)
             {
-                FirstName = user.Firstname,
-                LastName = user.Surname,
-                Email = user.Email,
-                JobTitle = user.JobTitle,
-                Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
-            };
-            _employeeRepository.Create(microsoftuser);
+                return Ok("User allready exists, redirect depending on the role");
+            }
+            else
+            {
+                var microsoftuser = new Employee
+                {
+                    FirstName = user.Firstname,
+                    LastName = user.Surname,
+                    Email = user.Email,
+                    JobTitle = user.JobTitle,
+                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
+                };
+                _employeeRepository.Create(microsoftuser);
 
-            return "Oke";
+                return Ok("User created, redirect depending on the role");
+            }
         }
 
         /*[HttpPost("/register")]
