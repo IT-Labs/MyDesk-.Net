@@ -7,6 +7,8 @@ using inOffice.Repository.Interface;
 using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using inOffice.BusinessLogicLayer.Responses;
 
 namespace inOfficeApplication.Controllers
 {
@@ -15,15 +17,31 @@ namespace inOfficeApplication.Controllers
     public class AdminController : Controller
     {
         private readonly IOfficeService _officeService;
-        private readonly JwtService _jwtService;
+        private readonly IReservationService _reservationService;
 
-        public AdminController(IOfficeService officeService, JwtService jwtService)
+        public AdminController(IOfficeService officeService, IReservationService reservationService)
         {
             _officeService = officeService;
-            _jwtService = jwtService;
+            _reservationService = reservationService;   
         }
 
-        [HttpGet("admin/configuration")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [HttpGet("employee/reservations/all")]
+        public ActionResult<AllReservationsResponse> ReservationsAll()
+        {
+            try
+            {
+                var reservations = _reservationService.AllReservations();
+
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /*[HttpGet("admin/configuration")]
         public IActionResult Configuration()
         {
             try
@@ -42,9 +60,9 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-        }
+        }*/
 
-        [HttpGet("admin/reservations")]
+       /* [HttpGet("admin/reservations")]
         public IActionResult Reservations()
         {
             try
@@ -63,9 +81,9 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-        }
+        }*/
 
-        [HttpGet("admin/dashboard")]
+      /*  [HttpGet("admin/dashboard")]
         public IActionResult Admin()
         {
             try
@@ -84,6 +102,6 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-        }
+        }*/
     }
 }

@@ -25,6 +25,7 @@ namespace inOfficeApplication.Controllers
             _employeeRepository = employeeRepository;   
         }
 
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpPost("employee/reserve")]
         public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)

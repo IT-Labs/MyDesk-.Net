@@ -4,6 +4,9 @@ using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Models;
+using Newtonsoft.Json;
+using System.Dynamic;
+using System.Linq;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -14,19 +17,23 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IRepository<Office> _officeRepository;
         private readonly IRepository<Review> _reviewRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
 
         public ReservationService(IRepository<Reservation> reservation, 
             IRepository<Desk> desk, 
             IRepository<ConferenceRoom> conferenceRoomRepository,
             IRepository<Office> officeRepository,
-            IRepository<Review> reviewRepository) 
+            IRepository<Review> reviewRepository,
+            IEmployeeRepository employeeRepository) 
+
         { 
             _reservationRepository = reservation;
             _deskRepository = desk;
             _conferenceRoomRepository = conferenceRoomRepository;
             _officeRepository = officeRepository;
             _reviewRepository = reviewRepository;
+            _employeeRepository = employeeRepository;  
         }
 
         public CancelReservationResponse CancelReservation(int id)
@@ -236,6 +243,62 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 response.Success = false;
             }
+
+            return response;
+        }
+
+        public AllReservationsResponse AllReservations()
+        {
+            var response = new AllReservationsResponse();
+
+            var reservations = _reservationRepository.GetAll().ToList();
+
+            List<ReservationNew> newList = new List<ReservationNew>();
+            
+            foreach(var r in reservations)
+            {
+                var employee = _employeeRepository.GetById(r.EmployeeId);
+
+                var newReservation = new ReservationNew
+                {
+                    Employee = employee,
+                    Desk = r.Desk,
+                    StartDate = r.StartDate,
+                    EndDate = r.EndDate,
+                    ConferenceRoom = r.ConferenceRoom,
+                    ConferenceRoomId = r.ConferenceRoomId,
+                    Review = r.Review,
+                    Id = r.Id,
+                };
+
+                newReservation.Employee.Reservations.Clear();
+                newReservation.Employee.Password = null;
+                var desk = _deskRepository.Get(r.DeskId);
+                if (desk != null)
+                {
+                    var office = _officeRepository.Get(desk.OfficeId);
+                    if (office != null)
+                    {
+                        newReservation.OfficeName = office.Name;
+                    }
+                }
+               
+                newList.Add(newReservation);
+
+            }
+
+            response.Reservations = newList;
+            response.TotalReservations = response.Reservations.Count();
+
+            if (response.TotalReservations > 0)
+            {
+                response.Success = true;
+            }
+            else
+            {
+                response.Success=false;
+            }
+            
 
             return response;
         }
