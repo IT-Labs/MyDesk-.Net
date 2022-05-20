@@ -4,9 +4,12 @@ using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Helpers;
 using Newtonsoft.Json;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
+
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -18,14 +21,15 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<Office> _officeRepository;
         private readonly IRepository<Review> _reviewRepository;
         private readonly IEmployeeRepository _employeeRepository;
-
+        static HttpClient client = new HttpClient() ;
 
         public ReservationService(IRepository<Reservation> reservation, 
             IRepository<Desk> desk, 
             IRepository<ConferenceRoom> conferenceRoomRepository,
             IRepository<Office> officeRepository,
             IRepository<Review> reviewRepository,
-            IEmployeeRepository employeeRepository) 
+            IEmployeeRepository employeeRepository
+            ) 
 
         { 
             _reservationRepository = reservation;
@@ -34,6 +38,24 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _officeRepository = officeRepository;
             _reviewRepository = reviewRepository;
             _employeeRepository = employeeRepository;  
+        }
+
+        static async Task<String> GetAnalysedReview(string textReview)
+        {
+            string review = ""; 
+            Dictionary<String, String> data = new Dictionary<string, string>();
+            data.Add("text", textReview);
+            var dataTwo = JsonConvert.SerializeObject(data);
+
+            var content = new StringContent(dataTwo, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync("https://inofficenlpmodel.azurewebsites.net/api/get_sentiment",content);
+            string str = response.Content.ReadAsStringAsync().Result;
+            var result = JsonConvert.DeserializeObject<ReviewAzureFunction>(str);
+            if (response.IsSuccessStatusCode)
+            {
+                review = result.sentiment;
+            }
+            return review;
         }
 
         public CancelReservationResponse CancelReservation(int id)
@@ -74,11 +96,14 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             var reservation = _reservationRepository.Get(createReviewRequest.ReservationId);
 
+            var responseSentimentAnalysis = GetAnalysedReview(createReviewRequest.Review);
+
             try
             {
                 Review review = new Review();
                 review.Reviews = createReviewRequest.Review;
                 review.ReservationId=createReviewRequest.ReservationId;
+                review.ReviewOutput = responseSentimentAnalysis.Result;
 
                 _reviewRepository.Insert(review);
 
