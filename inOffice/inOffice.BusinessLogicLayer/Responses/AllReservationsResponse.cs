@@ -21,5 +21,7 @@ namespace inOffice.BusinessLogicLayer.Responses
     public class ReservationNew : Reservation
     {
         public string? OfficeName { get; set; }
+
+        public int? IndexForOffice { get; set; }    
     }
 }

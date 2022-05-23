@@ -41,6 +41,30 @@ namespace inOfficeApplication.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [HttpGet("eployee/reviews/all")]
+        public ActionResult<AllReviewsResponse> ReviewsAll()
+        {
+            try {
+
+                var reviews = _reservationService.AllReviews();
+
+                if(reviews.Sucess != true)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return Ok(reviews);
+                }    
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+
         /*[HttpGet("admin/configuration")]
         public IActionResult Configuration()
         {
@@ -62,46 +86,46 @@ namespace inOfficeApplication.Controllers
             }
         }*/
 
-       /* [HttpGet("admin/reservations")]
-        public IActionResult Reservations()
-        {
-            try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
+        /* [HttpGet("admin/reservations")]
+         public IActionResult Reservations()
+         {
+             try
+             {
+                 string authHeader = Request.Headers[HeaderNames.Authorization];
 
-                var admin = _jwtService.AdminRoleVerification(authHeader);
+                 var admin = _jwtService.AdminRoleVerification(authHeader);
 
-                if (admin != null)
-                {
-                    return Ok(admin);
-                }
-                else return Unauthorized();
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }*/
+                 if (admin != null)
+                 {
+                     return Ok(admin);
+                 }
+                 else return Unauthorized();
+             }
+             catch (Exception _)
+             {
+                 return Unauthorized();
+             }
+         }*/
 
-      /*  [HttpGet("admin/dashboard")]
-        public IActionResult Admin()
-        {
-            try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
+        /*  [HttpGet("admin/dashboard")]
+          public IActionResult Admin()
+          {
+              try
+              {
+                  string authHeader = Request.Headers[HeaderNames.Authorization];
 
-                var admin = _jwtService.AdminRoleVerification(authHeader);
+                  var admin = _jwtService.AdminRoleVerification(authHeader);
 
-                if (admin != null)
-                {
-                    return Ok(admin);
-                }
-                else return Unauthorized();
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }*/
+                  if (admin != null)
+                  {
+                      return Ok(admin);
+                  }
+                  else return Unauthorized();
+              }
+              catch (Exception _)
+              {
+                  return Unauthorized();
+              }
+          }*/
     }
 }

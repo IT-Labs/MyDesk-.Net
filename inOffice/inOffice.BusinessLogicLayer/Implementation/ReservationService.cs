@@ -135,6 +135,25 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         }
 
+        public AllReviewsResponse AllReviews()
+        {
+            AllReviewsResponse allReviews = new AllReviewsResponse();
+            var reviews = _reviewRepository.GetAll();
+
+            if (reviews != null)
+            {
+                allReviews.AllReviews = reviews.ToList();
+                allReviews.Sucess = true;
+            }
+            else
+            {
+                allReviews.Sucess=false;
+            }
+
+            allReviews.TotalReviews = allReviews.AllReviews.Count();
+            return allReviews;
+        }
+
         public EmployeeReservationsResponse EmployeeReservations(Employee employee)
         {
             EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
@@ -305,6 +324,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     if (office != null)
                     {
                         newReservation.OfficeName = office.Name;
+                        newReservation.IndexForOffice = desk.IndexForOffice;
                     }
                 }
                
