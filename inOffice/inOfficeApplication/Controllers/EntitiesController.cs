@@ -22,7 +22,7 @@ namespace inOfficeApplication.Controllers
 
         //TODO: implement review for desk
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
-        [HttpGet("entitiy/reviews/{id}")]
+        [HttpGet("entity/reviews/{id}")]
         public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
         {
             try {

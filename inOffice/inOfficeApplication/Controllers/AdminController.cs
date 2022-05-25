@@ -42,14 +42,14 @@ namespace inOfficeApplication.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
-        [HttpGet("eployee/reviews/all")]
+        [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
         {
             try {
 
                 var reviews = _reservationService.AllReviews();
 
-                if(reviews.Sucess != true)
+                if(reviews.Success != true)
                 {
                     return BadRequest();
                 }

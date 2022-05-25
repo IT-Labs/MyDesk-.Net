@@ -138,19 +138,42 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public AllReviewsResponse AllReviews()
         {
             AllReviewsResponse allReviews = new AllReviewsResponse();
-            var reviews = _reviewRepository.GetAll();
+            var reviews = _reviewRepository.GetAll().ToList();
+            List<CustomReviews> list = new List<CustomReviews>();
+            
+            foreach(var review in reviews)
+            {
+
+                var reviewText = review.Reviews;
+                var reviewOutput = review.ReviewOutput;
+                var reservationId = _reservationRepository.Get(review.ReservationId);
+                var deskId = _deskRepository.Get(reservationId.DeskId);
+                var deskIndex = deskId.IndexForOffice;
+                var office = _officeRepository.Get(deskId.OfficeId);
+                var officeName = office.Name;
+
+                CustomReviews custom = new CustomReviews();
+
+                custom.OfficeName = officeName;
+                custom.Review = reviewText;
+                custom.ReviewOutput = reviewOutput;
+                custom.DeskIndex = deskIndex;
+
+                list.Add(custom);
+
+            }
 
             if (reviews != null)
             {
-                allReviews.AllReviews = reviews.ToList();
-                allReviews.Sucess = true;
+                allReviews.Success = true;
+                allReviews.ListOfReviews = list;
             }
             else
             {
-                allReviews.Sucess=false;
+                allReviews.Success=false;
             }
 
-            allReviews.TotalReviews = allReviews.AllReviews.Count();
+            
             return allReviews;
         }
 
