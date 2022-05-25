@@ -16,13 +16,43 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<Desk> _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IRepository<Reservation> _reservationRepository;
+        private readonly IRepository<Review> _reviewRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository)
+        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
-            _reservationRepository = reservationRepository; 
+            _reservationRepository = reservationRepository;
+            _reviewRepository = reviewRepository;
 
+        }
+
+        public AllReviewsForEntity AllReviewsForEntity(int id)
+        {
+            var reservationsOfDesk = _reservationRepository.GetAll().Where(x => x.DeskId == id && x.ReviewId != null).ToList();
+
+            AllReviewsForEntity response = new AllReviewsForEntity();
+
+            List<string> list = new List<string>();
+
+            foreach(var r in reservationsOfDesk)
+            {
+                var review = _reviewRepository.Get(r.ReviewId);
+                var output = review.Reviews;
+                list.Add(output);
+            }
+
+            response.AllReviews = list;
+            if (response.AllReviews.Count > 0)
+            {
+                response.Success = true;
+            }
+            else
+            {
+                response.Success = false;
+            }
+            return response;
+  
         }
 
         public EntitiesResponse CreateNewEntities(EntitiesRequest o)

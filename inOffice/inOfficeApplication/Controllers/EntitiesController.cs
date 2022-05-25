@@ -20,6 +20,27 @@ namespace inOfficeApplication.Controllers
             _entitiesService = entitiesService;
         }
 
+        //TODO: implement review for desk
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [HttpGet("entitiy/reviews/{id}")]
+        public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
+        {
+            try {
+                var response = _entitiesService.AllReviewsForEntity(id);
+                if (response.Success == true)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch(Exception _) {
+                return BadRequest();
+            }
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpPost("admin/office-entities/{id}")]
         public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)

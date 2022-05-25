@@ -21,5 +21,7 @@ namespace inOffice.BusinessLogicLayer.Interface
 
         DeleteResponse DeleteEntity(DeleteRequest o);
 
+        AllReviewsForEntity AllReviewsForEntity(int id);
+
     }
 }
