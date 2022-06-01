@@ -57,7 +57,7 @@ namespace inOfficeApplication.Controllers
             }
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
-        [HttpGet("employee/reserve")]
+        [HttpGet("employee/future-reservation")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
