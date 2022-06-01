@@ -78,10 +78,8 @@ namespace inOfficeApplication.Controllers
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest("Sucess is false");
                     }
-                
-                
 
             }
             catch (Exception _)
