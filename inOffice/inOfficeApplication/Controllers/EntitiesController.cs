@@ -70,7 +70,7 @@ namespace inOfficeApplication.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpGet("admin/office-desks/{id}")]
-        public ActionResult<IEnumerable<Desk>> GetAllDesks(int id)
+        public ActionResult<DesksResponse> GetAllDesks(int id)
         {
 
             try
@@ -78,7 +78,7 @@ namespace inOfficeApplication.Controllers
                 var deskList = _entitiesService.ListAllDesks(id);
                 if (deskList.sucess == true)
                 {
-                    return Ok(deskList.DeskList);
+                    return Ok(deskList);
                 }
                 else
                 {

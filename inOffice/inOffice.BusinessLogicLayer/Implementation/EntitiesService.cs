@@ -17,14 +17,15 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IRepository<Reservation> _reservationRepository;
         private readonly IRepository<Review> _reviewRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository)
+        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository,IEmployeeRepository employeeRepository)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
             _reservationRepository = reservationRepository;
             _reviewRepository = reviewRepository;
-
+            _employeeRepository = employeeRepository;
         }
 
         public AllReviewsForEntity AllReviewsForEntity(int id)
@@ -102,25 +103,34 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public DesksResponse ListAllDesks(int id)
         {
             DesksResponse responseDeskList = new DesksResponse();
-
+            List<DeskCustom> list = new List<DeskCustom>();
             try
             {
-
-                responseDeskList.DeskList = this._deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
-                foreach (var item in responseDeskList.DeskList)
+                var desks = this._deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
+               
+                foreach (var item in desks)
                 {
-                    if (item.ReservationId != null)
-                    {
-                        var reservation = _reservationRepository.Get(item.ReservationId);
-                        if(DateTime.Compare(reservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(reservation.EndDate, DateTime.Now) < 0)
-                        {
-                            item.ReservationId = null;
-                            _deskRepository.Update(item);
-                        }
-                    }
+                    var reservationsForDesk = _reservationRepository.GetAll().Where(x => x.DeskId == item.Id && x.StartDate > DateTime.Today).ToList();
+                    
+                    DeskCustom custom = new DeskCustom();
+
+                    reservationsForDesk.ForEach(x => x.Employee = _employeeRepository.GetById(x.EmployeeId));
+                    reservationsForDesk.ForEach(x => x.Employee.Reservations.Clear());
+                    reservationsForDesk.ForEach(x=> x.Employee.Password = null);
+
+                    custom.Id = item.Id;
+                    custom.IndexForOffice = item.IndexForOffice;
+                    custom.Reservations = reservationsForDesk;
+
+                    list.Add(custom);
+                    
                 }
+
+                
+                
                 responseDeskList.sucess = true;
 
+                responseDeskList.DeskList = list;
                 return responseDeskList;
             }
             

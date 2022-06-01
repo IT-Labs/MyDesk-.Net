@@ -10,9 +10,19 @@ namespace inOffice.BusinessLogicLayer.Responses
     public class DesksResponse
     {
 
-        public List<Desk> DeskList { get; set; }
+        public List<DeskCustom> DeskList { get; set; }
 
         public bool sucess;
+
+    }
+
+    public class DeskCustom
+    {
+        public int Id { get; set; }
+
+        public int? IndexForOffice { get; set; }
+
+        public List<Reservation>? Reservations { get; set; }
 
     }
 }
