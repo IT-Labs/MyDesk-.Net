@@ -22,7 +22,7 @@ namespace inOfficeApplication.Controllers
         public HomeController(IReservationService reservationService, IEmployeeRepository employeeRepository)
         {
             _reservationService = reservationService;
-            _employeeRepository = employeeRepository;   
+            _employeeRepository = employeeRepository;
         }
 
 
@@ -38,17 +38,17 @@ namespace inOfficeApplication.Controllers
             Employee employee = _employeeRepository.GetByEmail(email); ;
 
             try
-            {                
- 
-                    var response =_reservationService.Reserve(dto, employee);
-                    if (response.Success == true)
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                       return BadRequest();
-                    }
+            {
+
+                var response = _reservationService.Reserve(dto, employee);
+                if (response.Success == true)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
 
             }
             catch (Exception _)
@@ -56,6 +56,55 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [HttpPost("employee/reserve/coworker")]
+        public ActionResult<ReservationResponse> CoworkerReservation(CoworkerReservationRequest dto)
+        {
+            try
+            {
+                var response = _reservationService.CoworkerReserve(dto);
+                if(response.Success == true)
+                {
+                    string msg = String.Format("Sucessfuly reserved desk for coworker with mail {0}", dto.CoworkerMail);
+                    return Ok(msg);
+                }
+                else
+                {
+                    string error = String.Format("Reservation for that time period allready exists for {0}", dto.CoworkerMail);
+                    return Conflict(error);
+                }
+            }
+            catch(Exception _)
+            {
+                return BadRequest();
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [HttpGet("employee/all")]
+        public ActionResult<List<CustomEmployee>> AllEmployees()
+        {
+            try
+            {
+                var employees = _employeeRepository.GetAll().ToList();
+                List<CustomEmployee> result = new List<CustomEmployee>();
+
+               foreach (var employee in employees)
+               {
+                    result.Add(new CustomEmployee(employee.Id, employee.FirstName, employee.LastName, employee.Email, employee.JobTitle));
+               }
+
+               var filtereResult = result.DistinctBy(x=> x.Email);
+
+               return Ok(filtereResult);
+
+            }catch (Exception _)
+            {
+                return NotFound();
+            }
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpGet("employee/future-reservation")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
@@ -68,10 +117,11 @@ namespace inOfficeApplication.Controllers
 
             try
             {
-               
+                if (employee != null)
+                {
 
                     var response = _reservationService.EmployeeReservations(employee);
-                   
+
                     if (response.Success == true)
                     {
                         return Ok(response.CustomReservationResponses);
@@ -80,7 +130,11 @@ namespace inOfficeApplication.Controllers
                     {
                         return BadRequest("Sucess is false");
                     }
-
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             catch (Exception _)
             {
