@@ -223,7 +223,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 for (int i = 0; i < desks.Count; i++)
                 {
                     var desk = _deskRepository.Get(desks[i]);
-                    desk.Categories = "silent";
+                    desk.Categories = "Unavailable desk";
                     this._deskRepository.Update(desk);
                 }
                 for (int i = 0; i < uncheckedDesks.Count; i++)

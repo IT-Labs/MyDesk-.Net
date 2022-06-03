@@ -12,5 +12,7 @@ namespace inOffice.Repository.Interface
         Employee Create(Employee employee);
         Employee GetByEmail(string email);
         Employee GetById(int id);
+
+        IEnumerable<Employee> GetAll();
     }
 }

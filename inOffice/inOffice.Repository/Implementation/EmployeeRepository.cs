@@ -3,6 +3,7 @@ using inOfficeApplication.Data;
 using inOfficeApplication.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace inOffice.Repository.Implementation
 
         public EmployeeRepository(ApplicationDbContext context)
         {
-            _context = context;  
+            _context = context;
         }
 
         public Employee Create(Employee employee)
@@ -28,6 +29,13 @@ namespace inOffice.Repository.Implementation
         public Employee GetByEmail(string email)
         {
             return _context.Employees.FirstOrDefault(a => a.Email == email);
+            
+        }
+
+        public IEnumerable<Employee> GetAll()
+        {
+            return _context.Employees.ToList();
+
             
         }
 

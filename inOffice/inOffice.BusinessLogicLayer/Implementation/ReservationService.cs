@@ -314,6 +314,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
+
+
         public AllReservationsResponse AllReservations()
         {
             var response = new AllReservationsResponse();
@@ -369,6 +371,40 @@ namespace inOffice.BusinessLogicLayer.Implementation
             
 
             return response;
+        }
+
+        public ReservationResponse CoworkerReserve(CoworkerReservationRequest o)
+        {
+            var employee = _employeeRepository.GetByEmail(o.CoworkerMail);
+            var desk = _deskRepository.Get(o.DeskId);
+            var reservations = _reservationRepository.GetAll().Where(x => x.EmployeeId == employee.Id);
+            Reservation NewReservation = new Reservation();
+            ReservationResponse response = new ReservationResponse();
+
+
+            NewReservation.StartDate = DateTime.ParseExact(o.StartDate, "dd-MM-yyyy", null);
+            NewReservation.EndDate = DateTime.ParseExact(o.EndDate, "dd-MM-yyyy", null);
+
+            foreach (var reservation in reservations)
+            {
+                if (reservation.DeskId == desk.Id && (NewReservation.StartDate.Ticks >= reservation.StartDate.Ticks && NewReservation.EndDate.Ticks <= reservation.EndDate.Ticks)){
+
+                    response.Success = false;
+                    return response;
+                }
+            }
+
+            NewReservation.EmployeeId = employee.Id;
+            NewReservation.DeskId = o.DeskId;
+
+            this._reservationRepository.Insert(NewReservation);
+            desk.Reservation = NewReservation;
+            desk.ReservationId = NewReservation.Id;
+            _deskRepository.Update(desk);
+
+            response.Success = true;
+            return response;
+
         }
     }
 }

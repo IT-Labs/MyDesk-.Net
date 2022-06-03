@@ -19,6 +19,7 @@ namespace inOffice.BusinessLogicLayer.Interface
        ReviewResponse ShowReview(int id);
        AllReservationsResponse AllReservations();
        AllReviewsResponse AllReviews();
+       ReservationResponse CoworkerReserve(CoworkerReservationRequest dto); 
 
     }
 }
