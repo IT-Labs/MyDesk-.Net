@@ -377,7 +377,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             var employee = _employeeRepository.GetByEmail(o.CoworkerMail);
             var desk = _deskRepository.Get(o.DeskId);
-            var reservations = _reservationRepository.GetAll().Where(x => x.EmployeeId == employee.Id);
+            var reservations = _reservationRepository.GetAll().Where(x => x.EmployeeId == employee.Id).ToList();
             Reservation NewReservation = new Reservation();
             ReservationResponse response = new ReservationResponse();
 
@@ -387,7 +387,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             foreach (var reservation in reservations)
             {
-                if (reservation.DeskId == desk.Id && (NewReservation.StartDate.Ticks >= reservation.StartDate.Ticks && NewReservation.EndDate.Ticks <= reservation.EndDate.Ticks)){
+                var deskForReservationOfficeId = _deskRepository.Get(reservation.DeskId).OfficeId;
+
+
+
+                if (deskForReservationOfficeId == desk.OfficeId && (NewReservation.StartDate.Ticks >= reservation.StartDate.Ticks && NewReservation.EndDate.Ticks <= reservation.EndDate.Ticks)){
 
                     response.Success = false;
                     return response;

@@ -13,8 +13,8 @@ namespace inOffice.BusinessLogicLayer.Requests
 
         public List<int> UncheckedDesks { get; set; }
 
-        public List<ConfRoomToUpdate> ConferenceRoomCapacity { get; set; }
-
+/*        public List<ConfRoomToUpdate> ConferenceRoomCapacity { get; set; }
+*/
         public bool Sucess;
     }
 }

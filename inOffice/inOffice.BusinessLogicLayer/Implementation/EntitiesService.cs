@@ -61,8 +61,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             EntitiesResponse response = new EntitiesResponse();
             var indexForDesk = this._deskRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
-            var indexForConferenceRoom = this._conferenceRoomRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
-
+/*            var indexForConferenceRoom = this._conferenceRoomRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
+*/
             try
             {
                 for (int i = 0; i < o.NumberOfDesks; i++)
@@ -75,8 +75,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     desk.IndexForOffice = indexForDesk + i + 1;
 
                     this._deskRepository.Insert(desk);
-
                 }
+
+             /*   }
 
                 for (int i = 0; i < o.NumberOfConferenceRooms; i++)
                 {
@@ -88,7 +89,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                     this._conferenceRoomRepository.Insert(conferenceRoom);
 
-                }
+                }*/
 
                 response.Success = true;
             }
@@ -214,8 +215,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
 
             var desks = o.CheckedDesks;
-            var conferenceRooms = o.ConferenceRoomCapacity;
-            var uncheckedDesks = o.UncheckedDesks;
+/*            var conferenceRooms = o.ConferenceRoomCapacity;
+*/            var uncheckedDesks = o.UncheckedDesks;
             EntitiesResponse entitiesResponse = new EntitiesResponse();
 
             try
@@ -232,12 +233,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     desk.Categories = "regular";
                     this._deskRepository.Update(desk);
                 }
-                foreach (var room in conferenceRooms)
+               /* foreach (var room in conferenceRooms)
                 {
                     var roomToUpdate = _conferenceRoomRepository.Get(room.confId);
                     roomToUpdate.Capacity = room.confCap;
                     _conferenceRoomRepository.Update(roomToUpdate);
-                }
+                }*/
 
                 entitiesResponse.Success = true;
 

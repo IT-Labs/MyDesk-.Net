@@ -125,8 +125,8 @@ namespace inOfficeApplication.Controllers
 
                 request.CheckedDesks = dto.CheckedDesks;
                 request.UncheckedDesks = dto.UncheckedDesks;
-                request.ConferenceRoomCapacity = dto.ConferenceRoomCapacity;
-
+/*                request.ConferenceRoomCapacity = dto.ConferenceRoomCapacity;
+*/
                 var updateConfirmed = _entitiesService.UpdateEntities(request);
 
                 if(updateConfirmed.Success == true)

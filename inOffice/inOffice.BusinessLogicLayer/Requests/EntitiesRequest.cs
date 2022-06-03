@@ -11,6 +11,6 @@ namespace inOffice.BusinessLogicLayer.Requests
     {
         public int Id { get; set; }
         public int NumberOfDesks { get; set; }
-        public int NumberOfConferenceRooms { get; set; }
-    }
+/*        public int NumberOfConferenceRooms { get; set; }
+*/    }
 }
