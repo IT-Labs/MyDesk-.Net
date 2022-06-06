@@ -42,7 +42,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [DisableCors]
+        [EnableCors]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
