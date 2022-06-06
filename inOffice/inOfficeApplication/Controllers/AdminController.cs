@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using inOffice.BusinessLogicLayer.Responses;
+using Microsoft.AspNetCore.Cors;
 
 namespace inOfficeApplication.Controllers
 {
@@ -41,6 +42,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
+        [DisableCors]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
