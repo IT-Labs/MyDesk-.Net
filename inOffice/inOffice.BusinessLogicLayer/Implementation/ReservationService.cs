@@ -238,16 +238,16 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     {
 
                         var desk = _deskRepository.Get(item.DeskId);
-                        if (desk == null)
+                        if (desk != null)
                         {
-                            var confroom = _conferenceRoomRepository.Get(item.ConferenceRoomId);
+                           /* var confroom = _conferenceRoomRepository.Get(item.ConferenceRoomId);
 
                             var office = _officeRepository.Get(confroom.OfficeId);
                             var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate=item.EndDate ,OfficeName = office.Name, ConfRoomIndex = confroom.IndexForOffice };
                             employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                         }
                         else
-                        {
+                        {*/
                             var office = _officeRepository.Get(desk.OfficeId);
                             var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate = item.EndDate, OfficeName = office.Name, DeskIndex = desk.IndexForOffice };
                             employeeReservationsResponse.CustomReservationResponses.Add(reservation);
