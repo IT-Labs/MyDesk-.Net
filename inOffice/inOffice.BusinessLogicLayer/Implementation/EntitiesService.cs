@@ -152,7 +152,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 if(o.TypeOfEntity == "D")
                 {
                     var desk = _deskRepository.Get(o.IdOfEntity);
-                    this._deskRepository.Delete(desk);
+                    this._deskRepository.SoftDelete(desk);
                     deleteResponse.Success = true;
 
                 }

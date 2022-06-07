@@ -66,7 +66,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             OfficeResponse response = new OfficeResponse();
             try
             {
-                this._officeRepository.Delete(office);
+                this._officeRepository.SoftDelete(office);
                 response.Success = true;
             }
             catch (Exception _)
