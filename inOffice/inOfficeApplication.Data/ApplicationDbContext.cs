@@ -20,6 +20,11 @@ namespace inOfficeApplication.Data
         public virtual DbSet<ConferenceRoomMode> ConferenceRoomModes { get; set; }
         public virtual DbSet<DeskMode> DeskModes { get; set; }
 
+        public virtual DbSet<Categories> Categories { get; set; }
+
+        public virtual DbSet<DeskCategories> DeskCategories { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             
@@ -97,6 +102,19 @@ namespace inOfficeApplication.Data
                             .HasOne(z => z.Mode)
                             .WithMany(z => z.ConferenceRoomModes)
                             .HasForeignKey(z => z.ModeId)
+                            .OnDelete(DeleteBehavior.ClientCascade);
+
+            // M:N categories-desk
+            builder.Entity<DeskCategories>()
+                            .HasOne(z => z.Desk)
+                            .WithMany(z => z.DeskCategories)
+                            .HasForeignKey(z => z.CategoryId)
+                            .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<DeskCategories>()
+                            .HasOne(z => z.Categorie)
+                            .WithMany(z => z.DeskCategories)
+                            .HasForeignKey(z => z.DeskId)
                             .OnDelete(DeleteBehavior.ClientCascade);
 
 

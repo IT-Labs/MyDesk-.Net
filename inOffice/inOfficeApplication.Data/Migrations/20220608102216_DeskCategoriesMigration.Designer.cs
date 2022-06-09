@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using inOfficeApplication.Data;
 
@@ -11,9 +12,10 @@ using inOfficeApplication.Data;
 namespace inOfficeApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220608102216_DeskCategoriesMigration")]
+    partial class DeskCategoriesMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +63,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Admin",
                             IsDeleted = false,
                             LastName = "Prezime Admin",
-                            Password = "$2a$11$GbYZXsuaza80dC4zNp7T5u6OHgCslHgWPrj/0W8ANhxOvWNNFNTC2"
+                            Password = "$2a$11$VJYnT7RraGX22NQq8QGhKexacpmBokvQ2LY4JnzBAD2FJoC7q1Yp6"
                         });
                 });
 
@@ -73,22 +75,13 @@ namespace inOfficeApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("CategoriesId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DeskId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("DoubleMonitor")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("NearWindow")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("SingleMonitor")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Unavailable")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -288,7 +281,7 @@ namespace inOfficeApplication.Data.Migrations
                             FirstName = "Nekoj Employee",
                             IsDeleted = false,
                             LastName = "Prezime Employee",
-                            Password = "$2a$11$BBZYzOYelQJQgDyifH1DkuyuVmUFCZtuLjNLXNPJda6a/hLMVav0m"
+                            Password = "$2a$11$fb9wKLniDjfRQY2GWWsBeOOqCyn.yeAP7NhoiI4D5KayF391czMS6"
                         });
                 });
 

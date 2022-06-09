@@ -20,7 +20,7 @@ namespace inOfficeApplication.Controllers
             _entitiesService = entitiesService;
         }
 
-        //TODO: implement review for desk
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
         [HttpGet("entity/reviews/{id}")]
         public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
@@ -123,13 +123,11 @@ namespace inOfficeApplication.Controllers
 
                 UpdateRequest request = new UpdateRequest();
 
-                request.CheckedDesks = dto.CheckedDesks;
-                request.UncheckedDesks = dto.UncheckedDesks;
-/*                request.ConferenceRoomCapacity = dto.ConferenceRoomCapacity;
-*/
-                var updateConfirmed = _entitiesService.UpdateEntities(request);
+                request = dto;
 
-                if(updateConfirmed.Success == true)
+                var entitiesResponse = _entitiesService.UpdateEntities(dto);
+
+                if(entitiesResponse.Success == true)
                 {
                     return Ok();
                 }

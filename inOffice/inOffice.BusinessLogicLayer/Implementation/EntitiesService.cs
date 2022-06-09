@@ -17,15 +17,19 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IRepository<Reservation> _reservationRepository;
         private readonly IRepository<Review> _reviewRepository;
+        private readonly IRepository<Categories> _categoriesRepository;
+        private readonly IRepository<DeskCategories> _deskCategoriesRepository;
         private readonly IEmployeeRepository _employeeRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository,IEmployeeRepository employeeRepository)
+        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository,IEmployeeRepository employeeRepository,IRepository<Categories> categoriesRepository,IRepository<DeskCategories> deskCategories)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
             _reservationRepository = reservationRepository;
             _reviewRepository = reviewRepository;
             _employeeRepository = employeeRepository;
+            _categoriesRepository = categoriesRepository;
+            _deskCategoriesRepository = deskCategories;
         }
 
         public AllReviewsForEntity AllReviewsForEntity(int id)
@@ -122,7 +126,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     custom.Id = item.Id;
                     custom.IndexForOffice = item.IndexForOffice;
                     custom.Reservations = reservationsForDesk;
-
+                    var findCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == item.Id).FirstOrDefault();
+                    custom.Categories = findCategories;
                     list.Add(custom);
                     
                 }
@@ -214,31 +219,52 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public EntitiesResponse UpdateEntities(UpdateRequest o)
         {
 
-            var desks = o.CheckedDesks;
-/*            var conferenceRooms = o.ConferenceRoomCapacity;
-*/            var uncheckedDesks = o.UncheckedDesks;
+            var entities = o.ListOfDesksToUpdate;
             EntitiesResponse entitiesResponse = new EntitiesResponse();
 
             try
             {
-                for (int i = 0; i < desks.Count; i++)
+                foreach (var item in entities)
                 {
-                    var desk = _deskRepository.Get(desks[i]);
-                    desk.Categories = "Unavailable desk";
-                    this._deskRepository.Update(desk);
+                    var desk = _deskRepository.Get(item.DeskId);
+
+                    Categories categories = new Categories();
+
+                    categories.DeskId = item.DeskId;
+                    categories.DoubleMonitor = item.DualMonitor;
+                    categories.SingleMonitor = item.SingleMonitor;
+                    categories.NearWindow = item.NearWindow;
+                    categories.Unavailable = item.Unavailable;
+
+                    var DeskAllreadyHasCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == item.DeskId).FirstOrDefault();
+                    if (DeskAllreadyHasCategories != null)
+                    {
+                        DeskAllreadyHasCategories.DoubleMonitor = item.DualMonitor;
+                        DeskAllreadyHasCategories.SingleMonitor = item.SingleMonitor;
+                        DeskAllreadyHasCategories.NearWindow = item.NearWindow;
+                        DeskAllreadyHasCategories.Unavailable = item.Unavailable;
+
+                        _categoriesRepository.Update(DeskAllreadyHasCategories);
+                    }
+                    else
+                    {
+                        _categoriesRepository.Insert(categories);
+
+                        desk.CategorieId = categories.Id;
+
+                        _deskRepository.Update(desk);
+
+                        DeskCategories DeskCategories = new DeskCategories();
+
+                        DeskCategories.DeskId = item.DeskId;
+                        DeskCategories.CategoryId = categories.Id;
+
+
+                        _deskCategoriesRepository.Insert(DeskCategories);
+                    }
+
                 }
-                for (int i = 0; i < uncheckedDesks.Count; i++)
-                {
-                    var desk = _deskRepository.Get(uncheckedDesks[i]);
-                    desk.Categories = "regular";
-                    this._deskRepository.Update(desk);
-                }
-               /* foreach (var room in conferenceRooms)
-                {
-                    var roomToUpdate = _conferenceRoomRepository.Get(room.confId);
-                    roomToUpdate.Capacity = room.confCap;
-                    _conferenceRoomRepository.Update(roomToUpdate);
-                }*/
+               
 
                 entitiesResponse.Success = true;
 

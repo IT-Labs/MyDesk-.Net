@@ -24,5 +24,7 @@ namespace inOffice.BusinessLogicLayer.Responses
 
         public List<Reservation>? Reservations { get; set; }
 
+        public Categories? Categories { get; set; }
+
     }
 }
