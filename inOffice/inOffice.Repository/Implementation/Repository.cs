@@ -35,6 +35,12 @@ namespace inOffice.Repository.Implementation
              return entities.Where(z => z.Id == id && !z.IsDeleted).FirstOrDefault();
         }
 
+        public T GetEvenIfDeleted(int? id)
+        {
+            return entities.Where(z => z.Id == id).FirstOrDefault();
+
+        }
+
         public IEnumerable<T> GetAll()
         {
             return entities.Where(z => !z.IsDeleted).AsEnumerable();

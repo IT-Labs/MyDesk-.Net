@@ -254,14 +254,14 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                         _deskRepository.Update(desk);
 
-                        DeskCategories DeskCategories = new DeskCategories();
+                      /*  DeskCategories DeskCategories = new DeskCategories();
 
                         DeskCategories.DeskId = item.DeskId;
-                        DeskCategories.CategoryId = categories.Id;
+                        DeskCategories.CategoryId = categories.Id;*/
 
 
-                        _deskCategoriesRepository.Insert(DeskCategories);
-                    }
+/*                        _deskCategoriesRepository.Insert(DeskCategories);
+*/                    }
 
                 }
                

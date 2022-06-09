@@ -193,7 +193,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     if (DateTime.Compare(item.StartDate, DateTime.Now) > 0)
                     {
 
-                        var desk = _deskRepository.Get(item.DeskId);
+                        var desk = _deskRepository.GetEvenIfDeleted(item.DeskId);
                         if (desk != null) { 
                             /*if (desk == null)
                             {
@@ -204,7 +204,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                             }*/
                             /*else
                             {*/
-                        var office = _officeRepository.Get(desk.OfficeId);
+                        var office = _officeRepository.GetEvenIfDeleted(desk.OfficeId);
                         var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate, EndDate = item.EndDate, OfficeName = office.Name, DeskIndex = desk.IndexForOffice };
                         employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                     }
@@ -237,7 +237,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     if(DateTime.Compare(item.StartDate, DateTime.Now) < 0 && DateTime.Compare(item.EndDate,DateTime.Now)<0)
                     {
 
-                        var desk = _deskRepository.Get(item.DeskId);
+                        var desk = _deskRepository.GetEvenIfDeleted(item.DeskId);
                         if (desk != null)
                         {
                            /* var confroom = _conferenceRoomRepository.Get(item.ConferenceRoomId);
@@ -248,7 +248,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                         }
                         else
                         {*/
-                            var office = _officeRepository.Get(desk.OfficeId);
+                            var office = _officeRepository.GetEvenIfDeleted(desk.OfficeId);
                             var reservation = new CustomReservationResponse { Id = item.Id, EmployeeId = item.EmployeeId, DeskId = item.DeskId, ConfId = item.ConferenceRoomId, ReviewId = item.ReviewId, StartDate = item.StartDate,EndDate = item.EndDate, OfficeName = office.Name, DeskIndex = desk.IndexForOffice };
                             employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                         }

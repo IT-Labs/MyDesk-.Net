@@ -17,6 +17,8 @@ namespace inOffice.Repository.Interface
         void Delete(T entity);
         void SoftDelete(T entity);
 
+        T GetEvenIfDeleted(int? id);
+
 
     }
 }
