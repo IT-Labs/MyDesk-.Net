@@ -26,12 +26,26 @@ namespace inOffice.BusinessLogicLayer.Implementation
             Office office = new Office();
             office.Name = o.OfficeName;
             office.OfficeImage = "";
-           
+
+            //TODO same office name return response
+
+            var officeNameExist = _officeRepository.GetAll().Where(x => x.Name.ToLower() == office.Name.ToLower()).FirstOrDefault();
+            
+            
             OfficeResponse response = new OfficeResponse();
             try
             {
-                this._officeRepository.Insert(office);
-                response.Success=true;
+                if (officeNameExist != null)
+                {
+                    response.Success = false;
+                }
+                else
+                {
+                    this._officeRepository.Insert(office);
+                    response.Success = true;
+                }
+
+
             }
             catch(Exception _)
             {

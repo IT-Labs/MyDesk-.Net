@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
@@ -29,7 +30,15 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                return Created("Success", _officeService.CreateNewOffice(dto));
+                var response = _officeService.CreateNewOffice(dto);
+                if (response.Success != true)
+                {
+                    return Conflict("There is allready office with the same name");
+                }
+                else {
+
+                    return Created("Success", response);
+                }
             }
             catch (Exception _)
             {
