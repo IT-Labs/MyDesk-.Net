@@ -48,7 +48,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             var dataTwo = JsonConvert.SerializeObject(data);
 
             var content = new StringContent(dataTwo, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://inofficenlpmodel.azurewebsites.net/api/get_sentiment",content);
+            HttpResponseMessage response = await client.PostAsync("https://inofficenlpmodel.azurewebsites.net/api/get_sentiment?code=knpbFNoCymH02BtJtcO59H4mgbkRVbSBhSzlwuZmxXCtAzFuEqSMTA==", content);
             string str = response.Content.ReadAsStringAsync().Result;
             var result = JsonConvert.DeserializeObject<ReviewAzureFunction>(str);
             if (response.IsSuccessStatusCode)
