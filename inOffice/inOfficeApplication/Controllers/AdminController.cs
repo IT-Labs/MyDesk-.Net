@@ -23,7 +23,7 @@ namespace inOfficeApplication.Controllers
         public AdminController(IOfficeService officeService, IReservationService reservationService)
         {
             _officeService = officeService;
-            _reservationService = reservationService;   
+            _reservationService = reservationService;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
@@ -47,87 +47,24 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
         {
-            try {
+            try
+            {
 
                 var reviews = _reservationService.AllReviews();
 
-                if(reviews.Success != true)
+                if (reviews.Success != true)
                 {
                     return BadRequest();
                 }
                 else
                 {
                     return Ok(reviews);
-                }    
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex);
             }
         }
-
-
-        /*[HttpGet("admin/configuration")]
-        public IActionResult Configuration()
-        {
-            try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                if (admin != null)
-                {
-                    return Ok(admin);
-                }
-                else return Unauthorized();
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }*/
-
-        /* [HttpGet("admin/reservations")]
-         public IActionResult Reservations()
-         {
-             try
-             {
-                 string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                 var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                 if (admin != null)
-                 {
-                     return Ok(admin);
-                 }
-                 else return Unauthorized();
-             }
-             catch (Exception _)
-             {
-                 return Unauthorized();
-             }
-         }*/
-
-        /*  [HttpGet("admin/dashboard")]
-          public IActionResult Admin()
-          {
-              try
-              {
-                  string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                  var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                  if (admin != null)
-                  {
-                      return Ok(admin);
-                  }
-                  else return Unauthorized();
-              }
-              catch (Exception _)
-              {
-                  return Unauthorized();
-              }
-          }*/
     }
 }

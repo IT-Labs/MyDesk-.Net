@@ -19,12 +19,12 @@ namespace inOfficeApplication.Controllers
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IEmployeeRepository _employeeRepository;
-       
+
 
         public AuthController(IAdminRepository adminRepository, IEmployeeRepository employeeRepository)
         {
-            _adminRepository = adminRepository; 
-            _employeeRepository = employeeRepository;  
+            _adminRepository = adminRepository;
+            _employeeRepository = employeeRepository;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
@@ -55,32 +55,5 @@ namespace inOfficeApplication.Controllers
                 return Ok("User created, redirect depending on the role");
             }
         }
-
-        /*[HttpPost("/register")]
-        public string Register(RegisterDto dto)
-        {
-            try {
-                var email = dto.Email;
-                if (_employeeRepository.GetByEmail(email) == null)
-                {
-                    var employee = new Employee
-                    {
-                        FirstName = dto.FirstName,
-                        LastName = dto.LastName,
-                        Email = dto.Email,
-                        JobTitle = dto.JobTitle,
-                        Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                    };
-                    _employeeRepository.Create(employee);
-                    return "Success";
-                }
-                else return "Email already exist!";
-              
-            } 
-            catch(Exception _)
-            {
-                return "Bad Request!";
-            }
-        }*/
     }
 }

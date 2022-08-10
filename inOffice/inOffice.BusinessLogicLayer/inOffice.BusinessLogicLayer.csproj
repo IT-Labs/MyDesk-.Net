@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\inOffice.Repository\inOffice.Repository.csproj" />
-    <ProjectReference Include="..\inOfficeApplication.Data\inOfficeApplication.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
