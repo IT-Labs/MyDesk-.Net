@@ -2,6 +2,7 @@
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ namespace inOfficeApplication.Controllers
             _officeService = officeService;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
@@ -38,7 +39,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {

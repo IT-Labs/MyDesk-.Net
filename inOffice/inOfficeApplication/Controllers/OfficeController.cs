@@ -2,6 +2,7 @@
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ namespace inOfficeApplication.Controllers
             _configuration = configuration;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
@@ -45,7 +46,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
@@ -66,7 +67,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
@@ -80,7 +81,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
@@ -107,7 +108,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {

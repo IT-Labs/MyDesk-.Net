@@ -10,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using inOffice.BusinessLogicLayer.Responses;
 using Microsoft.AspNetCore.Cors;
+using inOfficeApplication.Data.Utils;
 
 namespace inOfficeApplication.Controllers
 {
@@ -26,7 +27,7 @@ namespace inOfficeApplication.Controllers
             _reservationService = reservationService;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/reservations/all")]
         public ActionResult<AllReservationsResponse> ReservationsAll()
         {
@@ -43,7 +44,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [EnableCors]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
         {

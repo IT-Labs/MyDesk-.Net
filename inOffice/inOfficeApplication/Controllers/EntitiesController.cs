@@ -2,6 +2,7 @@
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace inOfficeApplication.Controllers
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpGet("entity/reviews/{id}")]
         public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
         {
@@ -41,7 +42,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPost("admin/office-entities/{id}")]
         public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)
         {
@@ -68,7 +69,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpGet("admin/office-desks/{id}")]
         public ActionResult<DesksResponse> GetAllDesks(int id)
         {
@@ -91,7 +92,7 @@ namespace inOfficeApplication.Controllers
             }
 
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpDelete("admin/entity")]
         public ActionResult<DeleteResponse> DeleteEntity(DeleteRequest dto)
         {
@@ -115,7 +116,7 @@ namespace inOfficeApplication.Controllers
 
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPut("admin/office-entities")]
         public ActionResult<EntitiesResponse> UpdateEntities(UpdateRequest dto)
         {
@@ -141,7 +142,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpGet("admin/office-conferencerooms/{id}")]
         public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRooms(int id)
         {
@@ -165,7 +166,7 @@ namespace inOfficeApplication.Controllers
           
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("employee/office-conferencerooms/{id}")]
         public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRoomsForEmployee(int id)
         {
@@ -189,7 +190,7 @@ namespace inOfficeApplication.Controllers
 
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("employee/office-desks/{id}")]
         public ActionResult<IEnumerable<Desk>> GetAllDesksForEmployee(int id)
         {

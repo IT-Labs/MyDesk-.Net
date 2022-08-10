@@ -3,6 +3,7 @@ using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace inOfficeApplication.Controllers
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpPost("employee/reserve")]
         public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)
         {
@@ -57,7 +58,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpPost("employee/reserve/coworker")]
         public ActionResult<ReservationResponse> CoworkerReservation(CoworkerReservationRequest dto)
         {
@@ -81,7 +82,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/all")]
         public ActionResult<List<CustomEmployee>> AllEmployees()
         {
@@ -105,7 +106,7 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/future-reservation")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
         {
@@ -141,7 +142,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
 
         [HttpGet("employee/past-reservations")]
         public ActionResult<EmployeeReservationsResponse> PastReservations()
@@ -179,7 +180,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
 
         [HttpGet("employee/review/{id}")]
         public ActionResult<ReviewResponse> ShowReview(int id)
@@ -218,7 +219,7 @@ namespace inOfficeApplication.Controllers
 
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
 
         [HttpPost("employee/review")]
         public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
@@ -256,7 +257,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpDelete("employee/reserve/{id}")]
         public ActionResult<CancelReservationResponse> CancelReservation(int id)
         {

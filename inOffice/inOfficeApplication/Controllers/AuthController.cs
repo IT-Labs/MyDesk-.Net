@@ -3,6 +3,7 @@ using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,7 @@ namespace inOfficeApplication.Controllers
             _employeeRepository = employeeRepository;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpPost("/authentication")]
         public ActionResult Authentication(MicrosoftUser user)
         {
