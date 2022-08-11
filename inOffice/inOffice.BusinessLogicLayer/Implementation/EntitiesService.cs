@@ -3,11 +3,6 @@ using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -15,49 +10,30 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IRepository<Desk> _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
-        private readonly IRepository<Reservation> _reservationRepository;
-        private readonly IRepository<Review> _reviewRepository;
+        private readonly IReservationRepository _reservationRepository;
         private readonly IRepository<Categories> _categoriesRepository;
-        private readonly IRepository<DeskCategories> _deskCategoriesRepository;
-        private readonly IEmployeeRepository _employeeRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, IRepository<ConferenceRoom> conferenceRoomRepository, IRepository<Reservation> reservationRepository, IRepository<Review> reviewRepository, IEmployeeRepository employeeRepository, IRepository<Categories> categoriesRepository, IRepository<DeskCategories> deskCategories)
+        public EntitiesService(IRepository<Desk> deskRepository, 
+            IRepository<ConferenceRoom> conferenceRoomRepository,
+            IReservationRepository reservationRepository,
+            IRepository<Categories> categoriesRepository)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
             _reservationRepository = reservationRepository;
-            _reviewRepository = reviewRepository;
-            _employeeRepository = employeeRepository;
             _categoriesRepository = categoriesRepository;
-            _deskCategoriesRepository = deskCategories;
         }
 
         public AllReviewsForEntity AllReviewsForEntity(int id)
         {
-            var reservationsOfDesk = _reservationRepository.GetAll().Where(x => x.DeskId == id && x.ReviewId != null).ToList();
-
             AllReviewsForEntity response = new AllReviewsForEntity();
 
-            List<string> list = new List<string>();
+            List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(id, includeReview: true);
 
-            foreach (var r in reservationsOfDesk)
-            {
-                var review = _reviewRepository.Get(r.ReviewId);
-                var output = review.Reviews;
-                list.Add(output);
-            }
+            response.AllReviews = deskReservations.Where(x => x.Review != null).Select(x => x.Review.Reviews).ToList();
+            response.Success = response.AllReviews.Count > 0;
 
-            response.AllReviews = list;
-            if (response.AllReviews.Count > 0)
-            {
-                response.Success = true;
-            }
-            else
-            {
-                response.Success = false;
-            }
             return response;
-
         }
 
         public EntitiesResponse CreateNewEntities(EntitiesRequest o)
@@ -96,39 +72,41 @@ namespace inOffice.BusinessLogicLayer.Implementation
             List<DeskCustom> list = new List<DeskCustom>();
             try
             {
-                var desks = this._deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
+                List<Desk> desks = _deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
 
-                foreach (var item in desks)
+                foreach (Desk desk in desks)
                 {
-                    var reservationsForDesk = _reservationRepository.GetAll().Where(x => x.DeskId == item.Id && x.StartDate > DateTime.Today).ToList();
+                    List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true).Where(x => x.StartDate > DateTime.Today).ToList();
 
-                    DeskCustom custom = new DeskCustom();
+                    deskReservations.ForEach(x => x.Employee?.Reservations?.Clear());
+                    deskReservations.ForEach(x =>
+                    {
+                        if (x.Employee != null)
+                        {
+                            x.Employee.Password = null;
+                        }
+                    });
 
-                    reservationsForDesk.ForEach(x => x.Employee = _employeeRepository.GetById(x.EmployeeId));
-                    reservationsForDesk.ForEach(x => x.Employee.Reservations.Clear());
-                    reservationsForDesk.ForEach(x => x.Employee.Password = null);
+                    DeskCustom custom = new DeskCustom()
+                    {
+                        Id = desk.Id,
+                        IndexForOffice = desk.IndexForOffice,
+                        Reservations = deskReservations
+                    };
 
-                    custom.Id = item.Id;
-                    custom.IndexForOffice = item.IndexForOffice;
-                    custom.Reservations = reservationsForDesk;
-                    var findCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == item.Id).FirstOrDefault();
+                    Categories? findCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == desk.Id).FirstOrDefault();
                     custom.Categories = findCategories;
                     list.Add(custom);
-
                 }
 
-
-
                 responseDeskList.sucess = true;
-
                 responseDeskList.DeskList = list;
+
                 return responseDeskList;
             }
-
             catch (Exception _)
             {
                 responseDeskList.sucess = false;
-
                 return responseDeskList;
             }
         }
@@ -172,18 +150,17 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             try
             {
+                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetAll().Where(x => x.OfficeId == id).ToList();
 
-                responseConferenceRoom.ConferenceRoomsList = this._conferenceRoomRepository.GetAll().Where(x => x.OfficeId == id).ToList();
-
-                foreach (var item in responseConferenceRoom.ConferenceRoomsList)
+                foreach (ConferenceRoom conferenceRoom in responseConferenceRoom.ConferenceRoomsList)
                 {
-                    if (item.ReservationId != null)
+                    if (conferenceRoom.ReservationId.HasValue)
                     {
-                        var reservation = _reservationRepository.Get(item.ReservationId);
+                        Reservation reservation = _reservationRepository.Get(conferenceRoom.ReservationId.Value);
                         if (DateTime.Compare(reservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(reservation.EndDate, DateTime.Now) < 0)
                         {
-                            item.ReservationId = null;
-                            _conferenceRoomRepository.Update(item);
+                            conferenceRoom.ReservationId = null;
+                            _conferenceRoomRepository.Update(conferenceRoom);
                         }
                     }
                 }
@@ -198,8 +175,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                 return responseConferenceRoom;
             }
-
-
         }
 
         public EntitiesResponse UpdateEntities(UpdateRequest o)

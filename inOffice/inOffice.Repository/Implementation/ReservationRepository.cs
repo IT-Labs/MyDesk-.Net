@@ -83,6 +83,24 @@ namespace inOffice.Repository.Implementation
             return query.ToList();
         }
 
+        public List<Reservation> GetDeskReservations(int deskId, 
+            bool? includeReview = null,
+            bool? includeEmployee = null)
+        {
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId);
+
+            if (includeReview.HasValue)
+            {
+                query = query.Include(x => x.Review);
+            }
+            if (includeEmployee.HasValue)
+            {
+                query = query.Include(x => x.Employee);
+            }
+
+            return query.ToList();
+        }
+
         public void Insert(Reservation reservation)
         {
             _context.Reservations.Add(reservation);

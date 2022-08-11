@@ -15,7 +15,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IReservationRepository _reservationRepository;
         private readonly IRepository<Desk> _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
-        private readonly IRepository<Office> _officeRepository;
         private readonly IRepository<Review> _reviewRepository;
         private readonly IEmployeeRepository _employeeRepository;
         static HttpClient client = new HttpClient();
@@ -23,7 +22,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public ReservationService(IReservationRepository reservationRepository,
             IRepository<Desk> deskRepository,
             IRepository<ConferenceRoom> conferenceRoomRepository,
-            IRepository<Office> officeRepository,
             IRepository<Review> reviewRepository,
             IEmployeeRepository employeeRepository
             )
@@ -32,7 +30,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _reservationRepository = reservationRepository;
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
-            _officeRepository = officeRepository;
             _reviewRepository = reviewRepository;
             _employeeRepository = employeeRepository;
         }
