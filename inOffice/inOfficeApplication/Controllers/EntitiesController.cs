@@ -51,7 +51,7 @@ namespace inOfficeApplication.Controllers
 
                 dto.Id = id;
 
-                var response = _entitiesService.CreateNewEntities(dto);
+                var response = _entitiesService.CreateNewDesks(dto);
 
                 if (response.Success == true)
                 {
@@ -126,7 +126,7 @@ namespace inOfficeApplication.Controllers
 
                 request = dto;
 
-                var entitiesResponse = _entitiesService.UpdateEntities(dto);
+                var entitiesResponse = _entitiesService.UpdateDesks(dto);
 
                 if(entitiesResponse.Success == true)
                 {

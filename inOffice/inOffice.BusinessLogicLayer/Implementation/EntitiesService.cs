@@ -3,17 +3,18 @@ using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
+using System.Transactions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
     public class EntitiesService : IEntitiesService
     {
-        private readonly IRepository<Desk> _deskRepository;
+        private readonly IDeskRepository _deskRepository;
         private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IRepository<Categories> _categoriesRepository;
 
-        public EntitiesService(IRepository<Desk> deskRepository, 
+        public EntitiesService(IDeskRepository deskRepository,
             IRepository<ConferenceRoom> conferenceRoomRepository,
             IReservationRepository reservationRepository,
             IRepository<Categories> categoriesRepository)
@@ -36,25 +37,30 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
-        public EntitiesResponse CreateNewEntities(EntitiesRequest o)
+        public EntitiesResponse CreateNewDesks(EntitiesRequest request)
         {
-
             EntitiesResponse response = new EntitiesResponse();
-            var indexForDesk = this._deskRepository.GetAll().Where(x => x.OfficeId == o.Id).ToList().Count();
+
+            int deskCount = _deskRepository.GetOfficeDesks(request.Id).Count();
 
             try
             {
-                for (int i = 0; i < o.NumberOfDesks; i++)
+                List<Desk> desksToInsert = new List<Desk>();
+
+                for (int i = 0; i < request.NumberOfDesks; i++)
                 {
-                    Desk desk = new Desk();
+                    Desk desk = new Desk()
+                    {
+                        OfficeId = request.Id,
+                        IsDeleted = false,
+                        Categories = "regular",
+                        IndexForOffice = deskCount + i + 1
+                    };
 
-                    desk.OfficeId = o.Id;
-                    desk.IsDeleted = false;
-                    desk.Categories = "regular";
-                    desk.IndexForOffice = indexForDesk + i + 1;
-
-                    this._deskRepository.Insert(desk);
+                    desksToInsert.Add(desk);
                 }
+
+                _deskRepository.BulkInsert(desksToInsert);
 
                 response.Success = true;
             }
@@ -72,7 +78,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             List<DeskCustom> list = new List<DeskCustom>();
             try
             {
-                List<Desk> desks = _deskRepository.GetAll().Where(x => x.OfficeId == id).ToList();
+                List<Desk> desks = _deskRepository.GetOfficeDesks(id);
 
                 foreach (Desk desk in desks)
                 {
@@ -111,39 +117,43 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
         }
 
-        public DeleteResponse DeleteEntity(DeleteRequest o)
+        public DeleteResponse DeleteEntity(DeleteRequest request)
         {
             DeleteResponse deleteResponse = new DeleteResponse();
 
             try
             {
-
-                if (o.TypeOfEntity == "D")
+                if (request.TypeOfEntity == "D")
                 {
-                    var desk = _deskRepository.Get(o.IdOfEntity);
-                    this._deskRepository.SoftDelete(desk);
-                    deleteResponse.Success = true;
+                    Desk desk = _deskRepository.Get(request.IdOfEntity);
 
+                    if (desk == null)
+                    {
+                        deleteResponse.Success = false;
+                        return deleteResponse;
+                    }
+
+                    _deskRepository.SoftDelete(desk);
+
+                    deleteResponse.Success = true;
                 }
                 else
                 {
-                    var conferenceRoomToDelete = _conferenceRoomRepository.Get(o.IdOfEntity);
-                    this._conferenceRoomRepository.Delete(conferenceRoomToDelete);
-                    deleteResponse.Success = true;
+                    ConferenceRoom conferenceRoom = _conferenceRoomRepository.Get(request.IdOfEntity);
+                    _conferenceRoomRepository.Delete(conferenceRoom);
 
+                    deleteResponse.Success = true;
                 }
 
                 return deleteResponse;
-
             }
             catch (Exception _)
             {
                 deleteResponse.Success = false;
                 return deleteResponse;
-
             }
-
         }
+
         public ConferenceRoomsResponse ListAllConferenceRooms(int id)
         {
             ConferenceRoomsResponse responseConferenceRoom = new ConferenceRoomsResponse();
@@ -177,60 +187,63 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
         }
 
-        public EntitiesResponse UpdateEntities(UpdateRequest o)
+        public EntitiesResponse UpdateDesks(UpdateRequest request)
         {
-
-            var entities = o.ListOfDesksToUpdate;
             EntitiesResponse entitiesResponse = new EntitiesResponse();
 
             try
             {
-                foreach (var item in entities)
+                using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var desk = _deskRepository.Get(item.DeskId);
-
-                    Categories categories = new Categories();
-
-                    categories.DeskId = item.DeskId;
-                    categories.DoubleMonitor = item.DualMonitor;
-                    categories.SingleMonitor = item.SingleMonitor;
-                    categories.NearWindow = item.NearWindow;
-                    categories.Unavailable = item.Unavailable;
-
-                    var DeskAllreadyHasCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == item.DeskId).FirstOrDefault();
-                    if (DeskAllreadyHasCategories != null)
+                    foreach (DeskToUpdate deskToUpdate in request.ListOfDesksToUpdate)
                     {
-                        DeskAllreadyHasCategories.DoubleMonitor = item.DualMonitor;
-                        DeskAllreadyHasCategories.SingleMonitor = item.SingleMonitor;
-                        DeskAllreadyHasCategories.NearWindow = item.NearWindow;
-                        DeskAllreadyHasCategories.Unavailable = item.Unavailable;
+                        Categories existingDeskCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == deskToUpdate.DeskId).FirstOrDefault();
+                        if (existingDeskCategories != null)
+                        {
+                            existingDeskCategories.DoubleMonitor = deskToUpdate.DualMonitor;
+                            existingDeskCategories.SingleMonitor = deskToUpdate.SingleMonitor;
+                            existingDeskCategories.NearWindow = deskToUpdate.NearWindow;
+                            existingDeskCategories.Unavailable = deskToUpdate.Unavailable;
 
-                        _categoriesRepository.Update(DeskAllreadyHasCategories);
+                            _categoriesRepository.Update(existingDeskCategories);
+                        }
+                        else
+                        {
+                            Categories categories = new Categories()
+                            {
+                                DeskId = deskToUpdate.DeskId,
+                                DoubleMonitor = deskToUpdate.DualMonitor,
+                                SingleMonitor = deskToUpdate.SingleMonitor,
+                                NearWindow = deskToUpdate.NearWindow,
+                                Unavailable = deskToUpdate.Unavailable
+                            };
+
+                            Desk desk = _deskRepository.Get(deskToUpdate.DeskId);
+
+                            if (desk == null)
+                            {
+                                continue;
+                            }
+
+                            _categoriesRepository.Insert(categories);
+                            desk.CategorieId = categories.Id;
+
+                            _deskRepository.Update(desk);
+                        }
                     }
-                    else
-                    {
-                        _categoriesRepository.Insert(categories);
 
-                        desk.CategorieId = categories.Id;
-
-                        _deskRepository.Update(desk);
-                    }
-
+                    transaction.Complete();
                 }
-
 
                 entitiesResponse.Success = true;
 
                 return entitiesResponse;
             }
-
             catch (Exception _)
             {
                 entitiesResponse.Success = false;
-
                 return entitiesResponse;
             }
-
         }
     }
 }

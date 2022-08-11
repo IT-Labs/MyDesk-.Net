@@ -1,23 +1,17 @@
 ﻿using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
     public interface IEntitiesService
     {
-        EntitiesResponse CreateNewEntities(EntitiesRequest o);
+        EntitiesResponse CreateNewDesks(EntitiesRequest request);
 
         ConferenceRoomsResponse ListAllConferenceRooms(int id);
 
         DesksResponse ListAllDesks(int id);
 
-        EntitiesResponse UpdateEntities(UpdateRequest o);
+        EntitiesResponse UpdateDesks(UpdateRequest request);
 
         DeleteResponse DeleteEntity(DeleteRequest o);
 
