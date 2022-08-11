@@ -3,51 +3,42 @@ using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
     public class OfficeService : IOfficeService
     {
+        private readonly IOfficeRepository _officeRepository;
 
-        private readonly IRepository<Office> _officeRepository;
-
-        public OfficeService(IRepository<Office> officeRepository)
+        public OfficeService(IOfficeRepository officeRepository)
         {
-            _officeRepository = officeRepository;  
+            _officeRepository = officeRepository;
         }
 
-        public OfficeResponse CreateNewOffice(NewOfficeRequest o)
+        public OfficeResponse CreateNewOffice(NewOfficeRequest request)
         {
-            Office office = new Office();
-            office.Name = o.OfficeName;
-            office.OfficeImage = "";
-
-            //TODO same office name return response
-
-            var officeNameExist = _officeRepository.GetAll().Where(x => x.Name.ToLower() == office.Name.ToLower()).FirstOrDefault();
-            
-            
             OfficeResponse response = new OfficeResponse();
+            Office office = new Office()
+            {
+                Name = request.OfficeName,
+                OfficeImage = string.Empty
+            };
+
+            Office existingOffice = _officeRepository.GetByName(office.Name);
+
             try
             {
-                if (officeNameExist != null)
+                if (existingOffice != null)
                 {
                     response.Success = false;
                 }
                 else
                 {
-                    this._officeRepository.Insert(office);
+                    _officeRepository.Insert(office);
                     response.Success = true;
                 }
-
-
             }
-            catch(Exception _)
+            catch (Exception _)
             {
                 response.Success = false;
             }
@@ -55,62 +46,81 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
-        public OfficeResponse UpdateOffice(OfficeRequest o)
+        public OfficeResponse UpdateOffice(OfficeRequest request)
         {
             OfficeResponse response = new OfficeResponse();
-            var office = GetDetailsForOffice(o.Id);
-            office.Name = o.OfficeName;
-            office.OfficeImage=o.OfficePlan;
-            try
-            {
-                this._officeRepository.Update(office);
-                response.Success = true;
-                
-            }
-            catch(Exception _)
+
+            Office office = GetDetailsForOffice(request.Id);
+
+            if (office == null)
             {
                 response.Success = false;
+                return response;
             }
-            return response;
-        }
 
-        public OfficeResponse DeleteOffice(int id)
-        {
-            var office = this.GetDetailsForOffice(id);
-            OfficeResponse response = new OfficeResponse();
+            office.Name = request.OfficeName;
+            office.OfficeImage = request.OfficePlan;
+
             try
             {
-                this._officeRepository.SoftDelete(office);
+                _officeRepository.Update(office);
                 response.Success = true;
             }
             catch (Exception _)
             {
                 response.Success = false;
             }
+
+            return response;
+        }
+
+        public OfficeResponse DeleteOffice(int id)
+        {
+            OfficeResponse response = new OfficeResponse();
+
+            Office office = GetDetailsForOffice(id);
+
+            if (office == null)
+            {
+                response.Success = false;
+                return response;
+            }
+
+            try
+            {
+                _officeRepository.SoftDelete(office);
+                response.Success = true;
+            }
+            catch (Exception _)
+            {
+                response.Success = false;
+            }
+
             return response;
         }
 
         public OfficeListResponse GetAllOffices()
-        { 
+        {
             OfficeListResponse officeListResponse = new OfficeListResponse();
+
             try
             {
-                officeListResponse.Offices = this._officeRepository.GetAll().ToList();
+                officeListResponse.Offices = _officeRepository.GetAll();
                 officeListResponse.Success = true;
+
                 return officeListResponse;
             }
             catch (Exception _)
             {
                 officeListResponse.Success = false;
             }
+
             return officeListResponse;
         }
 
         public Office GetDetailsForOffice(int id)
         {
-            return this._officeRepository.Get(id);
+            return _officeRepository.Get(id);
         }
-
-        
     }
 }
