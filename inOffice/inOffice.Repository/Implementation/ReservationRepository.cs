@@ -19,7 +19,7 @@ namespace inOffice.Repository.Implementation
             bool? includeOffice = null,
             bool? includeonferenceRoom = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.Id == id);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.Id == id && !x.IsDeleted);
 
             if (includeDesk.HasValue && !includeOffice.HasValue)
             {
@@ -43,7 +43,7 @@ namespace inOffice.Repository.Implementation
             bool? includeDesk = null,
             bool? includeOffice = null)
         {
-            IQueryable<Reservation> query = _context.Reservations;
+            IQueryable<Reservation> query = _context.Reservations.Where(x => !x.IsDeleted);
 
             if (includeEmployee.HasValue)
             {
@@ -60,14 +60,31 @@ namespace inOffice.Repository.Implementation
                     .ThenInclude(x => x.Office);
             }
 
-            return query.ToList();
+            List<Reservation> result = query.ToList();
+            foreach (Reservation reservation in result)
+            {
+                if (reservation.Employee != null && reservation.Employee.IsDeleted)
+                {
+                    reservation.Employee = null;
+                }
+                if (reservation.Desk != null && reservation.Desk.IsDeleted)
+                {
+                    reservation.Desk = null;
+                }
+                else if (reservation.Desk != null && !reservation.Desk.IsDeleted && reservation.Desk.Office != null && reservation.Desk.Office.IsDeleted)
+                {
+                    reservation.Desk.Office = null;
+                }
+            }
+
+            return result;
         }
 
         public List<Reservation> GetEmployeeReservations(int employeeId,
             bool? includeDesk = null,
             bool? includeOffice = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && !x.IsDeleted);
 
             if (includeDesk.HasValue && !includeOffice.HasValue)
             {
@@ -87,7 +104,7 @@ namespace inOffice.Repository.Implementation
             bool? includeReview = null,
             bool? includeEmployee = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId && !x.IsDeleted);
 
             if (includeReview.HasValue)
             {
