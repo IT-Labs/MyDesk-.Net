@@ -10,12 +10,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
     public class EntitiesService : IEntitiesService
     {
         private readonly IDeskRepository _deskRepository;
-        private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
+        private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IRepository<Categories> _categoriesRepository;
 
         public EntitiesService(IDeskRepository deskRepository,
-            IRepository<ConferenceRoom> conferenceRoomRepository,
+            IConferenceRoomRepository conferenceRoomRepository,
             IReservationRepository reservationRepository,
             IRepository<Categories> categoriesRepository)
         {
@@ -139,8 +139,25 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 }
                 else
                 {
-                    ConferenceRoom conferenceRoom = _conferenceRoomRepository.Get(request.IdOfEntity);
-                    _conferenceRoomRepository.Delete(conferenceRoom);
+                    ConferenceRoom conferenceRoom = _conferenceRoomRepository.Get(request.IdOfEntity, includeReservation: true);
+
+                    if (conferenceRoom == null)
+                    {
+                        deleteResponse.Success = false;
+                        return deleteResponse;
+                    }
+
+                    using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        if (conferenceRoom.Reservation != null)
+                        {
+                            _reservationRepository.Delete(conferenceRoom.Reservation);
+                        }
+
+                        _conferenceRoomRepository.Delete(conferenceRoom);
+
+                        transaction.Complete();
+                    }
 
                     deleteResponse.Success = true;
                 }
@@ -160,7 +177,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             try
             {
-                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetAll().Where(x => x.OfficeId == id).ToList();
+                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id);
 
                 foreach (ConferenceRoom conferenceRoom in responseConferenceRoom.ConferenceRoomsList)
                 {
