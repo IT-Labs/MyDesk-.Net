@@ -2,7 +2,7 @@
 {
     public class ReviewAzureFunction
     {
-        public string? text { get; set; }
-        public string? sentiment { get; set; }
+        public string? Text { get; set; }
+        public string? Sentiment { get; set; }
     }
 }

@@ -1,12 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace inOffice.Repository.Implementation
 {
@@ -29,14 +23,11 @@ namespace inOffice.Repository.Implementation
         public Employee GetByEmail(string email)
         {
             return _context.Employees.FirstOrDefault(a => a.Email == email);
-            
         }
 
-        public IEnumerable<Employee> GetAll()
+        public List<Employee> GetAll()
         {
             return _context.Employees.ToList();
-
-            
         }
 
         public Employee GetById(int id)

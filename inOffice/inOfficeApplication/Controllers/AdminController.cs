@@ -1,15 +1,10 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
-using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using inOffice.Repository.Interface;
-using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using inOffice.BusinessLogicLayer.Responses;
 using Microsoft.AspNetCore.Cors;
+using inOfficeApplication.Data.Utils;
 
 namespace inOfficeApplication.Controllers
 {
@@ -17,22 +12,22 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        private readonly IOfficeService _officeService;
+        private readonly IReviewService _reviewService;
         private readonly IReservationService _reservationService;
 
-        public AdminController(IOfficeService officeService, IReservationService reservationService)
+        public AdminController(IReviewService reviewService, IReservationService reservationService)
         {
-            _officeService = officeService;
-            _reservationService = reservationService;   
+            _reviewService = reviewService;
+            _reservationService = reservationService;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/reservations/all")]
         public ActionResult<AllReservationsResponse> ReservationsAll()
         {
             try
             {
-                var reservations = _reservationService.AllReservations();
+                AllReservationsResponse reservations = _reservationService.AllReservations();
 
                 return Ok(reservations);
             }
@@ -43,91 +38,27 @@ namespace inOfficeApplication.Controllers
         }
 
         [EnableCors]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
         {
-            try {
+            try
+            {
+                AllReviewsResponse reviews = _reviewService.AllReviews();
 
-                var reviews = _reservationService.AllReviews();
-
-                if(reviews.Success != true)
+                if (reviews.Success != true)
                 {
                     return BadRequest();
                 }
                 else
                 {
                     return Ok(reviews);
-                }    
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex);
             }
         }
-
-
-        /*[HttpGet("admin/configuration")]
-        public IActionResult Configuration()
-        {
-            try
-            {
-                string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                if (admin != null)
-                {
-                    return Ok(admin);
-                }
-                else return Unauthorized();
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }*/
-
-        /* [HttpGet("admin/reservations")]
-         public IActionResult Reservations()
-         {
-             try
-             {
-                 string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                 var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                 if (admin != null)
-                 {
-                     return Ok(admin);
-                 }
-                 else return Unauthorized();
-             }
-             catch (Exception _)
-             {
-                 return Unauthorized();
-             }
-         }*/
-
-        /*  [HttpGet("admin/dashboard")]
-          public IActionResult Admin()
-          {
-              try
-              {
-                  string authHeader = Request.Headers[HeaderNames.Authorization];
-
-                  var admin = _jwtService.AdminRoleVerification(authHeader);
-
-                  if (admin != null)
-                  {
-                      return Ok(admin);
-                  }
-                  else return Unauthorized();
-              }
-              catch (Exception _)
-              {
-                  return Unauthorized();
-              }
-          }*/
     }
 }

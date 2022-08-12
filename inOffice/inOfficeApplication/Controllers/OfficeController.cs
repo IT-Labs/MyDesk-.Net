@@ -1,13 +1,12 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
+using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.Models;
-using inOfficeApplication.Helpers;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
@@ -16,27 +15,25 @@ namespace inOfficeApplication.Controllers
     public class OfficeController : Controller
     {
         private readonly IOfficeService _officeService;
-        private readonly IConfiguration _configuration;
 
-        public OfficeController(IOfficeService officeService, IConfiguration configuration)
+        public OfficeController(IOfficeService officeService)
         {
             _officeService = officeService;
-            _configuration = configuration;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
             try
             {
-                var response = _officeService.CreateNewOffice(dto);
+                OfficeResponse response = _officeService.CreateNewOffice(dto);
                 if (response.Success != true)
                 {
                     return Conflict("There is allready office with the same name");
                 }
-                else {
-
+                else
+                {
                     return Created("Success", response);
                 }
             }
@@ -45,13 +42,14 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
-            
-            try { 
-                var office = _officeService.GetDetailsForOffice(id);
+            try
+            {
+                Office office = _officeService.GetDetailsForOffice(id);
                 if (office.OfficeImage != null)
                 {
                     return Ok(office.OfficeImage);
@@ -66,40 +64,23 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
             try
             {
                 dto.Id = id;
-                return Ok(_officeService.UpdateOffice(dto));   
-            }
-            catch (Exception _)
-            {
-                return Unauthorized();
-            }
-        }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
-        [HttpDelete("admin/office/{id}")]
-        public ActionResult<OfficeResponse> Delete(int id)
-        {
-           
-            try
-            {
-                    if (id == null)
-                    {
-                        return NotFound();
+                OfficeResponse result = _officeService.UpdateOffice(dto);
+                if (result.Success)
+                {
+                    return Ok(result);
                 }
                 else
                 {
-                    _officeService.DeleteOffice(id);
-                    return Ok(new
-                    {
-                        message = "success"
-                    });
+                    return BadRequest();
                 }
-                    
             }
             catch (Exception _)
             {
@@ -107,14 +88,54 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
+        [HttpDelete("admin/office/{id}")]
+        public ActionResult<OfficeResponse> Delete(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    OfficeResponse result = _officeService.DeleteOffice(id);
+                    if (result.Success)
+                    {
+                        return Ok(new
+                        {
+                            message = "success"
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
             try
-            {  
-                var offices = this._officeService.GetAllOffices(); 
-                return Ok(offices.Offices);    
+            {
+                OfficeListResponse offices = _officeService.GetAllOffices();
+
+                if (offices.Success)
+                {
+                    return Ok(offices.Offices);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception _)
             {

@@ -2,6 +2,7 @@
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,19 +15,18 @@ namespace inOfficeApplication.Controllers
     {
         private readonly IEntitiesService _entitiesService;
 
-
         public EntitiesController(IEntitiesService entitiesService)
         {
             _entitiesService = entitiesService;
         }
 
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpGet("entity/reviews/{id}")]
         public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
         {
-            try {
-                var response = _entitiesService.AllReviewsForEntity(id);
+            try
+            {
+                AllReviewsForEntity response = _entitiesService.AllReviewsForEntity(id);
                 if (response.Success == true)
                 {
                     return Ok(response);
@@ -36,21 +36,21 @@ namespace inOfficeApplication.Controllers
                     return BadRequest();
                 }
             }
-            catch(Exception _) {
+            catch (Exception _)
+            {
                 return BadRequest();
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPost("admin/office-entities/{id}")]
         public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)
         {
-           try
+            try
             {
-
                 dto.Id = id;
 
-                var response = _entitiesService.CreateNewEntities(dto);
+                EntitiesResponse response = _entitiesService.CreateNewDesks(dto);
 
                 if (response.Success == true)
                 {
@@ -60,7 +60,6 @@ namespace inOfficeApplication.Controllers
                 {
                     return BadRequest(response);
                 }
-               
             }
             catch (Exception _)
             {
@@ -68,14 +67,13 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpGet("admin/office-desks/{id}")]
         public ActionResult<DesksResponse> GetAllDesks(int id)
         {
-
             try
             {
-                var deskList = _entitiesService.ListAllDesks(id);
+                DesksResponse deskList = _entitiesService.ListAllDesks(id);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList);
@@ -89,69 +87,42 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpDelete("admin/entity")]
         public ActionResult<DeleteResponse> DeleteEntity(DeleteRequest dto)
         {
-           try
+            try
             {
-                var deleteResponse = _entitiesService.DeleteEntity(dto);
+                DeleteResponse deleteResponse = _entitiesService.DeleteEntity(dto);
 
-                if(deleteResponse.Success == true)
+                if (deleteResponse.Success == true)
                 {
                     return Ok();
                 }
                 else
                 {
-                  return NotFound();
+                    return NotFound();
                 }
             }
-            catch (Exception _)    
+            catch (Exception _)
             {
                 return Unauthorized();
             }
-
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPut("admin/office-entities")]
         public ActionResult<EntitiesResponse> UpdateEntities(UpdateRequest dto)
         {
-           try{
+            try
+            {
+                EntitiesResponse entitiesResponse = _entitiesService.UpdateDesks(dto);
 
-                UpdateRequest request = new UpdateRequest();
-
-                request = dto;
-
-                var entitiesResponse = _entitiesService.UpdateEntities(dto);
-
-                if(entitiesResponse.Success == true)
+                if (entitiesResponse.Success == true)
                 {
                     return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            catch(Exception _) 
-            {
-                return Unauthorized();
-            }
-        }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN")]
-        [HttpGet("admin/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRooms(int id)
-        {
-            
-            try {
-
-                var conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
-                if(conferenceRoomList.Sucess == true)
-                {
-                    return Ok(conferenceRoomList.ConferenceRoomsList);
                 }
                 else
                 {
@@ -162,16 +133,15 @@ namespace inOfficeApplication.Controllers
             {
                 return Unauthorized();
             }
-          
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
-        [HttpGet("employee/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRoomsForEmployee(int id)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
+        [HttpGet("admin/office-conferencerooms/{id}")]
+        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRooms(int id)
         {
             try
             {
-                var conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
                 if (conferenceRoomList.Sucess == true)
                 {
                     return Ok(conferenceRoomList.ConferenceRoomsList);
@@ -184,18 +154,38 @@ namespace inOfficeApplication.Controllers
             catch (Exception _)
             {
                 return Unauthorized();
-
             }
-
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
+        [HttpGet("employee/office-conferencerooms/{id}")]
+        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRoomsForEmployee(int id)
+        {
+            try
+            {
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                if (conferenceRoomList.Sucess == true)
+                {
+                    return Ok(conferenceRoomList.ConferenceRoomsList);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception _)
+            {
+                return Unauthorized();
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("employee/office-desks/{id}")]
         public ActionResult<IEnumerable<Desk>> GetAllDesksForEmployee(int id)
         {
-
-            try{
-                var deskList = _entitiesService.ListAllDesks(id);
+            try
+            {
+                DesksResponse deskList = _entitiesService.ListAllDesks(id);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList.DeskList);
@@ -205,13 +195,10 @@ namespace inOfficeApplication.Controllers
                     return BadRequest();
                 }
             }
-            catch(Exception _)
+            catch (Exception _)
             {
                 return Unauthorized();
             }
-
         }
-
-
     }
 }

@@ -1,14 +1,10 @@
 ﻿using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
-using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
-using inOfficeApplication.Helpers;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace inOfficeApplication.Controllers
 {
@@ -17,17 +13,14 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private readonly IAdminRepository _adminRepository;
         private readonly IEmployeeRepository _employeeRepository;
-       
 
-        public AuthController(IAdminRepository adminRepository, IEmployeeRepository employeeRepository)
+        public AuthController(IEmployeeRepository employeeRepository)
         {
-            _adminRepository = adminRepository; 
-            _employeeRepository = employeeRepository;  
+            _employeeRepository = employeeRepository;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "ADMIN,EMPLOYEE")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpPost("/authentication")]
         public ActionResult Authentication(MicrosoftUser user)
         {
@@ -42,7 +35,7 @@ namespace inOfficeApplication.Controllers
             }
             else
             {
-                var microsoftuser = new Employee
+                Employee microsoftuser = new Employee
                 {
                     FirstName = user.Firstname,
                     LastName = user.Surname,
@@ -55,32 +48,5 @@ namespace inOfficeApplication.Controllers
                 return Ok("User created, redirect depending on the role");
             }
         }
-
-        /*[HttpPost("/register")]
-        public string Register(RegisterDto dto)
-        {
-            try {
-                var email = dto.Email;
-                if (_employeeRepository.GetByEmail(email) == null)
-                {
-                    var employee = new Employee
-                    {
-                        FirstName = dto.FirstName,
-                        LastName = dto.LastName,
-                        Email = dto.Email,
-                        JobTitle = dto.JobTitle,
-                        Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                    };
-                    _employeeRepository.Create(employee);
-                    return "Success";
-                }
-                else return "Email already exist!";
-              
-            } 
-            catch(Exception _)
-            {
-                return "Bad Request!";
-            }
-        }*/
     }
 }

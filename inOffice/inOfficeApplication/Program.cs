@@ -8,16 +8,15 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("inOfficeDb"),b=> b.MigrationsAssembly("inOfficeApplication.Data")));
+                    builder.Configuration.GetConnectionString("inOfficeDb"), b => b.MigrationsAssembly("inOfficeApplication.Data")));
 
 
 builder.Services.AddCors();
@@ -27,17 +26,23 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
+builder.Services.AddScoped<IDeskRepository, DeskRepository>();
+builder.Services.AddScoped<IConferenceRoomRepository, ConferenceRoomRepository>();
+builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReviewService, ReviewService>();
 
-var configManager = new ConfigurationManager<OpenIdConnectConfiguration>("https://login.microsoftonline.com/9a433611-0c81-4f7b-abae-891364ddda17/v2.0/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+ConfigurationManager<OpenIdConnectConfiguration> configManager = new ConfigurationManager<OpenIdConnectConfiguration>(configuration["Settings:MetadataAddress"], new OpenIdConnectConfigurationRetriever());
 
-var openIdConfig = await configManager.GetConfigurationAsync();
+OpenIdConnectConfiguration openIdConfig = await configManager.GetConfigurationAsync();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 options.TokenValidationParameters = new TokenValidationParameters
@@ -84,16 +89,17 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+    using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
     {
-        using (var scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+        using (ApplicationDbContext scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+        {
             scope?.Database.Migrate();
-        
+        }
     }
 }
 
@@ -105,12 +111,12 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseCors(options=>options
+app.UseCors(options => options
     .AllowAnyOrigin()
     .AllowAnyHeader()
     .AllowAnyMethod()
 );
- 
+
 app.UseAuthorization();
 app.UseAuthentication();
 

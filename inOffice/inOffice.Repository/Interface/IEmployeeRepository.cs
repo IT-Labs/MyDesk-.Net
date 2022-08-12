@@ -1,9 +1,4 @@
 ﻿using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace inOffice.Repository.Interface
 {
@@ -12,7 +7,6 @@ namespace inOffice.Repository.Interface
         Employee Create(Employee employee);
         Employee GetByEmail(string email);
         Employee GetById(int id);
-
-        IEnumerable<Employee> GetAll();
+        List<Employee> GetAll();
     }
 }
