@@ -37,6 +37,12 @@ namespace inOffice.Repository.Implementation
             _context.SaveChanges();
         }
 
+        public void BulkUpdate(List<ConferenceRoom> conferenceRooms)
+        {
+            _context.ConferenceRooms.UpdateRange(conferenceRooms);
+            _context.SaveChanges();
+        }
+
         public void Delete(ConferenceRoom conferenceRoom)
         {
             _context.ConferenceRooms.Remove(conferenceRoom);

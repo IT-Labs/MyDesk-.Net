@@ -7,6 +7,7 @@ namespace inOffice.Repository.Interface
         ConferenceRoom Get(int id, bool? includeReservation = null);
         List<ConferenceRoom> GetOfficeConferenceRooms(int officeId);
         void Update(ConferenceRoom conferenceRoom);
+        void BulkUpdate(List<ConferenceRoom> conferenceRooms);
         void Delete(ConferenceRoom conferenceRoom);
     }
 }

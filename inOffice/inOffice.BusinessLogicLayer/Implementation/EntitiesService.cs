@@ -179,6 +179,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id);
 
+                List<ConferenceRoom> roomsToUpdate = new List<ConferenceRoom>();
                 foreach (ConferenceRoom conferenceRoom in responseConferenceRoom.ConferenceRoomsList)
                 {
                     if (conferenceRoom.ReservationId.HasValue)
@@ -187,10 +188,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
                         if (DateTime.Compare(reservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(reservation.EndDate, DateTime.Now) < 0)
                         {
                             conferenceRoom.ReservationId = null;
-                            _conferenceRoomRepository.Update(conferenceRoom);
+                            roomsToUpdate.Add(conferenceRoom);
                         }
                     }
                 }
+                _conferenceRoomRepository.BulkUpdate(roomsToUpdate);
 
                 responseConferenceRoom.Sucess = true;
 
