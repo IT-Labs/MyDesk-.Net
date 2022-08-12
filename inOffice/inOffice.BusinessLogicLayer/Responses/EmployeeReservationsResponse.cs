@@ -14,7 +14,7 @@ namespace inOffice.BusinessLogicLayer.Responses
 
         public EmployeeReservationsResponse()
         {
-            this.CustomReservationResponses = new List<CustomReservationResponse>();
+            CustomReservationResponses = new List<CustomReservationResponse>();
         }
     }
 }

@@ -12,8 +12,8 @@ namespace inOffice.BusinessLogicLayer.Responses
         public CustomEmployee(int id, string? firstName, string? lastname, string? email, string? jobtitle)
         {
             Id = id;
-            this.FirstName = firstName;
-            this.LastName = lastname;
+            FirstName = firstName;
+            LastName = lastname;
             Email = email;
             JobTitle = jobtitle;
         }

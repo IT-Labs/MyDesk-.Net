@@ -39,7 +39,7 @@ namespace inOfficeApplication.Controllers
             try
             {
 
-                var response = _reservationService.Reserve(dto, employee);
+                ReservationResponse response = _reservationService.Reserve(dto, employee);
                 if (response.Success == true)
                 {
                     return Ok();
@@ -62,7 +62,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var response = _reservationService.CoworkerReserve(dto);
+                ReservationResponse response = _reservationService.CoworkerReserve(dto);
                 if (response.Success == true)
                 {
                     string msg = String.Format("Sucessfuly reserved desk for coworker with mail {0}", dto.CoworkerMail);
@@ -86,15 +86,15 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var employees = _employeeRepository.GetAll().ToList();
+                List<Employee> employees = _employeeRepository.GetAll().ToList();
                 List<CustomEmployee> result = new List<CustomEmployee>();
 
-                foreach (var employee in employees)
+                foreach (Employee employee in employees)
                 {
                     result.Add(new CustomEmployee(employee.Id, employee.FirstName, employee.LastName, employee.Email, employee.JobTitle));
                 }
 
-                var filtereResult = result.DistinctBy(x => x.Email);
+                IEnumerable<CustomEmployee> filtereResult = result.DistinctBy(x => x.Email);
 
                 return Ok(filtereResult);
 
@@ -116,7 +116,7 @@ namespace inOfficeApplication.Controllers
                 if (employee != null)
                 {
 
-                    var response = _reservationService.EmployeeReservations(employee);
+                    EmployeeReservationsResponse response = _reservationService.EmployeeReservations(employee);
 
                     if (response.Success == true)
                     {
@@ -149,7 +149,7 @@ namespace inOfficeApplication.Controllers
                 if (employee != null)
                 {
 
-                    var response = _reservationService.PastReservations(employee);
+                    EmployeeReservationsResponse response = _reservationService.PastReservations(employee);
 
                     if (response.Success == true)
                     {
@@ -247,7 +247,7 @@ namespace inOfficeApplication.Controllers
                 if (employee != null)
                 {
 
-                    var response = _reservationService.CancelReservation(id);
+                    CancelReservationResponse response = _reservationService.CancelReservation(id);
                     if (response.Success == true)
                     {
                         return Ok(new

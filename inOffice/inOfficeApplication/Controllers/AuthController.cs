@@ -43,7 +43,7 @@ namespace inOfficeApplication.Controllers
             }
             else
             {
-                var microsoftuser = new Employee
+                Employee microsoftuser = new Employee
                 {
                     FirstName = user.Firstname,
                     LastName = user.Surname,

@@ -1,5 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
@@ -29,7 +30,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var offices = this._officeService.GetAllOffices();
+                OfficeListResponse offices = _officeService.GetAllOffices();
                 return Ok(offices.Offices);
 
             }
@@ -45,7 +46,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var office = _officeService.GetDetailsForOffice(id);
+                Office office = _officeService.GetDetailsForOffice(id);
                 if (office.OfficeImage != null)
                 {
                     return Ok(office.OfficeImage);

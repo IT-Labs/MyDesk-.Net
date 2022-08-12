@@ -27,7 +27,7 @@ namespace inOfficeApplication.Controllers
         public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
         {
             try {
-                var response = _entitiesService.AllReviewsForEntity(id);
+                AllReviewsForEntity response = _entitiesService.AllReviewsForEntity(id);
                 if (response.Success == true)
                 {
                     return Ok(response);
@@ -51,7 +51,7 @@ namespace inOfficeApplication.Controllers
 
                 dto.Id = id;
 
-                var response = _entitiesService.CreateNewDesks(dto);
+                EntitiesResponse response = _entitiesService.CreateNewDesks(dto);
 
                 if (response.Success == true)
                 {
@@ -76,7 +76,7 @@ namespace inOfficeApplication.Controllers
 
             try
             {
-                var deskList = _entitiesService.ListAllDesks(id);
+                DesksResponse deskList = _entitiesService.ListAllDesks(id);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList);
@@ -98,7 +98,7 @@ namespace inOfficeApplication.Controllers
         {
            try
             {
-                var deleteResponse = _entitiesService.DeleteEntity(dto);
+                DeleteResponse deleteResponse = _entitiesService.DeleteEntity(dto);
 
                 if(deleteResponse.Success == true)
                 {
@@ -126,7 +126,7 @@ namespace inOfficeApplication.Controllers
 
                 request = dto;
 
-                var entitiesResponse = _entitiesService.UpdateDesks(dto);
+                EntitiesResponse entitiesResponse = _entitiesService.UpdateDesks(dto);
 
                 if(entitiesResponse.Success == true)
                 {
@@ -149,7 +149,7 @@ namespace inOfficeApplication.Controllers
             
             try {
 
-                var conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
                 if(conferenceRoomList.Sucess == true)
                 {
                     return Ok(conferenceRoomList.ConferenceRoomsList);
@@ -172,7 +172,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
                 if (conferenceRoomList.Sucess == true)
                 {
                     return Ok(conferenceRoomList.ConferenceRoomsList);
@@ -196,7 +196,7 @@ namespace inOfficeApplication.Controllers
         {
 
             try{
-                var deskList = _entitiesService.ListAllDesks(id);
+                DesksResponse deskList = _entitiesService.ListAllDesks(id);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList.DeskList);
