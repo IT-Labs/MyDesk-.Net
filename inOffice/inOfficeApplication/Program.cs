@@ -40,7 +40,7 @@ builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, ReviewService>();
 
-ConfigurationManager<OpenIdConnectConfiguration> configManager = new ConfigurationManager<OpenIdConnectConfiguration>("https://login.microsoftonline.com/9a433611-0c81-4f7b-abae-891364ddda17/v2.0/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+ConfigurationManager<OpenIdConnectConfiguration> configManager = new ConfigurationManager<OpenIdConnectConfiguration>(configuration["Settings:MetadataAddress"], new OpenIdConnectConfigurationRetriever());
 
 OpenIdConnectConfiguration openIdConfig = await configManager.GetConfigurationAsync();
 

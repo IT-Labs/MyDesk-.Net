@@ -4,6 +4,7 @@ using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Helpers;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text;
 using System.Transactions;
@@ -14,12 +15,16 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
+        private readonly IConfiguration _configuration;
         private HttpClient client = new HttpClient();
 
-        public ReviewService(IReviewRepository reviewRepository, IReservationRepository reservationRepository)
+        public ReviewService(IReviewRepository reviewRepository, 
+            IReservationRepository reservationRepository,
+            IConfiguration configuration)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
+            _configuration = configuration;
         }
 
         public ReviewResponse ShowReview(int id)
@@ -109,7 +114,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             string data = JsonConvert.SerializeObject(dictionaryData);
 
             StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://inofficenlpmodel.azurewebsites.net/api/get_sentiment?code=knpbFNoCymH02BtJtcO59H4mgbkRVbSBhSzlwuZmxXCtAzFuEqSMTA==", content);
+            HttpResponseMessage response = await client.PostAsync(_configuration["Settings:SentimentEndpoint"], content);
             string stringResponse = response.Content.ReadAsStringAsync().Result;
             ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
             if (response.IsSuccessStatusCode)
