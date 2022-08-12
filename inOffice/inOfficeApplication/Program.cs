@@ -31,6 +31,7 @@ builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
 builder.Services.AddScoped<IDeskRepository, DeskRepository>();
 builder.Services.AddScoped<IConferenceRoomRepository, ConferenceRoomRepository>();
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
@@ -38,6 +39,7 @@ IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettin
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReviewService, ReviewService>();
 
 var configManager = new ConfigurationManager<OpenIdConnectConfiguration>("https://login.microsoftonline.com/9a433611-0c81-4f7b-abae-891364ddda17/v2.0/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
 

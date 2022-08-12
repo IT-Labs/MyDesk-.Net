@@ -1,12 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
-using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using inOffice.Repository.Interface;
-using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using inOffice.BusinessLogicLayer.Responses;
 using Microsoft.AspNetCore.Cors;
@@ -18,12 +12,12 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        private readonly IOfficeService _officeService;
+        private readonly IReviewService _reviewService;
         private readonly IReservationService _reservationService;
 
-        public AdminController(IOfficeService officeService, IReservationService reservationService)
+        public AdminController(IReviewService reviewService, IReservationService reservationService)
         {
-            _officeService = officeService;
+            _reviewService = reviewService;
             _reservationService = reservationService;
         }
 
@@ -33,7 +27,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                var reservations = _reservationService.AllReservations();
+                AllReservationsResponse reservations = _reservationService.AllReservations();
 
                 return Ok(reservations);
             }
@@ -50,8 +44,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-
-                var reviews = _reservationService.AllReviews();
+                AllReviewsResponse reviews = _reviewService.AllReviews();
 
                 if (reviews.Success != true)
                 {
