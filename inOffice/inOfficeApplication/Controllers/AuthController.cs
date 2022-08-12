@@ -1,15 +1,10 @@
 ﻿using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
-using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
-using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace inOfficeApplication.Controllers
 {
@@ -18,13 +13,10 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private readonly IAdminRepository _adminRepository;
         private readonly IEmployeeRepository _employeeRepository;
 
-
-        public AuthController(IAdminRepository adminRepository, IEmployeeRepository employeeRepository)
+        public AuthController(IEmployeeRepository employeeRepository)
         {
-            _adminRepository = adminRepository;
             _employeeRepository = employeeRepository;
         }
 

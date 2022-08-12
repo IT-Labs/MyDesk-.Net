@@ -4,12 +4,9 @@ using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
-using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
@@ -18,12 +15,10 @@ namespace inOfficeApplication.Controllers
     public class OfficeController : Controller
     {
         private readonly IOfficeService _officeService;
-        private readonly IConfiguration _configuration;
 
-        public OfficeController(IOfficeService officeService, IConfiguration configuration)
+        public OfficeController(IOfficeService officeService)
         {
             _officeService = officeService;
-            _configuration = configuration;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
@@ -37,8 +32,8 @@ namespace inOfficeApplication.Controllers
                 {
                     return Conflict("There is allready office with the same name");
                 }
-                else {
-
+                else
+                {
                     return Created("Success", response);
                 }
             }
@@ -47,12 +42,13 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.EmployeeRole)]
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
-            
-            try { 
+            try
+            {
                 Office office = _officeService.GetDetailsForOffice(id);
                 if (office.OfficeImage != null)
                 {
@@ -68,6 +64,7 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
@@ -75,33 +72,47 @@ namespace inOfficeApplication.Controllers
             try
             {
                 dto.Id = id;
-                return Ok(_officeService.UpdateOffice(dto));   
+                OfficeResponse result = _officeService.UpdateOffice(dto);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception _)
             {
                 return Unauthorized();
             }
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AdminRole)]
         [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
-           
             try
             {
-                    if (id == null)
-                    {
-                        return NotFound();
+                if (id == 0)
+                {
+                    return NotFound();
                 }
                 else
                 {
-                    _officeService.DeleteOffice(id);
-                    return Ok(new
+                    OfficeResponse result = _officeService.DeleteOffice(id);
+                    if (result.Success)
                     {
-                        message = "success"
-                    });
+                        return Ok(new
+                        {
+                            message = "success"
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
                 }
-                    
             }
             catch (Exception _)
             {
@@ -114,9 +125,17 @@ namespace inOfficeApplication.Controllers
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
             try
-            {  
-                OfficeListResponse offices = _officeService.GetAllOffices(); 
-                return Ok(offices.Offices);    
+            {
+                OfficeListResponse offices = _officeService.GetAllOffices();
+
+                if (offices.Success)
+                {
+                    return Ok(offices.Offices);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception _)
             {

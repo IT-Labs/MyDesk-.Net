@@ -20,7 +20,7 @@ namespace inOfficeApplication.Controllers
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IReviewService _reviewService;
 
-        public HomeController(IReservationService reservationService, 
+        public HomeController(IReservationService reservationService,
             IEmployeeRepository employeeRepository,
             IReviewService reviewService)
         {
@@ -29,15 +29,13 @@ namespace inOfficeApplication.Controllers
             _reviewService = reviewService;
         }
 
-
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpPost("employee/reserve")]
         public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
 
                 ReservationResponse response = _reservationService.Reserve(dto, employee);
                 if (response.Success == true)
@@ -48,7 +46,6 @@ namespace inOfficeApplication.Controllers
                 {
                     return BadRequest();
                 }
-
             }
             catch (Exception _)
             {
@@ -65,13 +62,11 @@ namespace inOfficeApplication.Controllers
                 ReservationResponse response = _reservationService.CoworkerReserve(dto);
                 if (response.Success == true)
                 {
-                    string msg = String.Format("Sucessfuly reserved desk for coworker with mail {0}", dto.CoworkerMail);
-                    return Ok(msg);
+                    return Ok($"Sucessfuly reserved desk for coworker with mail {dto.CoworkerMail}");
                 }
                 else
                 {
-                    string error = String.Format("Reservation for that time period allready exists for {0}", dto.CoworkerMail);
-                    return Conflict(error);
+                    return Conflict($"Reservation for that time period allready exists for {dto.CoworkerMail}");
                 }
             }
             catch (Exception _)
@@ -86,7 +81,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                List<Employee> employees = _employeeRepository.GetAll().ToList();
+                List<Employee> employees = _employeeRepository.GetAll();
                 List<CustomEmployee> result = new List<CustomEmployee>();
 
                 foreach (Employee employee in employees)
@@ -109,13 +104,12 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/future-reservation")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
+
                 if (employee != null)
                 {
-
                     EmployeeReservationsResponse response = _reservationService.EmployeeReservations(employee);
 
                     if (response.Success == true)
@@ -142,13 +136,12 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/past-reservations")]
         public ActionResult<EmployeeReservationsResponse> PastReservations()
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
+
                 if (employee != null)
                 {
-
                     EmployeeReservationsResponse response = _reservationService.PastReservations(employee);
 
                     if (response.Success == true)
@@ -164,7 +157,6 @@ namespace inOfficeApplication.Controllers
                 {
                     return Unauthorized();
                 }
-
             }
             catch (Exception _)
             {
@@ -176,10 +168,10 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/review/{id}")]
         public ActionResult<ReviewResponse> ShowReview(int id)
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
+
                 if (employee != null)
                 {
                     ReviewResponse ReviewForGivenEntity = _reviewService.ShowReview(id);
@@ -208,10 +200,10 @@ namespace inOfficeApplication.Controllers
         [HttpPost("employee/review")]
         public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
+
                 if (employee != null)
                 {
                     CreateReviewResponse response = _reviewService.CreateReview(dto);
@@ -240,13 +232,12 @@ namespace inOfficeApplication.Controllers
         [HttpDelete("employee/reserve/{id}")]
         public ActionResult<CancelReservationResponse> CancelReservation(int id)
         {
-            Employee employee = GetEmployee();
-
             try
             {
+                Employee employee = GetEmployee();
+
                 if (employee != null)
                 {
-
                     CancelReservationResponse response = _reservationService.CancelReservation(id);
                     if (response.Success == true)
                     {
@@ -264,7 +255,6 @@ namespace inOfficeApplication.Controllers
                 {
                     return Unauthorized();
                 }
-
             }
             catch (Exception _)
             {

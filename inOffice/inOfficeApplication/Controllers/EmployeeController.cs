@@ -1,15 +1,11 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Responses;
-using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
-using inOfficeApplication.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace inOfficeApplication.Controllers
 {
@@ -32,7 +28,6 @@ namespace inOfficeApplication.Controllers
             {
                 OfficeListResponse offices = _officeService.GetAllOffices();
                 return Ok(offices.Offices);
-
             }
             catch (Exception _)
             {
@@ -61,6 +56,5 @@ namespace inOfficeApplication.Controllers
                 return Unauthorized();
             }
         }
-
     }
 }
