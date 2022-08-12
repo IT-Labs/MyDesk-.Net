@@ -13,15 +13,15 @@ namespace inOffice.BusinessLogicLayer.Implementation
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
-        private readonly IRepository<Desk> _deskRepository;
-        private readonly IRepository<ConferenceRoom> _conferenceRoomRepository;
+        private readonly IDeskRepository _deskRepository;
+        private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IRepository<Review> _reviewRepository;
         private readonly IEmployeeRepository _employeeRepository;
         static HttpClient client = new HttpClient();
 
         public ReservationService(IReservationRepository reservationRepository,
-            IRepository<Desk> deskRepository,
-            IRepository<ConferenceRoom> conferenceRoomRepository,
+            IDeskRepository deskRepository,
+            IConferenceRoomRepository conferenceRoomRepository,
             IRepository<Review> reviewRepository,
             IEmployeeRepository employeeRepository
             )

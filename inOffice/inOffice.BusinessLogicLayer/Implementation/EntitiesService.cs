@@ -12,12 +12,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IDeskRepository _deskRepository;
         private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IReservationRepository _reservationRepository;
-        private readonly IRepository<Categories> _categoriesRepository;
+        private readonly ICategoriesRepository _categoriesRepository;
 
         public EntitiesService(IDeskRepository deskRepository,
             IConferenceRoomRepository conferenceRoomRepository,
             IReservationRepository reservationRepository,
-            IRepository<Categories> categoriesRepository)
+            ICategoriesRepository categoriesRepository)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
@@ -100,7 +100,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                         Reservations = deskReservations
                     };
 
-                    Categories? findCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == desk.Id).FirstOrDefault();
+                    Categories? findCategories = _categoriesRepository.GetDeskCategories(desk.Id);
                     custom.Categories = findCategories;
                     list.Add(custom);
                 }
@@ -214,7 +214,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 {
                     foreach (DeskToUpdate deskToUpdate in request.ListOfDesksToUpdate)
                     {
-                        Categories existingDeskCategories = _categoriesRepository.GetAll().Where(x => x.DeskId == deskToUpdate.DeskId).FirstOrDefault();
+                        Categories existingDeskCategories = _categoriesRepository.GetDeskCategories(deskToUpdate.DeskId);
                         if (existingDeskCategories != null)
                         {
                             existingDeskCategories.DoubleMonitor = deskToUpdate.DualMonitor;
