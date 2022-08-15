@@ -39,6 +39,7 @@ builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, ReviewService>();
+builder.Services.AddTransient<IEmployeeService, EmployeeService>();
 
 ConfigurationManager<OpenIdConnectConfiguration> configManager = new ConfigurationManager<OpenIdConnectConfiguration>(configuration["Settings:MetadataAddress"], new OpenIdConnectConfigurationRetriever());
 
