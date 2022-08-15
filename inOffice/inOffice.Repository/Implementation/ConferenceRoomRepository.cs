@@ -26,9 +26,16 @@ namespace inOffice.Repository.Implementation
             return query.FirstOrDefault();
         }
 
-        public List<ConferenceRoom> GetOfficeConferenceRooms(int officeId)
+        public List<ConferenceRoom> GetOfficeConferenceRooms(int officeId, int? take = null, int? skip = null)
         {
-            return _context.ConferenceRooms.Where(x => x.OfficeId == officeId && !x.IsDeleted).ToList();
+            IQueryable<ConferenceRoom> query = _context.ConferenceRooms.Where(x => x.OfficeId == officeId && !x.IsDeleted);
+
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return query.ToList();
         }
 
         public void Update(ConferenceRoom conferenceRoom)

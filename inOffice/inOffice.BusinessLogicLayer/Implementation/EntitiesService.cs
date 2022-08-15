@@ -171,13 +171,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
         }
 
-        public ConferenceRoomsResponse ListAllConferenceRooms(int id)
+        public ConferenceRoomsResponse ListAllConferenceRooms(int id, int? take = null, int? skip = null)
         {
             ConferenceRoomsResponse responseConferenceRoom = new ConferenceRoomsResponse();
 
             try
             {
-                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id);
+                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id, take: take, skip: skip);
 
                 List<ConferenceRoom> roomsToUpdate = new List<ConferenceRoom>();
                 foreach (ConferenceRoom conferenceRoom in responseConferenceRoom.ConferenceRoomsList)
