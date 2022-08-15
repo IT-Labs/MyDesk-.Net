@@ -9,7 +9,7 @@ namespace inOffice.BusinessLogicLayer.Interface
 
         ConferenceRoomsResponse ListAllConferenceRooms(int id, int? take = null, int? skip = null);
 
-        DesksResponse ListAllDesks(int id);
+        DesksResponse ListAllDesks(int id, int? take = null, int? skip = null);
 
         EntitiesResponse UpdateDesks(UpdateRequest request);
 

@@ -18,9 +18,16 @@ namespace inOffice.Repository.Implementation
             return _context.Desks.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
         }
 
-        public List<Desk> GetOfficeDesks(int officeId)
+        public List<Desk> GetOfficeDesks(int officeId, int? take = null, int? skip = null)
         {
-            return _context.Desks.Where(x => x.OfficeId == officeId && !x.IsDeleted).ToList();
+            IQueryable<Desk> query = _context.Desks.Where(x => x.OfficeId == officeId && !x.IsDeleted);
+
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return query.ToList();
         }
 
         public void BulkInsert(List<Desk> desks)
