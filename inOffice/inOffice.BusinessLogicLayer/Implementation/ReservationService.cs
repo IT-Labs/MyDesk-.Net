@@ -184,12 +184,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
-        public AllReservationsResponse AllReservations()
+        public AllReservationsResponse AllReservations(int? take = null, int? skip = null)
         {
             AllReservationsResponse response = new AllReservationsResponse();
             List<ReservationNew> newList = new List<ReservationNew>();
 
-            List<Reservation> reservations = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true);
+            List<Reservation> reservations = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip);
 
             foreach (Reservation reservation in reservations)
             {

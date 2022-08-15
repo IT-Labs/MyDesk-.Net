@@ -41,7 +41,9 @@ namespace inOffice.Repository.Implementation
 
         public List<Reservation> GetAll(bool? includeEmployee = null, 
             bool? includeDesk = null,
-            bool? includeOffice = null)
+            bool? includeOffice = null,
+            int? take = null,
+            int? skip = null)
         {
             IQueryable<Reservation> query = _context.Reservations.Where(x => !x.IsDeleted);
 
@@ -58,6 +60,10 @@ namespace inOffice.Repository.Implementation
                 query = query
                     .Include(x => x.Desk)
                     .ThenInclude(x => x.Office);
+            }
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
             }
 
             List<Reservation> result = query.ToList();

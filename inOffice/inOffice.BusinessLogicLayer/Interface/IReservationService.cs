@@ -10,7 +10,7 @@ namespace inOffice.BusinessLogicLayer.Interface
        EmployeeReservationsResponse EmployeeReservations(Employee employee);
        CancelReservationResponse CancelReservation(int id);
        EmployeeReservationsResponse PastReservations(Employee employee);
-       AllReservationsResponse AllReservations();
+       AllReservationsResponse AllReservations(int? take = null, int? skip = null);
        ReservationResponse CoworkerReserve(CoworkerReservationRequest dto); 
 
     }
