@@ -18,9 +18,16 @@ namespace inOffice.Repository.Implementation
             return _context.Offices.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
         }
 
-        public List<Office> GetAll()
+        public List<Office> GetAll(int? take = null, int? skip = null)
         {
-            return _context.Offices.Where(x => !x.IsDeleted).ToList();
+            IQueryable<Office> query = _context.Offices.Where(x => !x.IsDeleted);
+
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return query.ToList();
         }
 
         public Office GetByName(string name)

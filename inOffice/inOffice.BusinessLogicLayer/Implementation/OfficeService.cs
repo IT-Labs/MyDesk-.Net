@@ -99,13 +99,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
-        public OfficeListResponse GetAllOffices()
+        public OfficeListResponse GetAllOffices(int? take = null, int? skip = null)
         {
             OfficeListResponse officeListResponse = new OfficeListResponse();
 
             try
             {
-                officeListResponse.Offices = _officeRepository.GetAll();
+                officeListResponse.Offices = _officeRepository.GetAll(take: take, skip: skip);
                 officeListResponse.Success = true;
 
                 return officeListResponse;
