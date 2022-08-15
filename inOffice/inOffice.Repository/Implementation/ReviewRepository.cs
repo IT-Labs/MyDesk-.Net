@@ -18,9 +18,16 @@ namespace inOffice.Repository.Implementation
             return _context.Reviews.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
         }
 
-        public List<Review> GetAll()
+        public List<Review> GetAll(int? take = null, int? skip = null)
         {
-            return _context.Reviews.Where(x => !x.IsDeleted).ToList();
+            IQueryable<Review> query = _context.Reviews.Where(x => !x.IsDeleted);
+
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return query.ToList();
         }
 
         public void Insert(Review review)

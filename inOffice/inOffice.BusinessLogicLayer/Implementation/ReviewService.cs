@@ -40,11 +40,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return reviewForGivenEntity;
         }
 
-        public AllReviewsResponse AllReviews()
+        public AllReviewsResponse AllReviews(int? take = null, int? skip = null)
         {
             List<CustomReviews> list = new List<CustomReviews>();
 
-            List<Review> reviews = _reviewRepository.GetAll();
+            List<Review> reviews = _reviewRepository.GetAll(take: take, skip: skip);
 
             foreach (Review review in reviews)
             {

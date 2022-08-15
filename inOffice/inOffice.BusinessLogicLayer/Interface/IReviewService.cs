@@ -6,7 +6,7 @@ namespace inOffice.BusinessLogicLayer.Interface
     public interface IReviewService
     {
         ReviewResponse ShowReview(int id);
-        AllReviewsResponse AllReviews();
+        AllReviewsResponse AllReviews(int? take = null, int? skip = null);
         CreateReviewResponse CreateReview(CreateReviewRequest createReviewRequest);
     }
 }
