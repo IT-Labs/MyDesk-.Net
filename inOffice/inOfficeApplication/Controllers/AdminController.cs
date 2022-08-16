@@ -27,7 +27,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                AllReservationsResponse reservations = _reservationService.AllReservations();
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                AllReservationsResponse reservations = _reservationService.AllReservations(take: take, skip: skip);
 
                 return Ok(reservations);
             }
@@ -44,7 +45,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                AllReviewsResponse reviews = _reviewService.AllReviews();
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                AllReviewsResponse reviews = _reviewService.AllReviews(take: take, skip: skip);
 
                 if (reviews.Success != true)
                 {
