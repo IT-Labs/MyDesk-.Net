@@ -1,4 +1,5 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
 
@@ -17,9 +18,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _employeeRepository.Create(employee);
         }
 
-        public List<Employee> GetAll(int? take = null, int? skip = null)
+        public List<CustomEmployee> GetAll()
         {
-            return _employeeRepository.GetAll();
+            List<CustomEmployee> result = new List<CustomEmployee>();
+
+            List<Employee> employees = _employeeRepository.GetAll();
+
+            foreach (Employee employee in employees)
+            {
+                result.Add(new CustomEmployee(employee.Id, employee.FirstName, employee.LastName, employee.Email, employee.JobTitle));
+            }
+
+            return result.DistinctBy(x => x.Email).ToList();
         }
 
         public Employee GetByEmail(string email)

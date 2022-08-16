@@ -26,21 +26,14 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             Office existingOffice = _officeRepository.GetByName(office.Name);
 
-            try
-            {
-                if (existingOffice != null)
-                {
-                    response.Success = false;
-                }
-                else
-                {
-                    _officeRepository.Insert(office);
-                    response.Success = true;
-                }
-            }
-            catch (Exception _)
+            if (existingOffice != null)
             {
                 response.Success = false;
+            }
+            else
+            {
+                _officeRepository.Insert(office);
+                response.Success = true;
             }
 
             return response;
@@ -61,15 +54,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
             office.Name = request.OfficeName;
             office.OfficeImage = request.OfficePlan;
 
-            try
-            {
-                _officeRepository.Update(office);
-                response.Success = true;
-            }
-            catch (Exception _)
-            {
-                response.Success = false;
-            }
+            _officeRepository.Update(office);
+            response.Success = true;
 
             return response;
         }
@@ -86,15 +72,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 return response;
             }
 
-            try
-            {
-                _officeRepository.SoftDelete(office);
-                response.Success = true;
-            }
-            catch (Exception _)
-            {
-                response.Success = false;
-            }
+            _officeRepository.SoftDelete(office);
+            response.Success = true;
 
             return response;
         }
@@ -103,17 +82,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             OfficeListResponse officeListResponse = new OfficeListResponse();
 
-            try
-            {
-                officeListResponse.Offices = _officeRepository.GetAll(take: take, skip: skip);
-                officeListResponse.Success = true;
-
-                return officeListResponse;
-            }
-            catch (Exception _)
-            {
-                officeListResponse.Success = false;
-            }
+            officeListResponse.Offices = _officeRepository.GetAll(take: take, skip: skip);
+            officeListResponse.Success = true;
 
             return officeListResponse;
         }
