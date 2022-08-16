@@ -1,7 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOffice.Repository.Interface;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,15 +16,15 @@ namespace inOfficeApplication.Controllers
     public class HomeController : ControllerBase
     {
         private readonly IReservationService _reservationService;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
         private readonly IReviewService _reviewService;
 
         public HomeController(IReservationService reservationService,
-            IEmployeeRepository employeeRepository,
+            IEmployeeService employeeRepository,
             IReviewService reviewService)
         {
             _reservationService = reservationService;
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeRepository;
             _reviewService = reviewService;
         }
 
@@ -81,7 +80,7 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                List<Employee> employees = _employeeRepository.GetAll();
+                List<Employee> employees = _employeeService.GetAll();
                 List<CustomEmployee> result = new List<CustomEmployee>();
 
                 foreach (Employee employee in employees)
@@ -92,7 +91,6 @@ namespace inOfficeApplication.Controllers
                 IEnumerable<CustomEmployee> filtereResult = result.DistinctBy(x => x.Email);
 
                 return Ok(filtereResult);
-
             }
             catch (Exception _)
             {
@@ -268,7 +266,7 @@ namespace inOfficeApplication.Controllers
             string jwt = authHeader.Substring(7);
             JwtPayload JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
             string email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
-            return _employeeRepository.GetByEmail(email);
+            return _employeeService.GetByEmail(email);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace inOffice.Repository.Implementation
 
         public List<Employee> GetAll()
         {
-            return _context.Employees.ToList();
+            return _context.Employees.Where(x => !x.IsDeleted).ToList();
         }
 
         public Employee GetById(int id)

@@ -1,5 +1,5 @@
-﻿using inOffice.BusinessLogicLayer.Requests;
-using inOffice.Repository.Interface;
+﻿using inOffice.BusinessLogicLayer.Interface;
+using inOffice.BusinessLogicLayer.Requests;
 using inOfficeApplication.Data.Models;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,11 +13,11 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
 
-        public AuthController(IEmployeeRepository employeeRepository)
+        public AuthController(IEmployeeService employeeRepository)
         {
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeRepository;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
@@ -29,7 +29,7 @@ namespace inOfficeApplication.Controllers
             {
                 return BadRequest("Invalid email adress");
             }
-            else if (_employeeRepository.GetByEmail(user.Email) != null)
+            else if (_employeeService.GetByEmail(user.Email) != null)
             {
                 return Ok("User allready exists, redirect depending on the role");
             }
@@ -43,7 +43,7 @@ namespace inOfficeApplication.Controllers
                     JobTitle = user.JobTitle,
                     Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
                 };
-                _employeeRepository.Create(microsoftuser);
+                _employeeService.Create(microsoftuser);
 
                 return Ok("User created, redirect depending on the role");
             }

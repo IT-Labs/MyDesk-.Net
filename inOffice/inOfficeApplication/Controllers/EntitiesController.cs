@@ -73,7 +73,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                DesksResponse deskList = _entitiesService.ListAllDesks(id);
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                DesksResponse deskList = _entitiesService.ListAllDesks(id, take: take, skip: skip);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList);
@@ -141,7 +142,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
                 if (conferenceRoomList.Sucess == true)
                 {
                     return Ok(conferenceRoomList.ConferenceRoomsList);
@@ -163,7 +165,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id);
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
                 if (conferenceRoomList.Sucess == true)
                 {
                     return Ok(conferenceRoomList.ConferenceRoomsList);
@@ -185,7 +188,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                DesksResponse deskList = _entitiesService.ListAllDesks(id);
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                DesksResponse deskList = _entitiesService.ListAllDesks(id, take: take, skip: skip);
                 if (deskList.sucess == true)
                 {
                     return Ok(deskList.DeskList);

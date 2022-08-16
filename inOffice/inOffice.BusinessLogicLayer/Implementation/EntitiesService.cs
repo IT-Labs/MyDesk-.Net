@@ -72,19 +72,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return response;
         }
 
-        public DesksResponse ListAllDesks(int id)
+        public DesksResponse ListAllDesks(int id, int? take = null, int? skip = null)
         {
             DesksResponse responseDeskList = new DesksResponse();
             List<DeskCustom> list = new List<DeskCustom>();
             try
             {
-                List<Desk> desks = _deskRepository.GetOfficeDesks(id);
+                List<Desk> desks = _deskRepository.GetOfficeDesks(id, take: take, skip: skip);
 
                 foreach (Desk desk in desks)
                 {
                     List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true).Where(x => x.StartDate > DateTime.Today).ToList();
 
-                    deskReservations.ForEach(x => x.Employee?.Reservations?.Clear());
                     deskReservations.ForEach(x =>
                     {
                         if (x.Employee != null)
@@ -104,6 +103,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     custom.Categories = findCategories;
                     list.Add(custom);
                 }
+
+                list.ForEach(x => x.Reservations?.ForEach(y => y.Employee?.Reservations?.Clear()));
 
                 responseDeskList.sucess = true;
                 responseDeskList.DeskList = list;
@@ -171,13 +172,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
         }
 
-        public ConferenceRoomsResponse ListAllConferenceRooms(int id)
+        public ConferenceRoomsResponse ListAllConferenceRooms(int id, int? take = null, int? skip = null)
         {
             ConferenceRoomsResponse responseConferenceRoom = new ConferenceRoomsResponse();
 
             try
             {
-                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id);
+                responseConferenceRoom.ConferenceRoomsList = _conferenceRoomRepository.GetOfficeConferenceRooms(id, take: take, skip: skip);
 
                 List<ConferenceRoom> roomsToUpdate = new List<ConferenceRoom>();
                 foreach (ConferenceRoom conferenceRoom in responseConferenceRoom.ConferenceRoomsList)

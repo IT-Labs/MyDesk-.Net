@@ -26,7 +26,8 @@ namespace inOfficeApplication.Controllers
         {
             try
             {
-                OfficeListResponse offices = _officeService.GetAllOffices();
+                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+                OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
                 return Ok(offices.Offices);
             }
             catch (Exception _)
