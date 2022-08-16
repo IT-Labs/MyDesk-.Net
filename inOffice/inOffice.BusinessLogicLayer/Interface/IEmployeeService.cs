@@ -1,4 +1,5 @@
-﻿using inOfficeApplication.Data.Models;
+﻿using inOffice.BusinessLogicLayer.Responses;
+using inOfficeApplication.Data.Models;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
@@ -6,7 +7,7 @@ namespace inOffice.BusinessLogicLayer.Interface
     {
         Employee GetByEmail(string email);
         Employee GetById(int id);
-        List<Employee> GetAll(int? take = null, int? skip = null);
+        List<CustomEmployee> GetAll();
         void Create(Employee employee);
     }
 }

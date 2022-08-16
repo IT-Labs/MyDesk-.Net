@@ -24,15 +24,16 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
-            try
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
+
+            if (offices.Success == true)
             {
-                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-                OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
                 return Ok(offices.Offices);
             }
-            catch (Exception _)
+            else
             {
-                return Unauthorized();
+                return BadRequest();
             }
         }
 
@@ -40,21 +41,14 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
-            try
+            Office office = _officeService.GetDetailsForOffice(id);
+            if (office.OfficeImage != null)
             {
-                Office office = _officeService.GetDetailsForOffice(id);
-                if (office.OfficeImage != null)
-                {
-                    return Ok(office.OfficeImage);
-                }
-                else
-                {
-                    return BadRequest("Image not found");
-                }
+                return Ok(office.OfficeImage);
             }
-            catch (Exception _)
+            else
             {
-                return Unauthorized();
+                return BadRequest("Image not found");
             }
         }
     }

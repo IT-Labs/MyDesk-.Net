@@ -11,14 +11,14 @@ using System.Transactions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
-    public class ReviewService: IReviewService
+    public class ReviewService : IReviewService
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IConfiguration _configuration;
         private HttpClient client = new HttpClient();
 
-        public ReviewService(IReviewRepository reviewRepository, 
+        public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
             IConfiguration configuration)
         {
@@ -76,32 +76,24 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             Reservation reservation = _reservationRepository.Get(createReviewRequest.ReservationId);
             Task<string> responseSentimentAnalysis = GetAnalysedReview(createReviewRequest.Review);
-
-            try
+            Review review = new Review()
             {
-                Review review = new Review()
-                {
-                    Reviews = createReviewRequest.Review,
-                    ReservationId = createReviewRequest.ReservationId,
-                    ReviewOutput = responseSentimentAnalysis.Result
-                };
+                Reviews = createReviewRequest.Review,
+                ReservationId = createReviewRequest.ReservationId,
+                ReviewOutput = responseSentimentAnalysis.Result
+            };
 
-                using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    _reviewRepository.Insert(review);
-
-                    reservation.ReviewId = review.Id;
-                    _reservationRepository.Update(reservation);
-
-                    transaction.Complete();
-                }
-
-                response.Success = true;
-            }
-            catch (Exception _)
+            using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                response.Success = false;
+                _reviewRepository.Insert(review);
+
+                reservation.ReviewId = review.Id;
+                _reservationRepository.Update(reservation);
+
+                transaction.Complete();
             }
+
+            response.Success = true;
 
             return response;
         }

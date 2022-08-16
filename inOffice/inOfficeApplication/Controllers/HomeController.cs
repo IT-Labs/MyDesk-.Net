@@ -32,23 +32,21 @@ namespace inOfficeApplication.Controllers
         [HttpPost("employee/reserve")]
         public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)
         {
-            try
-            {
-                Employee employee = GetEmployee();
+            Employee employee = GetEmployee();
 
-                ReservationResponse response = _reservationService.Reserve(dto, employee);
-                if (response.Success == true)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            catch (Exception _)
+            if (employee == null)
             {
-                return Unauthorized();
+                return NotFound("Employee not found");
+            }
+
+            ReservationResponse response = _reservationService.Reserve(dto, employee);
+            if (response.Success == true)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 
@@ -56,21 +54,14 @@ namespace inOfficeApplication.Controllers
         [HttpPost("employee/reserve/coworker")]
         public ActionResult<ReservationResponse> CoworkerReservation(CoworkerReservationRequest dto)
         {
-            try
+            ReservationResponse response = _reservationService.CoworkerReserve(dto);
+            if (response.Success == true)
             {
-                ReservationResponse response = _reservationService.CoworkerReserve(dto);
-                if (response.Success == true)
-                {
-                    return Ok($"Sucessfuly reserved desk for coworker with mail {dto.CoworkerMail}");
-                }
-                else
-                {
-                    return Conflict($"Reservation for that time period allready exists for {dto.CoworkerMail}");
-                }
+                return Ok($"Sucessfuly reserved desk for coworker with mail {dto.CoworkerMail}");
             }
-            catch (Exception _)
+            else
             {
-                return BadRequest();
+                return Conflict($"Reservation for that time period allready exists for {dto.CoworkerMail}");
             }
         }
 
@@ -78,55 +69,31 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/all")]
         public ActionResult<List<CustomEmployee>> AllEmployees()
         {
-            try
-            {
-                List<Employee> employees = _employeeService.GetAll();
-                List<CustomEmployee> result = new List<CustomEmployee>();
+            List<CustomEmployee> result = _employeeService.GetAll();
 
-                foreach (Employee employee in employees)
-                {
-                    result.Add(new CustomEmployee(employee.Id, employee.FirstName, employee.LastName, employee.Email, employee.JobTitle));
-                }
-
-                IEnumerable<CustomEmployee> filtereResult = result.DistinctBy(x => x.Email);
-
-                return Ok(filtereResult);
-            }
-            catch (Exception _)
-            {
-                return NotFound();
-            }
+            return Ok(result);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Constants.AllRoles)]
         [HttpGet("employee/future-reservation")]
         public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
         {
-            try
+            Employee employee = GetEmployee();
+
+            if (employee == null)
             {
-                Employee employee = GetEmployee();
-
-                if (employee != null)
-                {
-                    EmployeeReservationsResponse response = _reservationService.EmployeeReservations(employee);
-
-                    if (response.Success == true)
-                    {
-                        return Ok(response.CustomReservationResponses);
-                    }
-                    else
-                    {
-                        return BadRequest("Sucess is false");
-                    }
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return NotFound("Employee not found");
             }
-            catch (Exception _)
+
+            EmployeeReservationsResponse response = _reservationService.EmployeeReservations(employee);
+
+            if (response.Success == true)
             {
-                return Unauthorized();
+                return Ok(response.CustomReservationResponses);
+            }
+            else
+            {
+                return BadRequest("Sucess is false");
             }
         }
 
@@ -134,31 +101,22 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/past-reservations")]
         public ActionResult<EmployeeReservationsResponse> PastReservations()
         {
-            try
+            Employee employee = GetEmployee();
+
+            if (employee == null)
             {
-                Employee employee = GetEmployee();
-
-                if (employee != null)
-                {
-                    EmployeeReservationsResponse response = _reservationService.PastReservations(employee);
-
-                    if (response.Success == true)
-                    {
-                        return Ok(response.CustomReservationResponses);
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
+                return NotFound("Employee not found");
             }
-            catch (Exception _)
+
+            EmployeeReservationsResponse response = _reservationService.PastReservations(employee);
+
+            if (response.Success == true)
             {
-                return Unauthorized();
+                return Ok(response.CustomReservationResponses);
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 
@@ -166,31 +124,22 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/review/{id}")]
         public ActionResult<ReviewResponse> ShowReview(int id)
         {
-            try
+            Employee employee = GetEmployee();
+
+            if (employee == null)
             {
-                Employee employee = GetEmployee();
-
-                if (employee != null)
-                {
-                    ReviewResponse ReviewForGivenEntity = _reviewService.ShowReview(id);
-
-                    if (ReviewForGivenEntity.Sucess == true)
-                    {
-                        return Ok(ReviewForGivenEntity.Review);
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
+                return NotFound("Employee not found");
             }
-            catch (Exception _)
+
+            ReviewResponse ReviewForGivenEntity = _reviewService.ShowReview(id);
+
+            if (ReviewForGivenEntity.Sucess == true)
             {
-                return Unauthorized();
+                return Ok(ReviewForGivenEntity.Review);
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 
@@ -198,31 +147,22 @@ namespace inOfficeApplication.Controllers
         [HttpPost("employee/review")]
         public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
         {
-            try
+            Employee employee = GetEmployee();
+
+            if (employee == null)
             {
-                Employee employee = GetEmployee();
-
-                if (employee != null)
-                {
-                    CreateReviewResponse response = _reviewService.CreateReview(dto);
-
-                    if (response.Success == true)
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
+                return NotFound("Employee not found");
             }
-            catch (Exception _)
+
+            CreateReviewResponse response = _reviewService.CreateReview(dto);
+
+            if (response.Success == true)
             {
-                return Unauthorized();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 
@@ -230,33 +170,25 @@ namespace inOfficeApplication.Controllers
         [HttpDelete("employee/reserve/{id}")]
         public ActionResult<CancelReservationResponse> CancelReservation(int id)
         {
-            try
-            {
-                Employee employee = GetEmployee();
+            Employee employee = GetEmployee();
 
-                if (employee != null)
-                {
-                    CancelReservationResponse response = _reservationService.CancelReservation(id);
-                    if (response.Success == true)
-                    {
-                        return Ok(new
-                        {
-                            message = "success"
-                        });
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
-                else
-                {
-                    return Unauthorized();
-                }
-            }
-            catch (Exception _)
+            if (employee == null)
             {
-                return Unauthorized();
+                return NotFound("Employee not found");
+            }
+
+            CancelReservationResponse response = _reservationService.CancelReservation(id);
+
+            if (response.Success == true)
+            {
+                return Ok(new
+                {
+                    message = "success"
+                });
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 

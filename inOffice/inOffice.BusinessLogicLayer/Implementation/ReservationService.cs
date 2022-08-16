@@ -32,41 +32,33 @@ namespace inOffice.BusinessLogicLayer.Implementation
             CancelReservationResponse cancelReservationResponse = new CancelReservationResponse();
 
             Reservation reservationToDelete = _reservationRepository.Get(id, includeDesk: true, includeonferenceRoom: true);
-            try
+            if (reservationToDelete.Desk != null)
             {
-                if (reservationToDelete.Desk != null)
+                reservationToDelete.Desk.ReservationId = null;
+
+                using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    reservationToDelete.Desk.ReservationId = null;
+                    _deskRepository.Update(reservationToDelete.Desk);
+                    _reservationRepository.Delete(reservationToDelete);
 
-                    using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        _deskRepository.Update(reservationToDelete.Desk);
-                        _reservationRepository.Delete(reservationToDelete);
-
-                        transaction.Complete();
-                    }
-
-                    cancelReservationResponse.Success = true;
-                }
-                else if (reservationToDelete.ConferenceRoom != null)
-                {
-                    reservationToDelete.ConferenceRoom.ReservationId = null;
-
-                    using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        _conferenceRoomRepository.Update(reservationToDelete.ConferenceRoom);
-                        _reservationRepository.Delete(reservationToDelete);
-
-                        transaction.Complete();
-                    }
-
-                    cancelReservationResponse.Success = true;
+                    transaction.Complete();
                 }
 
+                cancelReservationResponse.Success = true;
             }
-            catch (Exception _)
+            else if (reservationToDelete.ConferenceRoom != null)
             {
-                cancelReservationResponse.Success = false;
+                reservationToDelete.ConferenceRoom.ReservationId = null;
+
+                using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    _conferenceRoomRepository.Update(reservationToDelete.ConferenceRoom);
+                    _reservationRepository.Delete(reservationToDelete);
+
+                    transaction.Complete();
+                }
+
+                cancelReservationResponse.Success = true;
             }
 
             return cancelReservationResponse;
@@ -77,34 +69,26 @@ namespace inOffice.BusinessLogicLayer.Implementation
             EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
 
             List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeOffice: true);
-
-            try
+            foreach (Reservation employeeReservation in employeeReservations)
             {
-                foreach (Reservation employeeReservation in employeeReservations)
+                if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) > 0)
                 {
-                    if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) > 0)
+                    CustomReservationResponse reservation = new CustomReservationResponse
                     {
-                        CustomReservationResponse reservation = new CustomReservationResponse
-                        {
-                            Id = employeeReservation.Id,
-                            EmployeeId = employeeReservation.EmployeeId,
-                            DeskId = employeeReservation.DeskId,
-                            ConfId = employeeReservation.ConferenceRoomId,
-                            ReviewId = employeeReservation.ReviewId,
-                            StartDate = employeeReservation.StartDate,
-                            EndDate = employeeReservation.EndDate,
-                            OfficeName = employeeReservation.Desk?.Office?.Name,
-                            DeskIndex = employeeReservation.Desk?.IndexForOffice
-                        };
-                        employeeReservationsResponse.CustomReservationResponses.Add(reservation);
-                    }
+                        Id = employeeReservation.Id,
+                        EmployeeId = employeeReservation.EmployeeId,
+                        DeskId = employeeReservation.DeskId,
+                        ConfId = employeeReservation.ConferenceRoomId,
+                        ReviewId = employeeReservation.ReviewId,
+                        StartDate = employeeReservation.StartDate,
+                        EndDate = employeeReservation.EndDate,
+                        OfficeName = employeeReservation.Desk?.Office?.Name,
+                        DeskIndex = employeeReservation.Desk?.IndexForOffice
+                    };
+                    employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                 }
-                employeeReservationsResponse.Success = true;
             }
-            catch (Exception _)
-            {
-                employeeReservationsResponse.Success = false;
-            }
+            employeeReservationsResponse.Success = true;
 
             return employeeReservationsResponse;
         }
@@ -114,33 +98,26 @@ namespace inOffice.BusinessLogicLayer.Implementation
             EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
             List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeOffice: true);
 
-            try
+            foreach (Reservation employeeReservation in employeeReservations)
             {
-                foreach (Reservation employeeReservation in employeeReservations)
+                if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(employeeReservation.EndDate, DateTime.Now) < 0)
                 {
-                    if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(employeeReservation.EndDate, DateTime.Now) < 0)
+                    CustomReservationResponse reservation = new CustomReservationResponse
                     {
-                        CustomReservationResponse reservation = new CustomReservationResponse
-                        {
-                            Id = employeeReservation.Id,
-                            EmployeeId = employeeReservation.EmployeeId,
-                            DeskId = employeeReservation.DeskId,
-                            ConfId = employeeReservation.ConferenceRoomId,
-                            ReviewId = employeeReservation.ReviewId,
-                            StartDate = employeeReservation.StartDate,
-                            EndDate = employeeReservation.EndDate,
-                            OfficeName = employeeReservation.Desk?.Office?.Name,
-                            DeskIndex = employeeReservation.Desk?.IndexForOffice
-                        };
-                        employeeReservationsResponse.CustomReservationResponses.Add(reservation);
-                    }
+                        Id = employeeReservation.Id,
+                        EmployeeId = employeeReservation.EmployeeId,
+                        DeskId = employeeReservation.DeskId,
+                        ConfId = employeeReservation.ConferenceRoomId,
+                        ReviewId = employeeReservation.ReviewId,
+                        StartDate = employeeReservation.StartDate,
+                        EndDate = employeeReservation.EndDate,
+                        OfficeName = employeeReservation.Desk?.Office?.Name,
+                        DeskIndex = employeeReservation.Desk?.IndexForOffice
+                    };
+                    employeeReservationsResponse.CustomReservationResponses.Add(reservation);
                 }
-                employeeReservationsResponse.Success = true;
             }
-            catch (Exception _)
-            {
-                employeeReservationsResponse.Success = false;
-            }
+            employeeReservationsResponse.Success = true;
 
             return employeeReservationsResponse;
         }
@@ -205,7 +182,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     Id = reservation.Id,
                     OfficeName = reservation.Desk?.Office?.Name,
                     IndexForOffice = reservation.Desk?.IndexForOffice
-            };
+                };
 
                 if (newReservation.Employee != null)
                 {

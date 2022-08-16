@@ -25,21 +25,14 @@ namespace inOfficeApplication.Controllers
         [HttpPost("admin/office")]
         public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
         {
-            try
+            OfficeResponse response = _officeService.CreateNewOffice(dto);
+            if (response.Success != true)
             {
-                OfficeResponse response = _officeService.CreateNewOffice(dto);
-                if (response.Success != true)
-                {
-                    return Conflict("There is allready office with the same name");
-                }
-                else
-                {
-                    return Created("Success", response);
-                }
+                return Conflict("There is allready office with the same name");
             }
-            catch (Exception _)
+            else
             {
-                return Unauthorized();
+                return Created("Success", response);
             }
         }
 
@@ -47,21 +40,14 @@ namespace inOfficeApplication.Controllers
         [HttpGet("admin/office/image/{id}")]
         public ActionResult<OfficeResponse> ImageUrl(int id)
         {
-            try
+            Office office = _officeService.GetDetailsForOffice(id);
+            if (office.OfficeImage != null)
             {
-                Office office = _officeService.GetDetailsForOffice(id);
-                if (office.OfficeImage != null)
-                {
-                    return Ok(office.OfficeImage);
-                }
-                else
-                {
-                    return BadRequest("Image not found");
-                }
+                return Ok(office.OfficeImage);
             }
-            catch
+            else
             {
-                return Unauthorized();
+                return BadRequest("Image not found");
             }
         }
 
@@ -69,22 +55,15 @@ namespace inOfficeApplication.Controllers
         [HttpPut("admin/office/{id}")]
         public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
         {
-            try
+            dto.Id = id;
+            OfficeResponse result = _officeService.UpdateOffice(dto);
+            if (result.Success)
             {
-                dto.Id = id;
-                OfficeResponse result = _officeService.UpdateOffice(dto);
-                if (result.Success)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                return Ok(result);
             }
-            catch (Exception _)
+            else
             {
-                return Unauthorized();
+                return BadRequest();
             }
         }
 
@@ -92,31 +71,17 @@ namespace inOfficeApplication.Controllers
         [HttpDelete("admin/office/{id}")]
         public ActionResult<OfficeResponse> Delete(int id)
         {
-            try
+            OfficeResponse result = _officeService.DeleteOffice(id);
+            if (result.Success)
             {
-                if (id == 0)
+                return Ok(new
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    OfficeResponse result = _officeService.DeleteOffice(id);
-                    if (result.Success)
-                    {
-                        return Ok(new
-                        {
-                            message = "success"
-                        });
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
+                    message = "success"
+                });
             }
-            catch (Exception _)
+            else
             {
-                return Unauthorized();
+                return BadRequest();
             }
         }
 
@@ -124,23 +89,16 @@ namespace inOfficeApplication.Controllers
         [HttpGet("admin/offices")]
         public ActionResult<IEnumerable<Office>> GetAllOffices()
         {
-            try
-            {
-                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-                OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
 
-                if (offices.Success)
-                {
-                    return Ok(offices.Offices);
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            catch (Exception _)
+            if (offices.Success)
             {
-                return Unauthorized();
+                return Ok(offices.Offices);
+            }
+            else
+            {
+                return BadRequest();
             }
         }
     }

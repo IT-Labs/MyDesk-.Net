@@ -25,16 +25,16 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/reservations/all")]
         public ActionResult<AllReservationsResponse> ReservationsAll()
         {
-            try
-            {
-                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-                AllReservationsResponse reservations = _reservationService.AllReservations(take: take, skip: skip);
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            AllReservationsResponse reservations = _reservationService.AllReservations(take: take, skip: skip);
 
-                return Ok(reservations);
-            }
-            catch (Exception ex)
+            if (reservations.Success != true)
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(reservations);
             }
         }
 
@@ -43,23 +43,16 @@ namespace inOfficeApplication.Controllers
         [HttpGet("employee/reviews/all")]
         public ActionResult<AllReviewsResponse> ReviewsAll()
         {
-            try
-            {
-                Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-                AllReviewsResponse reviews = _reviewService.AllReviews(take: take, skip: skip);
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            AllReviewsResponse reviews = _reviewService.AllReviews(take: take, skip: skip);
 
-                if (reviews.Success != true)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return Ok(reviews);
-                }
-            }
-            catch (Exception ex)
+            if (reviews.Success != true)
             {
-                return BadRequest(ex);
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(reviews);
             }
         }
     }
