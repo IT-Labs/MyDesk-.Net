@@ -32,13 +32,20 @@ namespace inOfficeApplication.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, out string message))
+            if (context.Request.Method.ToUpper() == "OPTIONS")
             {
-                await _requestDelegate(context);
+                await context.Response.CompleteAsync();
             }
             else
             {
-                await HandleUnauthorized(context, message);
+                if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, out string message))
+                {
+                    await _requestDelegate(context);
+                }
+                else
+                {
+                    await HandleUnauthorized(context, message);
+                }
             }
         }
 
