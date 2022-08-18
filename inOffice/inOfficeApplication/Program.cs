@@ -90,11 +90,7 @@ app.UseMiddleware(typeof(AuthorizationMiddleware));
 
 app.UseHttpsRedirection();
 
-app.UseCors(options => options
-    .AllowAnyOrigin()
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-);
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
 
 app.MapControllers();
 
