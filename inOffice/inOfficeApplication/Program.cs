@@ -6,10 +6,6 @@ using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Implementation;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols;
 using inOfficeApplication.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -33,29 +29,11 @@ builder.Services.AddScoped<IConferenceRoomRepository, ConferenceRoomRepository>(
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
-IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, ReviewService>();
 builder.Services.AddTransient<IEmployeeService, EmployeeService>();
-
-ConfigurationManager<OpenIdConnectConfiguration> configManager = new ConfigurationManager<OpenIdConnectConfiguration>(configuration["Settings:MetadataAddress"], new OpenIdConnectConfigurationRetriever());
-
-OpenIdConnectConfiguration openIdConfig = await configManager.GetConfigurationAsync();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-options.TokenValidationParameters = new TokenValidationParameters
-{
-    ValidateAudience = true,
-    ValidateIssuer = true,
-    ValidateLifetime = true,
-    ValidateIssuerSigningKey = true,
-    ValidIssuer = configuration["JwtInfo:Issuer"],
-    ValidAudience = configuration["JwtInfo:Audience"],
-    IssuerSigningKeys = openIdConfig.SigningKeys,
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -108,6 +86,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+app.UseMiddleware(typeof(AuthorizationMiddleware));
 
 app.UseHttpsRedirection();
 
@@ -116,9 +95,6 @@ app.UseCors(options => options
     .AllowAnyHeader()
     .AllowAnyMethod()
 );
-
-app.UseAuthorization();
-app.UseAuthentication();
 
 app.MapControllers();
 

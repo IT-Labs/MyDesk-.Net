@@ -37,6 +37,24 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return _employeeRepository.GetByEmail(email);
         }
 
+        public Employee GetByEmailAndPassword(string email, string password)
+        {
+            Employee employee = _employeeRepository.GetByEmail(email);
+            if (employee == null)
+            {
+                return null;
+            }
+
+            if (BCrypt.Net.BCrypt.Verify(password, employee.Password))
+            {
+                return employee;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public Employee GetById(int id)
         {
             return _employeeRepository.GetById(id);
