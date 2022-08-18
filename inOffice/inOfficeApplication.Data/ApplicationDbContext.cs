@@ -9,7 +9,6 @@ namespace inOfficeApplication.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
 
-        public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Office> Offices { get; set; }
         public virtual DbSet<Mode> Modes { get; set; }
@@ -27,7 +26,6 @@ namespace inOfficeApplication.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            
             base.OnModelCreating(builder);
 
             //ONE TO ONE
@@ -116,18 +114,6 @@ namespace inOfficeApplication.Data
                             .WithMany(z => z.DeskCategories)
                             .HasForeignKey(z => z.DeskId)
                             .OnDelete(DeleteBehavior.ClientCascade);
-
-
-            builder.Entity<Admin>().HasData(
-                new Admin
-                {
-                    FirstName = "Nekoj Admin",
-                    LastName = "Prezime Admin",
-                    Id = 2,
-                    Email = "admin@inoffice.com",
-                    Password = BCrypt.Net.BCrypt.HashPassword("Passvord!23"),
-                    IsDeleted = false
-                }) ;
 
             builder.Entity<Employee>().HasData(
                 new Employee

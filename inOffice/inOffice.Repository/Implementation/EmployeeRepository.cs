@@ -13,16 +13,15 @@ namespace inOffice.Repository.Implementation
             _context = context;
         }
 
-        public Employee Create(Employee employee)
+        public void Create(Employee employee)
         {
-            _context.Add(employee);
-            employee.Id = _context.SaveChanges();
-            return employee;
+            _context.Employees.Add(employee);
+            _context.SaveChanges();
         }
 
         public Employee GetByEmail(string email)
         {
-            return _context.Employees.FirstOrDefault(a => a.Email == email);
+            return _context.Employees.FirstOrDefault(a => a.Email == email && !a.IsDeleted);
         }
 
         public List<Employee> GetAll()
