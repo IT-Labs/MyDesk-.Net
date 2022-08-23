@@ -93,6 +93,7 @@ namespace inOffice.Repository.Implementation
 
         public List<Reservation> GetEmployeeReservations(int employeeId,
             bool? includeDesk = null,
+            bool? includeConferenceRoom = null,
             bool? includeOffice = null)
         {
             IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false);
@@ -101,10 +102,21 @@ namespace inOffice.Repository.Implementation
             {
                 query = query.Include(x => x.Desk);
             }
-            if (includeDesk == true && includeOffice == true)
+            else if (includeDesk == true && includeOffice == true)
             {
                 query = query
                     .Include(x => x.Desk)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (includeConferenceRoom == true && includeOffice != true)
+            {
+                query = query.Include(x => x.ConferenceRoom);
+            }
+            else if (includeConferenceRoom == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.ConferenceRoom)
                     .ThenInclude(x => x.Office);
             }
 

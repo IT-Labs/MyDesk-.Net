@@ -52,9 +52,10 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
 
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeOffice: true);
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
             foreach (Reservation employeeReservation in employeeReservations)
             {
+                string officeName = GetReservationOfficeName(employeeReservation);
                 if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) > 0)
                 {
                     ReservationDto reservation = new ReservationDto
@@ -66,7 +67,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                         ReviewId = employeeReservation.Reviews.FirstOrDefault()?.Id,
                         StartDate = employeeReservation.StartDate,
                         EndDate = employeeReservation.EndDate,
-                        OfficeName = employeeReservation.Desk?.Office?.Name,
+                        OfficeName = officeName,
                         DeskIndex = employeeReservation.Desk?.IndexForOffice
                     };
                     employeeReservationsResponse.CustomReservationResponses.Add(reservation);
@@ -80,10 +81,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public EmployeeReservationsResponse PastReservations(Employee employee)
         {
             EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeOffice: true);
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
 
             foreach (Reservation employeeReservation in employeeReservations)
             {
+                string officeName = GetReservationOfficeName(employeeReservation);
                 if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(employeeReservation.EndDate, DateTime.Now) < 0)
                 {
                     ReservationDto reservation = new ReservationDto
@@ -95,7 +97,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                         ReviewId = employeeReservation.Reviews.FirstOrDefault()?.Id,
                         StartDate = employeeReservation.StartDate,
                         EndDate = employeeReservation.EndDate,
-                        OfficeName = employeeReservation.Desk?.Office?.Name,
+                        OfficeName = officeName,
                         DeskIndex = employeeReservation.Desk?.IndexForOffice
                     };
                     employeeReservationsResponse.CustomReservationResponses.Add(reservation);
@@ -178,6 +180,22 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             response.Success = true;
             return response;
+        }
+
+        private string GetReservationOfficeName(Reservation employeeReservation)
+        {
+            string officeName = string.Empty;
+
+            if (employeeReservation.Desk != null)
+            {
+                officeName = employeeReservation.Desk.Office.Name;
+            }
+            else if (employeeReservation.ConferenceRoom != null)
+            {
+                officeName = employeeReservation.ConferenceRoom.Office.Name;
+            }
+
+            return officeName;
         }
     }
 }
