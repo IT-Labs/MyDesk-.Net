@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Implementation
 {
@@ -13,18 +13,19 @@ namespace inOffice.Repository.Implementation
             _context = context;
         }
 
-        public Categories GetDeskCategories(int deskId)
+        public Category Get(bool? doubleMonitor, bool? nearWindow, bool? singleMonitor, bool? unavailable)
         {
-            return _context.Categories.FirstOrDefault(x => x.DeskId == deskId && !x.IsDeleted);
+            return _context.Categories.FirstOrDefault(x => x.DoubleMonitor == doubleMonitor && x.NearWindow == nearWindow && 
+            x.SingleMonitor == singleMonitor && x.Unavailable == unavailable && x.IsDeleted == false);
         }
 
-        public void Insert(Categories categories)
+        public void Insert(Category categories)
         {
             _context.Categories.Add(categories);
             _context.SaveChanges();
         }
 
-        public void Update(Categories categories)
+        public void Update(Category categories)
         {
             _context.Categories.Update(categories);
             _context.SaveChanges();

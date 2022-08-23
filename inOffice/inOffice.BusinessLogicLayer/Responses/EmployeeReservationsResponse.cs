@@ -1,20 +1,15 @@
-﻿using inOfficeApplication.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using inOfficeApplication.Data.DTO;
 
 namespace inOffice.BusinessLogicLayer.Responses
 {
     public class EmployeeReservationsResponse
     {
-        public List<CustomReservationResponse> CustomReservationResponses { get; set; }
+        public List<ReservationDto> CustomReservationResponses { get; set; }
         public bool Success { get; set; }
 
         public EmployeeReservationsResponse()
         {
-            CustomReservationResponses = new List<CustomReservationResponse>();
+            CustomReservationResponses = new List<ReservationDto>();
         }
     }
 }

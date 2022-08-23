@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Implementation
 {
@@ -21,17 +21,12 @@ namespace inOffice.Repository.Implementation
 
         public Employee GetByEmail(string email)
         {
-            return _context.Employees.FirstOrDefault(a => a.Email == email && !a.IsDeleted);
+            return _context.Employees.FirstOrDefault(a => a.Email == email && a.IsDeleted == false);
         }
 
         public List<Employee> GetAll()
         {
-            return _context.Employees.Where(x => !x.IsDeleted).ToList();
-        }
-
-        public Employee GetById(int id)
-        {
-            return _context.Employees.FirstOrDefault(a => a.Id == id);
+            return _context.Employees.Where(x => x.IsDeleted == false).ToList();
         }
     }
 }

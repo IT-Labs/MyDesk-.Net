@@ -22,7 +22,7 @@ namespace inOfficeApplication.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Categories", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,30 +30,41 @@ namespace inOfficeApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("DeskId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("DoubleMonitor")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("DoubleMonitor")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("NearWindow")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("NearWindow")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
-                    b.Property<bool>("SingleMonitor")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("SingleMonitor")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
-                    b.Property<bool>("Unavailable")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("Unavailable")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.HasIndex(new[] { "DoubleMonitor", "NearWindow", "SingleMonitor", "IsDeleted", "Unavailable" }, "IX_Categories");
+
+                    b.ToTable("Category", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoom", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.ConferenceRoom", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,53 +78,23 @@ namespace inOfficeApplication.Data.Migrations
                     b.Property<int?>("IndexForOffice")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReservationId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OfficeId");
+                    b.HasIndex(new[] { "OfficeId" }, "IX_ConferenceRooms_OfficeId");
 
-                    b.HasIndex("ReservationId")
-                        .IsUnique()
-                        .HasFilter("[ReservationId] IS NOT NULL");
-
-                    b.ToTable("ConferenceRooms");
+                    b.ToTable("ConferenceRoom", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoomMode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ConferenceRoomId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ModeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConferenceRoomId");
-
-                    b.HasIndex("ModeId");
-
-                    b.ToTable("ConferenceRoomModes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Desk", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Desk", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,79 +112,25 @@ namespace inOfficeApplication.Data.Migrations
                     b.Property<int?>("IndexForOffice")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReservationId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OfficeId");
+                    b.HasIndex("CategorieId");
 
-                    b.HasIndex("ReservationId")
-                        .IsUnique()
-                        .HasFilter("[ReservationId] IS NOT NULL");
+                    b.HasIndex(new[] { "OfficeId" }, "IX_Desks_OfficeId");
 
-                    b.ToTable("Desks");
+                    b.ToTable("Desk", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskCategories", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeskId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("DeskId");
-
-                    b.ToTable("DeskCategories");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskMode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("DeskId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ModeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeskId");
-
-                    b.HasIndex("ModeId");
-
-                    b.ToTable("DeskModes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Employee", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Employee", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -220,10 +147,16 @@ namespace inOfficeApplication.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsAdmin")
-                        .HasColumnType("bit");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(1)))");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
@@ -238,21 +171,10 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "user@inoffice.com",
-                            FirstName = "Nekoj Employee",
-                            IsDeleted = false,
-                            LastName = "Prezime Employee",
-                            Password = "$2a$11$Nhp5LeLiLWYm5xXKQW1RuOA7xVL90vxwmSLHLhIzRdP8FM9C20TH2"
-                        });
+                    b.ToTable("Employee", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Mode", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Office", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,35 +182,11 @@ namespace inOfficeApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OfficeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OfficeId");
-
-                    b.ToTable("Modes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Office", b =>
-                {
-                    b.Property<int>("Id")
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -300,10 +198,10 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Offices");
+                    b.ToTable("Office", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Reservation", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Reservation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -321,25 +219,31 @@ namespace inOfficeApplication.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.0000000')");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("int");
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex(new[] { "ConferenceRoomId" }, "IX_Reservations_ConferenceRoomId");
 
-                    b.ToTable("Reservations");
+                    b.HasIndex(new[] { "DeskId" }, "IX_Reservations_DeskId");
+
+                    b.HasIndex(new[] { "EmployeeId" }, "IX_Reservations_EmployeeId");
+
+                    b.ToTable("Reservation", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Review", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -347,8 +251,11 @@ namespace inOfficeApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsDeleted")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<int>("ReservationId")
                         .HasColumnType("int");
@@ -362,181 +269,107 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId")
-                        .IsUnique();
+                    b.HasIndex(new[] { "ReservationId" }, "IX_Reviews_ReservationId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Review", (string)null);
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoom", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.ConferenceRoom", b =>
                 {
-                    b.HasOne("inOfficeApplication.Data.Models.Office", "Office")
+                    b.HasOne("inOfficeApplication.Data.Entities.Office", "Office")
                         .WithMany("ConferenceRooms")
                         .HasForeignKey("OfficeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("inOfficeApplication.Data.Models.Reservation", "Reservation")
-                        .WithOne("ConferenceRoom")
-                        .HasForeignKey("inOfficeApplication.Data.Models.ConferenceRoom", "ReservationId");
-
                     b.Navigation("Office");
-
-                    b.Navigation("Reservation");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoomMode", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Desk", b =>
                 {
-                    b.HasOne("inOfficeApplication.Data.Models.ConferenceRoom", "ConferenceRoom")
-                        .WithMany("ConferenceRoomModes")
-                        .HasForeignKey("ConferenceRoomId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
+                    b.HasOne("inOfficeApplication.Data.Entities.Category", "Categorie")
+                        .WithMany("Desks")
+                        .HasForeignKey("CategorieId")
+                        .HasConstraintName("FK_Desks_Category_CategorieId");
 
-                    b.HasOne("inOfficeApplication.Data.Models.Mode", "Mode")
-                        .WithMany("ConferenceRoomModes")
-                        .HasForeignKey("ModeId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("ConferenceRoom");
-
-                    b.Navigation("Mode");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Desk", b =>
-                {
-                    b.HasOne("inOfficeApplication.Data.Models.Office", "Office")
+                    b.HasOne("inOfficeApplication.Data.Entities.Office", "Office")
                         .WithMany("Desks")
                         .HasForeignKey("OfficeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("inOfficeApplication.Data.Models.Reservation", "Reservation")
-                        .WithOne("Desk")
-                        .HasForeignKey("inOfficeApplication.Data.Models.Desk", "ReservationId");
-
-                    b.Navigation("Office");
-
-                    b.Navigation("Reservation");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskCategories", b =>
-                {
-                    b.HasOne("inOfficeApplication.Data.Models.Desk", "Desk")
-                        .WithMany("DeskCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("inOfficeApplication.Data.Models.Categories", "Categorie")
-                        .WithMany("DeskCategories")
-                        .HasForeignKey("DeskId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Desks_Offices_OfficeId");
 
                     b.Navigation("Categorie");
 
-                    b.Navigation("Desk");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.DeskMode", b =>
-                {
-                    b.HasOne("inOfficeApplication.Data.Models.Desk", "Desk")
-                        .WithMany("DeskModes")
-                        .HasForeignKey("DeskId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("inOfficeApplication.Data.Models.Mode", "Mode")
-                        .WithMany("DeskModes")
-                        .HasForeignKey("ModeId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("Desk");
-
-                    b.Navigation("Mode");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Mode", b =>
-                {
-                    b.HasOne("inOfficeApplication.Data.Models.Office", "Office")
-                        .WithMany("Modes")
-                        .HasForeignKey("OfficeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Office");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Reservation", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Reservation", b =>
                 {
-                    b.HasOne("inOfficeApplication.Data.Models.Employee", "Employee")
+                    b.HasOne("inOfficeApplication.Data.Entities.ConferenceRoom", "ConferenceRoom")
+                        .WithMany("Reservations")
+                        .HasForeignKey("ConferenceRoomId");
+
+                    b.HasOne("inOfficeApplication.Data.Entities.Desk", "Desk")
+                        .WithMany("Reservations")
+                        .HasForeignKey("DeskId")
+                        .HasConstraintName("FK_Reservations_Desks_DeskId");
+
+                    b.HasOne("inOfficeApplication.Data.Entities.Employee", "Employee")
                         .WithMany("Reservations")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Reservations_Employees_EmployeeId");
+
+                    b.Navigation("ConferenceRoom");
+
+                    b.Navigation("Desk");
 
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Review", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Review", b =>
                 {
-                    b.HasOne("inOfficeApplication.Data.Models.Reservation", "Reservation")
-                        .WithOne("Review")
-                        .HasForeignKey("inOfficeApplication.Data.Models.Review", "ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("inOfficeApplication.Data.Entities.Reservation", "Reservation")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ReservationId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Reviews_Reservations_ReservationId");
 
                     b.Navigation("Reservation");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Categories", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Category", b =>
                 {
-                    b.Navigation("DeskCategories");
+                    b.Navigation("Desks");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoom", b =>
-                {
-                    b.Navigation("ConferenceRoomModes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Desk", b =>
-                {
-                    b.Navigation("DeskCategories");
-
-                    b.Navigation("DeskModes");
-                });
-
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Employee", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.ConferenceRoom", b =>
                 {
                     b.Navigation("Reservations");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Mode", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Desk", b =>
                 {
-                    b.Navigation("ConferenceRoomModes");
-
-                    b.Navigation("DeskModes");
+                    b.Navigation("Reservations");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Office", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Employee", b =>
+                {
+                    b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Office", b =>
                 {
                     b.Navigation("ConferenceRooms");
 
                     b.Navigation("Desks");
-
-                    b.Navigation("Modes");
                 });
 
-            modelBuilder.Entity("inOfficeApplication.Data.Models.Reservation", b =>
+            modelBuilder.Entity("inOfficeApplication.Data.Entities.Reservation", b =>
                 {
-                    b.Navigation("ConferenceRoom");
-
-                    b.Navigation("Desk");
-
-                    b.Navigation("Review");
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

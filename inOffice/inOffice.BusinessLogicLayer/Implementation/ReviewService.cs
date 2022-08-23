@@ -2,12 +2,11 @@
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Helpers;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text;
-using System.Transactions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -50,12 +49,29 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 Reservation reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeOffice: true);
 
+                if (reservation == null)
+                {
+                    continue;
+                }
+
+                string officeName = string.Empty;
+                int? deskIndex = null;
+                if (reservation.Desk != null)
+                {
+                    officeName = reservation.Desk.Office?.Name;
+                    deskIndex = reservation.Desk.IndexForOffice;
+                }
+                else if (reservation.ConferenceRoom != null)
+                {
+                    officeName = reservation.ConferenceRoom.Office?.Name;
+                }
+
                 CustomReviews custom = new CustomReviews()
                 {
-                    OfficeName = reservation.Desk?.Office?.Name,
+                    OfficeName = officeName,
                     Review = review.Reviews,
                     ReviewOutput = review.ReviewOutput,
-                    DeskIndex = reservation.Desk?.IndexForOffice
+                    DeskIndex = deskIndex
                 };
 
                 list.Add(custom);
@@ -75,23 +91,23 @@ namespace inOffice.BusinessLogicLayer.Implementation
             CreateReviewResponse response = new CreateReviewResponse();
 
             Reservation reservation = _reservationRepository.Get(createReviewRequest.ReservationId);
+
+            if (reservation == null)
+            {
+                response.Success = false;
+                return response;
+            }
+
             Task<string> responseSentimentAnalysis = GetAnalysedReview(createReviewRequest.Review);
             Review review = new Review()
             {
                 Reviews = createReviewRequest.Review,
                 ReservationId = createReviewRequest.ReservationId,
-                ReviewOutput = responseSentimentAnalysis.Result
+                ReviewOutput = responseSentimentAnalysis.Result,
+                Reservation = reservation
             };
 
-            using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                _reviewRepository.Insert(review);
-
-                reservation.ReviewId = review.Id;
-                _reservationRepository.Update(reservation);
-
-                transaction.Complete();
-            }
+            _reviewRepository.Insert(review);
 
             response.Success = true;
 

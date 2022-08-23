@@ -1,7 +1,7 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,27 +23,6 @@ namespace inOfficeApplication.Controllers
             _reservationService = reservationService;
             _employeeService = employeeRepository;
             _reviewService = reviewService;
-        }
-
-        [HttpPost("employee/reserve")]
-        public ActionResult<ReservationResponse> Reservation(ReservationRequest dto)
-        {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
-            {
-                return NotFound("Employee not found");
-            }
-
-            ReservationResponse response = _reservationService.Reserve(dto, employee);
-            if (response.Success == true)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
         }
 
         [HttpPost("employee/reserve/coworker")]
@@ -185,8 +164,8 @@ namespace inOfficeApplication.Controllers
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
             string jwt = authHeader.Substring(7);
-            JwtPayload JwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
-            string email = JwtSecurityTokenDecoded.ElementAt(9).Value.ToString();
+            JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+            string email = jwtSecurityTokenDecoded.Claims.First(x => x.Type == "preferred_username").Value;
             return _employeeService.GetByEmail(email);
         }
     }

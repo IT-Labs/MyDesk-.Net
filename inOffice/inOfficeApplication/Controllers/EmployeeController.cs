@@ -1,7 +1,8 @@
 ﻿using inOffice.BusinessLogicLayer;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/offices")]
-        public ActionResult<IEnumerable<Office>> GetAllOffices()
+        public ActionResult<IEnumerable<OfficeDto>> GetAllOffices()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
             OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);

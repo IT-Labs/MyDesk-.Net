@@ -1,6 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {

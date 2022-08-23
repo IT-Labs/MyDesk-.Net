@@ -7,6 +7,8 @@ using inOffice.BusinessLogicLayer.Implementation;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using inOfficeApplication.Middleware;
+using AutoMapper;
+using inOfficeApplication.Mapper;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,10 @@ builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, ReviewService>();
 builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+
+// Configure mapper
+IMapper mapper = MapperConfigurations.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

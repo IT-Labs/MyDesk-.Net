@@ -1,17 +1,15 @@
 ﻿using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
     public interface IReservationService
     {
-       ReservationResponse Reserve(ReservationRequest request, Employee employee);
        EmployeeReservationsResponse EmployeeReservations(Employee employee);
        CancelReservationResponse CancelReservation(int id);
        EmployeeReservationsResponse PastReservations(Employee employee);
        AllReservationsResponse AllReservations(int? take = null, int? skip = null);
-       ReservationResponse CoworkerReserve(CoworkerReservationRequest dto); 
-
+       ReservationResponse CoworkerReserve(CoworkerReservationRequest dto);
     }
 }

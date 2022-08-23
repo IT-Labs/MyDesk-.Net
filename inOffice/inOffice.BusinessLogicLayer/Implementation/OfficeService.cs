@@ -1,18 +1,22 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using AutoMapper;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
     public class OfficeService : IOfficeService
     {
         private readonly IOfficeRepository _officeRepository;
+        private readonly IMapper _mapper;
 
-        public OfficeService(IOfficeRepository officeRepository)
+        public OfficeService(IOfficeRepository officeRepository, IMapper mapper)
         {
             _officeRepository = officeRepository;
+            _mapper = mapper;
         }
 
         public OfficeResponse CreateNewOffice(NewOfficeRequest request)
@@ -43,7 +47,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             OfficeResponse response = new OfficeResponse();
 
-            Office office = GetDetailsForOffice(request.Id);
+            Office office = _officeRepository.Get(request.Id);
 
             if (office == null)
             {
@@ -64,7 +68,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             OfficeResponse response = new OfficeResponse();
 
-            Office office = GetDetailsForOffice(id);
+            Office office = _officeRepository.Get(id);
 
             if (office == null)
             {
@@ -80,12 +84,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public OfficeListResponse GetAllOffices(int? take = null, int? skip = null)
         {
-            OfficeListResponse officeListResponse = new OfficeListResponse();
+            List<Office> offices = _officeRepository.GetAll(take: take, skip: skip);
 
-            officeListResponse.Offices = _officeRepository.GetAll(take: take, skip: skip);
-            officeListResponse.Success = true;
-
-            return officeListResponse;
+            return new OfficeListResponse()
+            {
+                Offices = _mapper.Map<List<OfficeDto>>(offices),
+                Success = true
+            };
         }
 
         public Office GetDetailsForOffice(int id)

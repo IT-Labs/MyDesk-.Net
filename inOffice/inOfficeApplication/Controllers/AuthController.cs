@@ -1,6 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

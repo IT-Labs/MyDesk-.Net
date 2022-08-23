@@ -1,11 +1,12 @@
-﻿using inOfficeApplication.Data.Models;
+﻿using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Interface
 {
     public interface IDeskRepository
     {
-        Desk Get(int id);
-        List<Desk> GetOfficeDesks(int officeId, int? take = null, int? skip = null);
+        Desk Get(int id, bool? includeReservations = null, bool? includeReviews = null);
+        int GetHighestDeskIndexForOffice(int officeId);
+        List<Desk> GetOfficeDesks(int officeId, bool? includeCategory = null, int? take = null, int? skip = null);
         void BulkInsert(List<Desk> desks);
         void Update(Desk desk);
         void SoftDelete(Desk desk);

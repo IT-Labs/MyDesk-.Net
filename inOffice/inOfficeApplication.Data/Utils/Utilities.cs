@@ -2,7 +2,7 @@
 
 namespace inOfficeApplication.Data.Utils
 {
-    public class Utilities
+    public static class Utilities
     {
         public static void GetPaginationParameters(HttpRequest request, out int? take, out int? skip)
         {
@@ -19,6 +19,11 @@ namespace inOfficeApplication.Data.Utils
                 take = null;
                 skip = null;
             }
+        }
+
+        public static bool IsInRange(this DateTime date, DateTime from, DateTime to)
+        {
+            return DateTime.Compare(from, date) <= 0 && DateTime.Compare(date, to) <= 0;
         }
     }
 }

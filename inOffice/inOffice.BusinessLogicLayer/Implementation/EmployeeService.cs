@@ -1,7 +1,7 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -53,11 +53,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 return null;
             }
-        }
-
-        public Employee GetById(int id)
-        {
-            return _employeeRepository.GetById(id);
         }
     }
 }
