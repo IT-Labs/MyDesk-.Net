@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace inOffice.Repository.Implementation
@@ -14,22 +14,37 @@ namespace inOffice.Repository.Implementation
             _context = context;
         }
 
-        public ConferenceRoom Get(int id, bool? includeReservation = null)
+        public ConferenceRoom Get(int id, 
+            bool? includeReservations = null, 
+            bool? includeReviews = null)
         {
-            IQueryable<ConferenceRoom> query = _context.ConferenceRooms.Where(x => x.Id == id && !x.IsDeleted);
+            IQueryable<ConferenceRoom> query = _context.ConferenceRooms.Where(x => x.Id == id && x.IsDeleted == false);
 
-            if (includeReservation.HasValue)
+            if (includeReservations == true && includeReviews != true)
             {
-                query = query.Include(x => x.Reservation);
+                query = query.Include(x => x.Reservations.Where(y => y.IsDeleted == false));
             }
-
+            else if (includeReservations == true && includeReviews == true)
+            {
+                query = query
+                    .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
+                    .ThenInclude(x => x.Reviews.Where(y => y.IsDeleted == false));
+            }
+            
             return query.FirstOrDefault();
         }
 
-        public List<ConferenceRoom> GetOfficeConferenceRooms(int officeId, int? take = null, int? skip = null)
+        public List<ConferenceRoom> GetOfficeConferenceRooms(int officeId, 
+            bool? includeReservations = null, 
+            int? take = null, 
+            int? skip = null)
         {
-            IQueryable<ConferenceRoom> query = _context.ConferenceRooms.Where(x => x.OfficeId == officeId && !x.IsDeleted);
+            IQueryable<ConferenceRoom> query = _context.ConferenceRooms.Where(x => x.OfficeId == officeId && x.IsDeleted == false);
 
+            if (includeReservations == true)
+            {
+                query = query.Include(x =>x.Reservations.Where(y => y.IsDeleted == false));
+            }
             if (take.HasValue && skip.HasValue)
             {
                 query = query.Skip(skip.Value).Take(take.Value);
@@ -38,21 +53,10 @@ namespace inOffice.Repository.Implementation
             return query.ToList();
         }
 
-        public void Update(ConferenceRoom conferenceRoom)
+        public void SoftDelete(ConferenceRoom conferenceRoom)
         {
+            conferenceRoom.IsDeleted = true;
             _context.ConferenceRooms.Update(conferenceRoom);
-            _context.SaveChanges();
-        }
-
-        public void BulkUpdate(List<ConferenceRoom> conferenceRooms)
-        {
-            _context.ConferenceRooms.UpdateRange(conferenceRooms);
-            _context.SaveChanges();
-        }
-
-        public void Delete(ConferenceRoom conferenceRoom)
-        {
-            _context.ConferenceRooms.Remove(conferenceRoom);
             _context.SaveChanges();
         }
     }

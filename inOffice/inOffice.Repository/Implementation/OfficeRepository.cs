@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Implementation
 {
@@ -15,12 +15,17 @@ namespace inOffice.Repository.Implementation
 
         public Office Get(int id)
         {
-            return _context.Offices.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+            return _context.Offices.FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+        }
+
+        public Office GetByName(string name)
+        {
+            return _context.Offices.FirstOrDefault(x => x.Name == name && x.IsDeleted == false);
         }
 
         public List<Office> GetAll(int? take = null, int? skip = null)
         {
-            IQueryable<Office> query = _context.Offices.Where(x => !x.IsDeleted);
+            IQueryable<Office> query = _context.Offices.Where(x => x.IsDeleted == false);
 
             if (take.HasValue && skip.HasValue)
             {
@@ -28,11 +33,6 @@ namespace inOffice.Repository.Implementation
             }
 
             return query.ToList();
-        }
-
-        public Office GetByName(string name)
-        {
-            return _context.Offices.FirstOrDefault(x => x.Name == name && !x.IsDeleted);
         }
 
         public void Insert(Office office)

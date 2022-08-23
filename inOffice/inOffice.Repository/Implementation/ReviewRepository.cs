@@ -1,6 +1,6 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Implementation
 {
@@ -15,12 +15,12 @@ namespace inOffice.Repository.Implementation
 
         public Review Get(int id)
         {
-            return _context.Reviews.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+            return _context.Reviews.FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
         }
 
         public List<Review> GetAll(int? take = null, int? skip = null)
         {
-            IQueryable<Review> query = _context.Reviews.Where(x => !x.IsDeleted);
+            IQueryable<Review> query = _context.Reviews.Where(x => x.IsDeleted == false);
 
             if (take.HasValue && skip.HasValue)
             {

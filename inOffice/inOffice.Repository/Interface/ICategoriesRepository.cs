@@ -1,11 +1,11 @@
-﻿using inOfficeApplication.Data.Models;
+﻿using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Interface
 {
     public interface ICategoriesRepository
     {
-        Categories GetDeskCategories(int deskId);
-        void Insert(Categories categories);
-        void Update(Categories categories);
+        Category Get(bool? doubleMonitor, bool? nearWindow, bool? singleMonitor, bool? unavailable);
+        void Insert(Category categories);
+        void Update(Category categories);
     }
 }

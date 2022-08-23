@@ -1,4 +1,4 @@
-﻿using inOfficeApplication.Data.Models;
+﻿using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Interface
 {

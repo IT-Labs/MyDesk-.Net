@@ -1,4 +1,4 @@
-﻿using inOfficeApplication.Data.Models;
+﻿using inOfficeApplication.Data.Entities;
 
 namespace inOffice.Repository.Interface
 {
@@ -6,7 +6,6 @@ namespace inOffice.Repository.Interface
     {
         void Create(Employee employee);
         Employee GetByEmail(string email);
-        Employee GetById(int id);
         List<Employee> GetAll();
     }
 }

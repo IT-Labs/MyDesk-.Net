@@ -1,7 +1,7 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Models;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -95,7 +95,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("admin/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRooms(int id)
+        public ActionResult<IEnumerable<ConferenceRoomDto>> GetAllConferenceRooms(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
             ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
@@ -110,7 +110,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoom>> GetAllConferenceRoomsForEmployee(int id)
+        public ActionResult<IEnumerable<ConferenceRoomDto>> GetAllConferenceRoomsForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
             ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
@@ -125,7 +125,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office-desks/{id}")]
-        public ActionResult<IEnumerable<Desk>> GetAllDesksForEmployee(int id)
+        public ActionResult<IEnumerable<DeskDto>> GetAllDesksForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
             DesksResponse deskList = _entitiesService.ListAllDesks(id, take: take, skip: skip);
