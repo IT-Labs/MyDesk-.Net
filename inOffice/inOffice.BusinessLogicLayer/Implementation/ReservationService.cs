@@ -156,7 +156,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             ReservationResponse response = new ReservationResponse();
 
             Employee employee = _employeeRepository.GetByEmail(request.CoworkerMail);
-            List<Reservation> reservations = _reservationRepository.GetDeskReservations(request.DeskId);
+            List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(request.DeskId);
 
             Reservation newReservation = new Reservation()
             {
@@ -166,7 +166,20 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 DeskId = request.DeskId
             };
 
-            foreach (Reservation reservation in reservations)
+            // Check if there are existing reservations for that desk in that time-frame
+            foreach (Reservation reservation in deskReservations)
+            {
+                if (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
+                    newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate))
+                {
+                    response.Success = false;
+                    return response;
+                }
+            }
+
+            // Check if are existing reservations for that employee in that time-frame
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id);
+            foreach (Reservation reservation in employeeReservations)
             {
                 if (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
                     newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate))
