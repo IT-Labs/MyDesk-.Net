@@ -142,7 +142,7 @@ namespace inOfficeApplication.Middleware
 
         private RoleTypes GetRequiredRole(HttpContext context)
         {
-            string path = context.Request.Path.Value;
+            string path = context.Request.Path.Value.TrimEnd('/');
             string pathId = Regex.Match(path, @"\d+").Value;
 
             if (!string.IsNullOrEmpty(pathId))
