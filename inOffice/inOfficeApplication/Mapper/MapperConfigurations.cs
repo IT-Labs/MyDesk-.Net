@@ -49,18 +49,19 @@ namespace inOfficeApplication.Mapper
 
                 config.CreateMap<Reservation, ReservationDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
-                    .ForMember(x => x.DeskId, opt => opt.MapFrom(y => y.DeskId))
-                    .ForMember(x => x.ConfId, opt => opt.MapFrom(y => y.ConferenceRoomId))
                     .ForMember(x => x.StartDate, opt => opt.MapFrom(y => y.StartDate))
                     .ForMember(x => x.EndDate, opt => opt.MapFrom(y => y.EndDate))
-                    .ForMember(x => x.ReviewId, opt => opt.MapFrom(y => GetFirstReviewId(y.Reviews)))
-                    .ForMember(x => x.EmployeeId, opt => opt.MapFrom(y => y.EmployeeId))
-                    .ForMember(x => x.Employee, opt => opt.MapFrom(y => y.Employee));
+                    .ForMember(x => x.Reviews, opt => opt.MapFrom(y => y.Reviews))
+                    .ForMember(x => x.Employee, opt => opt.MapFrom(y => y.Employee))
+                    .ForMember(x => x.Desk, opt => opt.MapFrom(y => y.Desk))
+                    .ForMember(x => x.ConferenceRoom, opt => opt.MapFrom(y => y.ConferenceRoom))
+                    .ForMember(x => x.OfficeName, opt => opt.MapFrom(y => GetReservationOfficeName(y)));
             });
 
             return configuration.CreateMapper();
         }
 
+        #region Private methods
         private static int? GetFirstDeskId(ICollection<Desk> desks)
         {
             if (desks != null && desks.Count > 0)
@@ -73,16 +74,21 @@ namespace inOfficeApplication.Mapper
             }
         }
 
-        private static int? GetFirstReviewId(ICollection<Review> reviews)
+        private static string GetReservationOfficeName(Reservation reservation)
         {
-            if (reviews != null && reviews.Count > 0)
+            string officeName = string.Empty;
+
+            if (reservation.Desk != null)
             {
-                return reviews.First().Id;
+                officeName = reservation.Desk.Office?.Name;
             }
-            else
+            else if (reservation.ConferenceRoom != null)
             {
-                return null;
+                officeName = reservation.ConferenceRoom.Office?.Name;
             }
+
+            return officeName;
         }
+        #endregion
     }
 }
