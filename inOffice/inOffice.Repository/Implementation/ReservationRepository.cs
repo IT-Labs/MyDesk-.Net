@@ -44,12 +44,13 @@ namespace inOffice.Repository.Implementation
             return query.FirstOrDefault();
         }
 
-        public List<Reservation> GetAll(bool? includeEmployee = null, 
+        public Tuple<int?,List<Reservation>> GetAll(bool? includeEmployee = null, 
             bool? includeDesk = null,
             bool? includeOffice = null,
             int? take = null,
             int? skip = null)
         {
+            int? totalCount = null;
             IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false);
 
             if (includeEmployee == true)
@@ -68,6 +69,7 @@ namespace inOffice.Repository.Implementation
             }
             if (take.HasValue && skip.HasValue)
             {
+                totalCount = query.Count();
                 query = query.Skip(skip.Value).Take(take.Value);
             }
 
@@ -88,13 +90,14 @@ namespace inOffice.Repository.Implementation
                 }
             }
 
-            return result;
+            return Tuple.Create(totalCount, result);
         }
 
         public List<Reservation> GetEmployeeReservations(int employeeId,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
-            bool? includeOffice = null)
+            bool? includeOffice = null,
+            bool? includeReviews = null)
         {
             IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false);
 
@@ -118,6 +121,11 @@ namespace inOffice.Repository.Implementation
                 query = query
                     .Include(x => x.ConferenceRoom)
                     .ThenInclude(x => x.Office);
+            }
+
+            if (includeReviews == true)
+            {
+                query = query.Include(x => x.Reviews.Where(y => y.IsDeleted == false));
             }
 
             return query.ToList();
