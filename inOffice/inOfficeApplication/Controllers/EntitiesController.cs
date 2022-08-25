@@ -35,7 +35,10 @@ namespace inOfficeApplication.Controllers
         [HttpPost("admin/office-entities/{id}")]
         public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)
         {
-            dto.Id = id;
+            if (dto.Id != id)
+            {
+                return BadRequest("IDs in URL and body don't match");
+            }
 
             EntitiesResponse response = _entitiesService.CreateNewDesks(dto);
 
