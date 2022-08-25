@@ -15,18 +15,21 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly ICategoriesRepository _categoriesRepository;
+        private readonly IOfficeRepository _officeRepository;
         private readonly IMapper _mapper;
 
         public EntitiesService(IDeskRepository deskRepository,
             IConferenceRoomRepository conferenceRoomRepository,
             IReservationRepository reservationRepository,
             ICategoriesRepository categoriesRepository,
+            IOfficeRepository officeRepository,
             IMapper mapper)
         {
             _deskRepository = deskRepository;
             _conferenceRoomRepository = conferenceRoomRepository;
             _reservationRepository = reservationRepository;
             _categoriesRepository = categoriesRepository;
+            _officeRepository = officeRepository;
             _mapper = mapper;
         }
 
@@ -44,6 +47,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public EntitiesResponse CreateNewDesks(EntitiesRequest request)
         {
             EntitiesResponse response = new EntitiesResponse();
+
+            Office existinOffice = _officeRepository.Get(request.Id);
+            if (existinOffice == null)
+            {
+                response.Success = false;
+                return response;
+            }
 
             int highestIndex = _deskRepository.GetHighestDeskIndexForOffice(request.Id);
 
