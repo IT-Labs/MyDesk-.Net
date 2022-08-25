@@ -40,6 +40,11 @@ namespace inOfficeApplication.Controllers
                 return BadRequest("IDs in URL and body don't match");
             }
 
+            if (dto.NumberOfDesks < 1 || dto.NumberOfDesks > 500)
+            {
+                return BadRequest("Maximum number of desks to be created is 500");
+            }
+
             EntitiesResponse response = _entitiesService.CreateNewDesks(dto);
 
             if (response.Success == true)
