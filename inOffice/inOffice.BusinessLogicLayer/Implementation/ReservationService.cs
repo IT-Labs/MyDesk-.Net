@@ -13,15 +13,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IDeskRepository _deskRepository;
         private readonly IMapper _mapper;
 
         public ReservationService(IReservationRepository reservationRepository,
             IEmployeeRepository employeeRepository,
+            IDeskRepository deskRepository,
             IMapper mapper)
 
         {
             _reservationRepository = reservationRepository;
             _employeeRepository = employeeRepository;
+            _deskRepository = deskRepository;
             _mapper = mapper;
         }
 
@@ -29,7 +32,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             CancelReservationResponse cancelReservationResponse = new CancelReservationResponse();
 
-            Reservation reservationToDelete = _reservationRepository.Get(id, includeDesk: true, includeonferenceRoom: true, includeReviews: true);
+            Reservation reservationToDelete = _reservationRepository.Get(id, includeReviews: true);
             if (reservationToDelete == null)
             {
                 cancelReservationResponse.Success = false;
@@ -102,6 +105,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             ReservationResponse response = new ReservationResponse();
 
+            Desk desk = _deskRepository.Get(request.DeskId);
+            if (desk == null)
+            {
+                response.Success = false;
+                return response;
+            }
+
             Employee employee = _employeeRepository.GetByEmail(request.CoworkerMail);
             List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(request.DeskId);
 
@@ -124,12 +134,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 }
             }
 
-            // Check if there are existing reservations for that employee in that time-frame
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id);
+            // Check if there are existing reservations for that employee in that time-frame for current office
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true);
             foreach (Reservation reservation in employeeReservations)
             {
-                if (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
-                    newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate))
+                if (desk.OfficeId == GetOfficeId(reservation) && (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
+                    newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate)))
                 {
                     response.Success = false;
                     return response;
@@ -140,6 +150,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             response.Success = true;
             return response;
+        }
+
+        private int GetOfficeId(Reservation reservation)
+        {
+            if (reservation.Desk != null)
+            {
+                return reservation.Desk.OfficeId;
+            }
+            else
+            {
+                return reservation.ConferenceRoom.OfficeId;
+            }
         }
     }
 }

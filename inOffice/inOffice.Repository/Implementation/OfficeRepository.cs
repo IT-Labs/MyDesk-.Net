@@ -1,6 +1,7 @@
 ﻿using inOffice.Repository.Interface;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace inOffice.Repository.Implementation
 {
@@ -13,9 +14,23 @@ namespace inOffice.Repository.Implementation
             _context = context;
         }
 
-        public Office Get(int id)
+        public Office Get(int id,
+            bool? includeDesks = null,
+            bool? includeConferenceRooms = null)
         {
-            return _context.Offices.FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+            IQueryable<Office> query = _context.Offices.Where(x => x.Id == id && x.IsDeleted == false);
+
+            if (includeDesks == true)
+            {
+                query = query.Include(x => x.Desks.Where(y => y.IsDeleted == false));
+            }
+
+            if (includeConferenceRooms == true)
+            {
+                query = query.Include(x => x.ConferenceRooms.Where(y => y.IsDeleted == false));
+            }
+
+            return query.FirstOrDefault();
         }
 
         public Office GetByName(string name)
