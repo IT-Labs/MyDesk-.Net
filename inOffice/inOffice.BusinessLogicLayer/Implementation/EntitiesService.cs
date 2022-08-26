@@ -44,26 +44,26 @@ namespace inOffice.BusinessLogicLayer.Implementation
             };
         }
 
-        public EntitiesResponse CreateNewDesks(EntitiesRequest request)
+        public EntitiesResponse CreateNewDesks(int officeId, int numberOfInstancesToCreate)
         {
             EntitiesResponse response = new EntitiesResponse();
 
-            Office existinOffice = _officeRepository.Get(request.Id);
+            Office existinOffice = _officeRepository.Get(officeId);
             if (existinOffice == null)
             {
                 response.Success = false;
                 return response;
             }
 
-            int highestIndex = _deskRepository.GetHighestDeskIndexForOffice(request.Id);
+            int highestIndex = _deskRepository.GetHighestDeskIndexForOffice(officeId);
 
             List<Desk> desksToInsert = new List<Desk>();
 
-            for (int i = 0; i < request.NumberOfDesks; i++)
+            for (int i = 0; i < numberOfInstancesToCreate; i++)
             {
                 Desk desk = new Desk()
                 {
-                    OfficeId = request.Id,
+                    OfficeId = officeId,
                     IsDeleted = false,
                     Categories = "regular",
                     IndexForOffice = highestIndex + i + 1

@@ -5,7 +5,7 @@ namespace inOffice.BusinessLogicLayer.Interface
 {
     public interface IEntitiesService
     {
-        EntitiesResponse CreateNewDesks(EntitiesRequest request);
+        EntitiesResponse CreateNewDesks(int officeId, int numberOfInstancesToCreate);
 
         ConferenceRoomsResponse ListAllConferenceRooms(int id, int? take = null, int? skip = null);
 
