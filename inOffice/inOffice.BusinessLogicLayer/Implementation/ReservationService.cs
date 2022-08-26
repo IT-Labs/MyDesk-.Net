@@ -130,6 +130,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate))
                 {
                     response.Success = false;
+                    response.ErrorMessage = $"Reservation for that time period already exists for desk {desk.IndexForOffice}";
                     return response;
                 }
             }
@@ -142,6 +143,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate)))
                 {
                     response.Success = false;
+                    response.ErrorMessage = $"Reservation for that time period already exists for {employee.Email}";
                     return response;
                 }
             }

@@ -35,7 +35,7 @@ namespace inOfficeApplication.Controllers
             }
             else
             {
-                return Conflict($"Reservation for that time period allready exists for {dto.CoworkerMail}");
+                return Conflict(response.ErrorMessage);
             }
         }
 
