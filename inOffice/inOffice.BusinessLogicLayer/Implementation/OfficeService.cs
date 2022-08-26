@@ -11,11 +11,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
     public class OfficeService : IOfficeService
     {
         private readonly IOfficeRepository _officeRepository;
+        private readonly IDeskRepository _deskRepository;
+        private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IMapper _mapper;
 
-        public OfficeService(IOfficeRepository officeRepository, IMapper mapper)
+        public OfficeService(IOfficeRepository officeRepository,
+            IDeskRepository deskRepository,
+            IConferenceRoomRepository conferenceRoomRepository,
+            IMapper mapper)
         {
             _officeRepository = officeRepository;
+            _deskRepository = deskRepository;
+            _conferenceRoomRepository = conferenceRoomRepository;
             _mapper = mapper;
         }
 
@@ -68,12 +75,30 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             OfficeResponse response = new OfficeResponse();
 
-            Office office = _officeRepository.Get(id);
+            Office office = _officeRepository.Get(id, includeDesks: true, includeConferenceRooms: true);
 
             if (office == null)
             {
                 response.Success = false;
                 return response;
+            }
+
+            for (int i = 0; i < office.Desks.Count; i++)
+            {
+                Desk desk = office.Desks.ElementAt(i);
+                desk = _deskRepository.Get(desk.Id, includeReservations: true, includeReviews: true);
+                desk.IsDeleted = true;
+
+                MarkAsSoftDeleted(desk.Reservations);
+            }
+
+            for (int i = 0; i < office.ConferenceRooms.Count; i++)
+            {
+                ConferenceRoom conferenceRoom = office.ConferenceRooms.ElementAt(i);
+                conferenceRoom = _conferenceRoomRepository.Get(conferenceRoom.Id, includeReservations: true, includeReviews: true);
+                conferenceRoom.IsDeleted = true;
+
+                MarkAsSoftDeleted(conferenceRoom.Reservations);
             }
 
             _officeRepository.SoftDelete(office);
@@ -96,6 +121,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public Office GetDetailsForOffice(int id)
         {
             return _officeRepository.Get(id);
+        }
+
+        private void MarkAsSoftDeleted(ICollection<Reservation> reservations)
+        {
+            foreach (Reservation reservation in reservations)
+            {
+                reservation.IsDeleted = true;
+                foreach (Review review in reservation.Reviews)
+                {
+                    review.IsDeleted = true;
+                }
+            }
         }
     }
 }

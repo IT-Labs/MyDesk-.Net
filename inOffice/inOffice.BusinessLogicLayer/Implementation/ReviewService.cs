@@ -47,7 +47,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             foreach (Review review in reviews)
             {
-                Reservation reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeOffice: true);
+                Reservation reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
 
                 if (reservation == null)
                 {

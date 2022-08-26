@@ -26,16 +26,24 @@ namespace inOffice.Repository.Implementation
             {
                 query = query.Include(x => x.Desk);
             }
-            if (includeDesk == true && includeOffice == true)
+            else if (includeDesk == true && includeOffice == true)
             {
                 query = query
                     .Include(x => x.Desk)
                     .ThenInclude(x => x.Office);
             }
-            if (includeonferenceRoom == true)
+
+            if (includeonferenceRoom == true && includeOffice != true)
             {
                 query = query.Include(x => x.ConferenceRoom);
             }
+            else if(includeonferenceRoom == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.ConferenceRoom)
+                    .ThenInclude(x => x.Office);
+            }
+
             if (includeReviews == true)
             {
                 query = query.Include(x => x.Reviews.Where(y => y.IsDeleted == false));
