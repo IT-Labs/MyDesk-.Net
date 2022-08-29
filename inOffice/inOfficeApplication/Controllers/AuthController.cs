@@ -1,6 +1,7 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -57,6 +58,18 @@ namespace inOfficeApplication.Controllers
                 return NotFound();
             }
 
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
+            {
+                new Claim("id", employee.Id.ToString()),
+                new Claim("name", $"{employee.FirstName} {employee.LastName}"),
+                new Claim("roles", RoleTypes.EMPLOYEE.ToString())
+            });
+
+            if (employee.IsAdmin == true)
+            {
+                claimsIdentity.AddClaim(new Claim("roles", RoleTypes.ADMIN.ToString()));
+            }
+
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             byte[] key = Encoding.ASCII.GetBytes(_configuration["Settings:CustomBearerTokenSigningKey"]);
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
@@ -65,12 +78,7 @@ namespace inOfficeApplication.Controllers
                 Expires = DateTime.UtcNow.AddHours(2),
                 Issuer = _configuration["JwtInfo:Issuer"],
                 Audience = _configuration["JwtInfo:Audience"],
-                Subject = new ClaimsIdentity(new[] 
-                { 
-                    new Claim("Id", employee.Id.ToString()),
-                    new Claim("Full name", $"{employee.FirstName} {employee.LastName}"),
-                    new Claim("IsAdmin", employee.IsAdmin.ToString())
-                })
+                Subject = claimsIdentity
             };
 
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
@@ -101,7 +109,7 @@ namespace inOfficeApplication.Controllers
 
                     password = BCrypt.Net.BCrypt.HashPassword(decodedPassword);
                 }
-                
+
 
                 Employee microsoftuser = new Employee
                 {
