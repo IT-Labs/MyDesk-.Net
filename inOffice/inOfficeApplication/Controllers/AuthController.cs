@@ -31,6 +31,12 @@ namespace inOfficeApplication.Controllers
         [HttpPost("register")]
         public IActionResult Register(MicrosoftUser user)
         {
+            user.Email = user.Email.Trim();
+            if (user.Email.Length < 3 || user.Email.Length > 254)
+            {
+                return BadRequest("Email length should be between 3 and 254.");
+            }
+
             return CreateEmployee(user);
         }
 
