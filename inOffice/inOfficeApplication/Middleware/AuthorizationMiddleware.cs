@@ -34,6 +34,9 @@ namespace inOfficeApplication.Middleware
         {
             if (context.Request.Method.ToUpper() == "OPTIONS")
             {
+                context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
+                context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 await context.Response.CompleteAsync();
             }
             else
@@ -110,33 +113,18 @@ namespace inOfficeApplication.Middleware
             RoleTypes requiredRole = GetRequiredRole(context);
 
             JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)securityToken;
-            if (_configuration.GetValue<bool>("Settings:UseCustomBearerToken"))
+            List<Claim> roleClaims = jwtSecurityToken.Claims.Where(x => x.Type == "roles").ToList();
+            if (requiredRole == RoleTypes.ADMIN)
             {
-                bool isAdmin = bool.Parse(jwtSecurityToken.Claims.First(x => x.Type == "IsAdmin").Value);
-                if (isAdmin)
-                {
-                    return true;
-                }
-                else
-                {
-                    return requiredRole == RoleTypes.All || requiredRole == RoleTypes.Employee;
-                }
+                return roleClaims.Any(x => x.Value == RoleTypes.ADMIN.ToString());
+            }
+            else if (requiredRole == RoleTypes.EMPLOYEE)
+            {
+                return roleClaims.Any(x => x.Value == RoleTypes.EMPLOYEE.ToString());
             }
             else
             {
-                List<Claim> roleClaims = jwtSecurityToken.Claims.Where(x => x.Type == "roles").ToList();
-                if (requiredRole == RoleTypes.Admin)
-                {
-                    return roleClaims.Any(x => x.Value == "ADMIN");
-                }
-                else if (requiredRole == RoleTypes.Employee)
-                {
-                    return roleClaims.Any(x => x.Value == "EMPLOYEE");
-                }
-                else
-                {
-                    return roleClaims.Any();
-                }
+                return roleClaims.Any();
             }
         }
 
@@ -153,15 +141,15 @@ namespace inOfficeApplication.Middleware
             Tuple<string, string> roles = Tuple.Create(context.Request.Method.ToUpper(), path.ToLower());
             if (Constants.AdminEndpoints.Contains(roles))
             {
-                return RoleTypes.Admin;
+                return RoleTypes.ADMIN;
             }
             else if (Constants.EmployeeEndpoints.Contains(roles))
             {
-                return RoleTypes.Employee;
+                return RoleTypes.EMPLOYEE;
             }
             else if (Constants.AllEndpoints.Contains(roles))
             {
-                return RoleTypes.All;
+                return RoleTypes.ALL;
             }
             else
             {

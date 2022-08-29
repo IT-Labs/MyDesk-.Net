@@ -45,8 +45,8 @@ namespace inOfficeApplication.Data.Utils
 
     public enum RoleTypes
     {
-        Admin,
-        Employee,
-        All
+        ADMIN,
+        EMPLOYEE,
+        ALL
     }
 }
