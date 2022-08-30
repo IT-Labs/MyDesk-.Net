@@ -4,6 +4,7 @@ using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -98,10 +99,21 @@ namespace inOfficeApplication.Controllers
             else
             {
                 string password;
+                bool isAdmin = false;
+
+                // MS SSO
                 if (string.IsNullOrEmpty(user.Password))
                 {
                     password = BCrypt.Net.BCrypt.HashPassword("Passvord!23");
+
+                    // Check if user is marked as admin
+                    string authHeader = Request.Headers[HeaderNames.Authorization];
+                    string jwt = authHeader.Substring(7);
+                    JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+                    List<Claim> roles = jwtSecurityTokenDecoded.Claims.Where(x => x.Type == "roles").ToList();
+                    isAdmin = roles.Any(x => x.Value == RoleTypes.ADMIN.ToString());
                 }
+                // Custom log-in
                 else
                 {
                     byte[] data = Convert.FromBase64String(user.Password);
@@ -118,7 +130,7 @@ namespace inOfficeApplication.Controllers
                     Email = user.Email,
                     JobTitle = user.JobTitle,
                     Password = password,
-                    IsAdmin = user.IsAdmin
+                    IsAdmin = isAdmin
                 };
                 _employeeService.Create(microsoftuser);
 
