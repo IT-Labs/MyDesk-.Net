@@ -1,7 +1,9 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
@@ -40,9 +42,10 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/all")]
-        public ActionResult<List<CustomEmployee>> AllEmployees()
+        public ActionResult<List<EmployeeDto>> AllEmployees()
         {
-            List<CustomEmployee> result = _employeeService.GetAll();
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            List<EmployeeDto> result = _employeeService.GetAll(take: take, skip: skip);
 
             return Ok(result);
         }
@@ -153,6 +156,21 @@ namespace inOfficeApplication.Controllers
                 {
                     message = "success"
                 });
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut("admin/employee/{id}")]
+        public IActionResult SetAsAdmin(int id)
+        {
+            GenericResponse response = _employeeService.SetEmployeeAsAdmin(id);
+
+            if (response.Success)
+            {
+                return Ok();
             }
             else
             {

@@ -1,6 +1,8 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using AutoMapper;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Implementation
@@ -8,9 +10,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        public EmployeeService(IEmployeeRepository employeeRepository)
+        private readonly IMapper _mapper;
+
+        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper)
         {
             _employeeRepository = employeeRepository;
+            _mapper = mapper;
         }
 
         public void Create(Employee employee)
@@ -18,16 +23,25 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _employeeRepository.Create(employee);
         }
 
-        public List<CustomEmployee> GetAll()
+        public GenericResponse SetEmployeeAsAdmin(int id)
         {
-            List<CustomEmployee> result = new List<CustomEmployee>();
+            Employee employee = _employeeRepository.Get(id);
 
-            List<Employee> employees = _employeeRepository.GetAll();
-
-            foreach (Employee employee in employees)
+            if (employee == null)
             {
-                result.Add(new CustomEmployee(employee.Id, employee.FirstName, employee.LastName, employee.Email, employee.JobTitle));
+                return new GenericResponse() { Success = false };
             }
+
+            employee.IsAdmin = true;
+            _employeeRepository.Update(employee);
+
+            return new GenericResponse() { Success = true };
+        }
+
+        public List<EmployeeDto> GetAll(int? take = null, int? skip = null)
+        {
+            List<Employee> employees = _employeeRepository.GetAll(take: take, skip: skip);
+            List<EmployeeDto> result = _mapper.Map<List<EmployeeDto>>(employees);
 
             return result.DistinctBy(x => x.Email).ToList();
         }

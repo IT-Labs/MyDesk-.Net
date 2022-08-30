@@ -32,7 +32,8 @@ namespace inOfficeApplication.Data.Utils
             Tuple.Create("GET", "/admin/office-conferencerooms/{id}"),
             Tuple.Create("POST", "/admin/office"),
             Tuple.Create("PUT", "/admin/office/{id}"),
-            Tuple.Create("DELETE", "/admin/office/{id}")
+            Tuple.Create("DELETE", "/admin/office/{id}"),
+            Tuple.Create("PUT", "/admin/employee/{id}")
         });
         public static readonly IList<Tuple<string, string>> EmployeeEndpoints = new ReadOnlyCollection<Tuple<string, string>>(new List<Tuple<string, string>>()
         {
