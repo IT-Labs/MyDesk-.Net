@@ -4,8 +4,10 @@ namespace inOffice.Repository.Interface
 {
     public interface IEmployeeRepository
     {
-        void Create(Employee employee);
+        Employee Get(int id);
         Employee GetByEmail(string email);
-        List<Employee> GetAll();
+        List<Employee> GetAll(int? take = null, int? skip = null);
+        void Create(Employee employee);
+        void Update(Employee employee);
     }
 }
