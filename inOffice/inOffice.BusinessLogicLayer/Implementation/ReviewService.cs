@@ -1,7 +1,9 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using AutoMapper;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Helpers;
 using Microsoft.Extensions.Configuration;
@@ -15,15 +17,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
         private HttpClient client = new HttpClient();
 
         public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMapper mapper)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public ReviewResponse ShowReview(int id)
@@ -39,51 +44,20 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return reviewForGivenEntity;
         }
 
-        public AllReviewsResponse AllReviews(int? take = null, int? skip = null)
+        public List<ReviewDto> AllReviews(int? take = null, int? skip = null)
         {
-            List<CustomReviews> list = new List<CustomReviews>();
-
             List<Review> reviews = _reviewRepository.GetAll(take: take, skip: skip);
 
             foreach (Review review in reviews)
             {
-                Reservation reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
-
-                if (reservation == null)
-                {
-                    continue;
-                }
-
-                string officeName = string.Empty;
-                int? deskIndex = null;
-                if (reservation.Desk != null)
-                {
-                    officeName = reservation.Desk.Office?.Name;
-                    deskIndex = reservation.Desk.IndexForOffice;
-                }
-                else if (reservation.ConferenceRoom != null)
-                {
-                    officeName = reservation.ConferenceRoom.Office?.Name;
-                }
-
-                CustomReviews custom = new CustomReviews()
-                {
-                    OfficeName = officeName,
-                    Review = review.Reviews,
-                    ReviewOutput = review.ReviewOutput,
-                    DeskIndex = deskIndex
-                };
-
-                list.Add(custom);
+                // EF will handle references
+                // We used foreach instead of SQL join in order to prevent inefficient queries
+                _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
             }
 
-            AllReviewsResponse allReviews = new AllReviewsResponse()
-            {
-                ListOfReviews = list,
-                Success = true
-            };
+            List<ReviewDto> result = _mapper.Map<List<ReviewDto>>(reviews);
 
-            return allReviews;
+            return result;
         }
 
         public CreateReviewResponse CreateReview(CreateReviewRequest createReviewRequest)

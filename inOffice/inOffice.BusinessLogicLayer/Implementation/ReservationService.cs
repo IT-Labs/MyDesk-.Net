@@ -87,18 +87,15 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return employeeReservationsResponse;
         }
 
-        public AllReservationsResponse AllReservations(int? take = null, int? skip = null)
+        public PaginationDto<ReservationDto> AllReservations(int? take = null, int? skip = null)
         {
-            AllReservationsResponse response = new AllReservationsResponse();
-
             Tuple<int?, List<Reservation>> result = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip);
 
-            response.Reservations = _mapper.Map<List<ReservationDto>>(result.Item2);
-            response.TotalReservations = result.Item1.HasValue ? result.Item1.Value : response.Reservations.Count();
-
-            response.Success = true;
-
-            return response;
+            return new PaginationDto<ReservationDto>()
+            {
+                Values = _mapper.Map<List<ReservationDto>>(result.Item2),
+                TotalCount = result.Item1.HasValue ? result.Item1.Value : result.Item2.Count()
+            };
         }
 
         public ReservationResponse CoworkerReserve(CoworkerReservationRequest request)

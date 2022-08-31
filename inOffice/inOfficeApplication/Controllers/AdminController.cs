@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using inOffice.BusinessLogicLayer.Responses;
 using Microsoft.AspNetCore.Cors;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Data.DTO;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class AdminController : Controller
     {
@@ -20,36 +21,27 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/reservations/all")]
-        public ActionResult<AllReservationsResponse> ReservationsAll()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ReservationsAll()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            AllReservationsResponse reservations = _reservationService.AllReservations(take: take, skip: skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.AllReservations(take: take, skip: skip);
 
-            if (reservations.Success != true)
-            {
-                return BadRequest();
-            }
-            else
-            {
-                return Ok(reservations);
-            }
+            return Ok(reservations);
         }
 
-        [EnableCors]
         [HttpGet("employee/reviews/all")]
-        public ActionResult<AllReviewsResponse> ReviewsAll()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReviewDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ReviewsAll()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            AllReviewsResponse reviews = _reviewService.AllReviews(take: take, skip: skip);
+            List<ReviewDto> reviews = _reviewService.AllReviews(take: take, skip: skip);
 
-            if (reviews.Success != true)
-            {
-                return BadRequest();
-            }
-            else
-            {
-                return Ok(reviews);
-            }
+            return Ok(reviews);
         }
     }
 }

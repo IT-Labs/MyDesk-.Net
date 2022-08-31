@@ -19,12 +19,15 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
                     .ForMember(x => x.Capacity, opt => opt.MapFrom(y => y.Capacity))
                     .ForMember(x => x.IndexForOffice, opt => opt.MapFrom(y => y.IndexForOffice))
-                    .ForMember(x => x.OfficeId, opt => opt.MapFrom(y => y.OfficeId))
-                    .ForMember(x => x.Reservation, opt => opt.MapFrom(y => y.Reservations.FirstOrDefault()));
+                    .ForMember(x => x.Office, opt => opt.MapFrom(y => y.Office))
+                    .ForMember(x => x.Reservations, opt => opt.MapFrom(y => y.Reservations));
 
                 config.CreateMap<Desk, DeskDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
-                    .ForMember(x => x.Categories, opt => opt.MapFrom(y => y.Categorie));
+                    .ForMember(x => x.IndexForOffice, opt => opt.MapFrom(y => y.IndexForOffice))
+                    .ForMember(x => x.Categories, opt => opt.MapFrom(y => y.Categorie))
+                    .ForMember(x => x.Reservations, opt => opt.MapFrom(y => y.Reservations))
+                    .ForMember(x => x.Office, opt => opt.MapFrom(y => y.Office));
 
                 config.CreateMap<Category, CategoryDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
@@ -45,7 +48,7 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
                     .ForMember(x => x.Reviews, opt => opt.MapFrom(y => y.Reviews))
                     .ForMember(x => x.ReviewOutput, opt => opt.MapFrom(y => y.ReviewOutput))
-                    .ForMember(x => x.ReservationId, opt => opt.MapFrom(y => y.ReservationId));
+                    .ForMember(x => x.Reservation, opt => opt.MapFrom(y => y.Reservation));
 
                 config.CreateMap<Reservation, ReservationDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
