@@ -1,99 +1,96 @@
-﻿using inOffice.BusinessLogicLayer;
+﻿using FluentValidation.Results;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class OfficeController : Controller
     {
         private readonly IOfficeService _officeService;
+        private readonly OfficeDtoValidation _validationRules;
 
         public OfficeController(IOfficeService officeService)
         {
             _officeService = officeService;
-        }
-
-        [HttpPost("admin/office")]
-        public ActionResult<OfficeResponse> AddNewOffice(NewOfficeRequest dto)
-        {
-            OfficeResponse response = _officeService.CreateNewOffice(dto);
-            if (response.Success != true)
-            {
-                return Conflict("There is allready office with the same name");
-            }
-            else
-            {
-                return Created("Success", response);
-            }
-        }
-
-        [HttpGet("admin/office/image/{id}")]
-        public ActionResult<OfficeResponse> ImageUrl(int id)
-        {
-            Office office = _officeService.GetDetailsForOffice(id);
-            if (office.OfficeImage != null)
-            {
-                return Ok(office.OfficeImage);
-            }
-            else
-            {
-                return BadRequest("Image not found");
-            }
-        }
-
-        [HttpPut("admin/office/{id}")]
-        public ActionResult<OfficeResponse> Edit(int id, OfficeRequest dto)
-        {
-            dto.Id = id;
-            OfficeResponse result = _officeService.UpdateOffice(dto);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
-
-        [HttpDelete("admin/office/{id}")]
-        public ActionResult<OfficeResponse> Delete(int id)
-        {
-            OfficeResponse result = _officeService.DeleteOffice(id);
-            if (result.Success)
-            {
-                return Ok(new
-                {
-                    message = "success"
-                });
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _validationRules = new OfficeDtoValidation();
         }
 
         [HttpGet("admin/offices")]
-        public ActionResult<IEnumerable<OfficeDto>> GetAllOffices()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllOffices()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
+            List<OfficeDto> offices = _officeService.GetAllOffices(take: take, skip: skip);
 
-            if (offices.Success)
+            return Ok(offices);
+        }
+
+        [HttpGet("admin/office/image/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ImageUrl(int id)
+        {
+            OfficeDto officeDto = _officeService.GetDetailsForOffice(id);
+            return Ok(officeDto.OfficeImage);
+        }
+
+        [HttpPost("admin/office")]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddNewOffice([FromBody] OfficeDto officeDto)
+        {
+            ValidationResult validationResult = _validationRules.Validate(officeDto);
+            if (!validationResult.IsValid)
             {
-                return Ok(offices.Offices);
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-            else
+
+            _officeService.CreateNewOffice(officeDto);
+
+            return Created("Success", officeDto);
+        }
+
+        [HttpPut("admin/office/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Edit(int id, [FromBody] OfficeDto officeDto)
+        {
+            ValidationResult validationResult = _validationRules.Validate(officeDto);
+            if (!validationResult.IsValid)
             {
-                return BadRequest();
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
+
+            officeDto.Id = id;
+            _officeService.UpdateOffice(officeDto);
+
+            return Ok();
+        }
+
+        [HttpDelete("admin/office/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Delete(int id)
+        {
+            _officeService.DeleteOffice(id);
+            return Ok();
         }
     }
 }

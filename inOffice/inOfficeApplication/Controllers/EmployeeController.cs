@@ -20,33 +20,19 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/offices")]
-        public ActionResult<IEnumerable<OfficeDto>> GetAllOffices()
+        public IActionResult GetAllOffices()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
+            List<OfficeDto> offices = _officeService.GetAllOffices(take: take, skip: skip);
 
-            if (offices.Success == true)
-            {
-                return Ok(offices.Offices);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return Ok(offices);
         }
 
         [HttpGet("employee/office/image/{id}")]
-        public ActionResult<OfficeResponse> ImageUrl(int id)
+        public IActionResult ImageUrl(int id)
         {
-            Office office = _officeService.GetDetailsForOffice(id);
-            if (office.OfficeImage != null)
-            {
-                return Ok(office.OfficeImage);
-            }
-            else
-            {
-                return BadRequest("Image not found");
-            }
+            OfficeDto office = _officeService.GetDetailsForOffice(id);
+            return Ok(office.OfficeImage);
         }
     }
 }

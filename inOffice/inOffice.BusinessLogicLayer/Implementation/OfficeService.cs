@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -26,61 +25,48 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _mapper = mapper;
         }
 
-        public OfficeResponse CreateNewOffice(NewOfficeRequest request)
+        public void CreateNewOffice(OfficeDto officeDto)
         {
-            OfficeResponse response = new OfficeResponse();
-            Office office = new Office()
-            {
-                Name = request.OfficeName,
-                OfficeImage = string.Empty
-            };
-
-            Office existingOffice = _officeRepository.GetByName(office.Name);
+            Office existingOffice = _officeRepository.GetByName(officeDto.Name);
 
             if (existingOffice != null)
             {
-                response.Success = false;
+                throw new ConflictException("There is allready office with the same name");
             }
             else
             {
-                _officeRepository.Insert(office);
-                response.Success = true;
-            }
+                Office office = new Office()
+                {
+                    Name = officeDto.Name,
+                    OfficeImage = officeDto.OfficeImage
+                };
 
-            return response;
+                _officeRepository.Insert(office);
+            }
         }
 
-        public OfficeResponse UpdateOffice(OfficeRequest request)
+        public void UpdateOffice(OfficeDto officeDto)
         {
-            OfficeResponse response = new OfficeResponse();
-
-            Office office = _officeRepository.Get(request.Id);
+            Office office = _officeRepository.Get(officeDto.Id.Value);
 
             if (office == null)
             {
-                response.Success = false;
-                return response;
+                throw new NotFoundException($"Office with ID: {officeDto.Id} not found.");
             }
 
-            office.Name = request.OfficeName;
-            office.OfficeImage = request.OfficePlan;
+            office.Name = officeDto.Name;
+            office.OfficeImage = officeDto.OfficeImage;
 
             _officeRepository.Update(office);
-            response.Success = true;
-
-            return response;
         }
 
-        public OfficeResponse DeleteOffice(int id)
+        public void DeleteOffice(int id)
         {
-            OfficeResponse response = new OfficeResponse();
-
             Office office = _officeRepository.Get(id, includeDesks: true, includeConferenceRooms: true);
 
             if (office == null)
             {
-                response.Success = false;
-                return response;
+                throw new NotFoundException($"Office with ID: {id} not found.");
             }
 
             for (int i = 0; i < office.Desks.Count; i++)
@@ -102,25 +88,27 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
 
             _officeRepository.SoftDelete(office);
-            response.Success = true;
-
-            return response;
         }
 
-        public OfficeListResponse GetAllOffices(int? take = null, int? skip = null)
+        public List<OfficeDto> GetAllOffices(int? take = null, int? skip = null)
         {
             List<Office> offices = _officeRepository.GetAll(take: take, skip: skip);
+            List<OfficeDto> officeDtos = _mapper.Map<List<OfficeDto>>(offices);
 
-            return new OfficeListResponse()
-            {
-                Offices = _mapper.Map<List<OfficeDto>>(offices),
-                Success = true
-            };
+            return officeDtos;
         }
 
-        public Office GetDetailsForOffice(int id)
+        public OfficeDto GetDetailsForOffice(int id)
         {
-            return _officeRepository.Get(id);
+            Office office = _officeRepository.Get(id);
+            if (office == null)
+            {
+                throw new NotFoundException($"Office with ID: {id} not found.");
+            }
+
+            OfficeDto officeDto = _mapper.Map<OfficeDto>(office);
+
+            return officeDto;
         }
 
         private void MarkAsSoftDeleted(ICollection<Reservation> reservations)

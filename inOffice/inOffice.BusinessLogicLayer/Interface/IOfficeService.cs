@@ -1,16 +1,14 @@
-﻿using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.Entities;
+﻿using inOfficeApplication.Data.DTO;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
     public interface IOfficeService
     {
-        OfficeListResponse GetAllOffices(int? take = null, int? skip = null);
-        Office GetDetailsForOffice(int id);
-        OfficeResponse CreateNewOffice(NewOfficeRequest request);
-        OfficeResponse DeleteOffice(int id);
-        OfficeResponse UpdateOffice(OfficeRequest request);
+        List<OfficeDto> GetAllOffices(int? take = null, int? skip = null);
+        OfficeDto GetDetailsForOffice(int id);
+        void CreateNewOffice(OfficeDto officeDto);
+        void DeleteOffice(int id);
+        void UpdateOffice(OfficeDto officeDto);
 
     }
 }
