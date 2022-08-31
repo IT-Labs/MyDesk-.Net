@@ -1,14 +1,11 @@
-﻿using inOffice.BusinessLogicLayer;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Responses;
+﻿using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -20,6 +17,9 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/offices")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllOffices()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -29,6 +29,10 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office/image/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ImageUrl(int id)
         {
             OfficeDto office = _officeService.GetDetailsForOffice(id);
