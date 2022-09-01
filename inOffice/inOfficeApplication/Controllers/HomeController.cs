@@ -1,16 +1,17 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using FluentValidation.Results;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
 using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class HomeController : ControllerBase
     {
@@ -28,17 +29,23 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("employee/reserve/coworker")]
-        public ActionResult<ReservationResponse> CoworkerReservation(CoworkerReservationRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult CoworkerReservation([FromBody]ReservationRequest reservationRequest)
         {
-            ReservationResponse response = _reservationService.CoworkerReserve(dto);
-            if (response.Success == true)
+            ReservationRequestValidation validationRules = new ReservationRequestValidation();
+            ValidationResult validationResult = validationRules.Validate(reservationRequest);
+            if (!validationResult.IsValid)
             {
-                return Ok($"Sucessfuly reserved desk for coworker with mail {dto.CoworkerMail}");
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-            else
-            {
-                return Conflict(response.ErrorMessage);
-            }
+
+            _reservationService.CoworkerReserve(reservationRequest);
+            return Ok($"Sucessfuly reserved desk for coworker with mail {reservationRequest.EmployeeEmail}");
         }
 
         [HttpGet("employee/all")]
@@ -51,116 +58,65 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/future-reservation")]
-        public ActionResult<EmployeeReservationsResponse> EmployeeReservations()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult EmployeeReservations()
         {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
-            {
-                return NotFound("Employee not found");
-            }
-
-            EmployeeReservationsResponse response = _reservationService.EmployeeReservations(employee);
-
-            if (response.Success == true)
-            {
-                return Ok(response.CustomReservationResponses);
-            }
-            else
-            {
-                return BadRequest("Sucess is false");
-            }
+            List<ReservationDto> reservations = _reservationService.EmployeeReservations(GetEmployeeEmail());
+            return Ok(reservations);
         }
 
         [HttpGet("employee/past-reservations")]
-        public ActionResult<EmployeeReservationsResponse> PastReservations()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult PastReservations()
         {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
-            {
-                return NotFound("Employee not found");
-            }
-
-            EmployeeReservationsResponse response = _reservationService.PastReservations(employee);
-
-            if (response.Success == true)
-            {
-                return Ok(response.CustomReservationResponses);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<ReservationDto> reservations = _reservationService.PastReservations(GetEmployeeEmail());
+            return Ok(reservations);
         }
 
         [HttpGet("employee/review/{id}")]
-        public ActionResult<ReviewResponse> ShowReview(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ReviewDto))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ShowReview(int id)
         {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
-            {
-                return NotFound("Employee not found");
-            }
-
-            ReviewResponse ReviewForGivenEntity = _reviewService.ShowReview(id);
-
-            if (ReviewForGivenEntity.Sucess == true)
-            {
-                return Ok(ReviewForGivenEntity.Review);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            ReviewDto review = _reviewService.ShowReview(id);
+            return Ok(review);
         }
 
         [HttpPost("employee/review")]
-        public ActionResult<CreateReviewResponse> CreateReview(CreateReviewRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult CreateReview([FromBody] ReviewDto reviewDto)
         {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
+            ReviewDtoValidation validationRules = new ReviewDtoValidation();
+            ValidationResult validationResult = validationRules.Validate(reviewDto);
+            if (!validationResult.IsValid)
             {
-                return NotFound("Employee not found");
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            CreateReviewResponse response = _reviewService.CreateReview(dto);
-
-            if (response.Success == true)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _reviewService.CreateReview(reviewDto);
+            return Ok();
         }
 
         [HttpDelete("employee/reserve/{id}")]
-        public ActionResult<CancelReservationResponse> CancelReservation(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult CancelReservation(int id)
         {
-            Employee employee = GetEmployee();
-
-            if (employee == null)
-            {
-                return NotFound("Employee not found");
-            }
-
-            CancelReservationResponse response = _reservationService.CancelReservation(id);
-
-            if (response.Success == true)
-            {
-                return Ok(new
-                {
-                    message = "success"
-                });
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _reservationService.CancelReservation(id);
+            return Ok();
         }
 
         [HttpPut("admin/employee/{id}")]
@@ -178,13 +134,12 @@ namespace inOfficeApplication.Controllers
             }
         }
 
-        private Employee GetEmployee()
+        private string GetEmployeeEmail()
         {
             string authHeader = Request.Headers[HeaderNames.Authorization];
             string jwt = authHeader.Substring(7);
             JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
-            string email = jwtSecurityTokenDecoded.Claims.First(x => x.Type == "preferred_username").Value;
-            return _employeeService.GetByEmail(email);
+            return jwtSecurityTokenDecoded.Claims.First(x => x.Type == "preferred_username").Value;
         }
     }
 }
