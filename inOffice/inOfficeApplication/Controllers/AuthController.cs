@@ -1,17 +1,19 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
+﻿using FluentValidation.Results;
+using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class AuthController : Controller
     {
@@ -25,38 +27,42 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("authentication")]
-        public IActionResult Authentication(MicrosoftUser user)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Authentication([FromBody] EmployeeDto employeeDto)
         {
-            return CreateEmployee(user);
+            return CreateEmployee(employeeDto);
         }
 
         [HttpPost("register")]
-        public IActionResult Register(MicrosoftUser user)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Register([FromBody] EmployeeDto employeeDto)
         {
-            user.Email = user.Email.Trim();
-            if (user.Email.Length < 3 || user.Email.Length > 254)
-            {
-                return BadRequest("Email length should be between 3 and 254.");
-            }
-
-            return CreateEmployee(user);
+            return CreateEmployee(employeeDto);
         }
 
         [HttpPost("token")]
-        public IActionResult GetToken(MicrosoftUser user)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
-            if (!_configuration.GetValue<bool>("Settings:UseCustomBearerToken") || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
+            if (!_configuration.GetValue<bool>("Settings:UseCustomBearerToken") || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
             {
                 return BadRequest();
             }
 
-            byte[] data = Convert.FromBase64String(user.Password);
+            byte[] data = Convert.FromBase64String(employeeDto.Password);
             string decodedPassword = Encoding.UTF8.GetString(data);
 
-            Employee employee = _employeeService.GetByEmailAndPassword(user.Email, decodedPassword);
+            Employee employee = _employeeService.GetByEmailAndPassword(employeeDto.Email, decodedPassword);
             if (employee == null)
             {
-                return NotFound();
+                return NotFound($"Employee with email: {employeeDto.Email} not found.");
             }
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
@@ -86,56 +92,57 @@ namespace inOfficeApplication.Controllers
             return Ok($"Bearer {tokenHandler.WriteToken(token)}");
         }
 
-        private IActionResult CreateEmployee(MicrosoftUser user)
+        private IActionResult CreateEmployee(EmployeeDto employeeDto)
         {
-            if (!user.Email.Contains("@it-labs.com"))
+            EmployeeDtoValidation validationRules = new EmployeeDtoValidation();
+            ValidationResult validationResult = validationRules.Validate(employeeDto);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("Invalid email adress");
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-            else if (_employeeService.GetByEmail(user.Email) != null)
+
+            Employee employee = _employeeService.GetByEmail(employeeDto.Email);
+            if (employee != null)
             {
                 return Ok("User allready exists, redirect depending on the role");
             }
+
+            string password;
+            bool isAdmin = false;
+
+            // MS SSO
+            if (string.IsNullOrEmpty(employeeDto.Password))
+            {
+                password = BCrypt.Net.BCrypt.HashPassword("Passvord!23");
+
+                // Check if user is marked as admin
+                string authHeader = Request.Headers[HeaderNames.Authorization];
+                string jwt = authHeader.Substring(7);
+                JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
+                List<Claim> roles = jwtSecurityTokenDecoded.Claims.Where(x => x.Type == "roles").ToList();
+                isAdmin = roles.Any(x => x.Value == RoleTypes.ADMIN.ToString());
+            }
+            // Custom log-in
             else
             {
-                string password;
-                bool isAdmin = false;
+                byte[] data = Convert.FromBase64String(employeeDto.Password);
+                string decodedPassword = Encoding.UTF8.GetString(data);
 
-                // MS SSO
-                if (string.IsNullOrEmpty(user.Password))
-                {
-                    password = BCrypt.Net.BCrypt.HashPassword("Passvord!23");
-
-                    // Check if user is marked as admin
-                    string authHeader = Request.Headers[HeaderNames.Authorization];
-                    string jwt = authHeader.Substring(7);
-                    JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
-                    List<Claim> roles = jwtSecurityTokenDecoded.Claims.Where(x => x.Type == "roles").ToList();
-                    isAdmin = roles.Any(x => x.Value == RoleTypes.ADMIN.ToString());
-                }
-                // Custom log-in
-                else
-                {
-                    byte[] data = Convert.FromBase64String(user.Password);
-                    string decodedPassword = Encoding.UTF8.GetString(data);
-
-                    password = BCrypt.Net.BCrypt.HashPassword(decodedPassword);
-                }
-
-
-                Employee microsoftuser = new Employee
-                {
-                    FirstName = user.Firstname,
-                    LastName = user.Surname,
-                    Email = user.Email,
-                    JobTitle = user.JobTitle,
-                    Password = password,
-                    IsAdmin = isAdmin
-                };
-                _employeeService.Create(microsoftuser);
-
-                return Ok("User created, redirect depending on the role");
+                password = BCrypt.Net.BCrypt.HashPassword(decodedPassword);
             }
+
+            employee = new Employee
+            {
+                FirstName = employeeDto.FirstName,
+                LastName = employeeDto.LastName,
+                Email = employeeDto.Email,
+                JobTitle = employeeDto.JobTitle,
+                Password = password,
+                IsAdmin = isAdmin
+            };
+            _employeeService.Create(employee);
+
+            return Ok("User created, redirect depending on the role");
         }
     }
 }

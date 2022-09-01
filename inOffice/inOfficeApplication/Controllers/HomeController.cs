@@ -1,7 +1,6 @@
 ﻿using FluentValidation.Results;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
@@ -120,18 +119,14 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPut("admin/employee/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult SetAsAdmin(int id)
         {
-            GenericResponse response = _employeeService.SetEmployeeAsAdmin(id);
-
-            if (response.Success)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _employeeService.SetEmployeeAsAdmin(id);
+            return Ok();
         }
 
         private string GetEmployeeEmail()
