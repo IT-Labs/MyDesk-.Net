@@ -50,4 +50,14 @@ namespace inOfficeApplication.Data.Utils
         EMPLOYEE,
         ALL
     }
+
+    public enum EntityTypes
+    {
+        Office,
+        Desk,
+        ConferenceRoom,
+        Reservation,
+        Review,
+        Employee
+    }
 }

@@ -48,7 +48,10 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/all")]
-        public ActionResult<List<EmployeeDto>> AllEmployees()
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<EmployeeDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AllEmployees()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
             List<EmployeeDto> result = _employeeService.GetAll(take: take, skip: skip);

@@ -25,7 +25,7 @@ namespace inOfficeApplication.Mapper
                 config.CreateMap<Desk, DeskDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
                     .ForMember(x => x.IndexForOffice, opt => opt.MapFrom(y => y.IndexForOffice))
-                    .ForMember(x => x.Categories, opt => opt.MapFrom(y => y.Categorie))
+                    .ForMember(x => x.Category, opt => opt.MapFrom(y => y.Categorie))
                     .ForMember(x => x.Reservations, opt => opt.MapFrom(y => y.Reservations))
                     .ForMember(x => x.Office, opt => opt.MapFrom(y => y.Office));
 

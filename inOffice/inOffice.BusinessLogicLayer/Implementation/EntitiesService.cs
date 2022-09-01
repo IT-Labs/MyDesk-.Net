@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
+using inOfficeApplication.Data.Utils;
 using System.Transactions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
@@ -33,26 +34,20 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _mapper = mapper;
         }
 
-        public AllReviewsForEntity AllReviewsForEntity(int id)
+        public List<ReviewDto> AllReviewsForEntity(int id)
         {
             List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(id, includeReview: true);
+            List<Review> reviews = deskReservations.SelectMany(x => x.Reviews).ToList();
 
-            return new AllReviewsForEntity()
-            {
-                AllReviews = deskReservations.SelectMany(x => x.Reviews.Select(y => y.Reviews)).ToList(),
-                Success = true
-            };
+            return _mapper.Map<List<ReviewDto>>(reviews);
         }
 
-        public EntitiesResponse CreateNewDesks(int officeId, int numberOfInstancesToCreate)
+        public void CreateNewDesks(int officeId, int numberOfInstancesToCreate)
         {
-            EntitiesResponse response = new EntitiesResponse();
-
             Office existinOffice = _officeRepository.Get(officeId);
             if (existinOffice == null)
             {
-                response.Success = false;
-                return response;
+                throw new NotFoundException($"Office with ID: {officeId} not found.");
             }
 
             int highestIndex = _deskRepository.GetHighestDeskIndexForOffice(officeId);
@@ -73,16 +68,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
 
             _deskRepository.BulkInsert(desksToInsert);
-
-            response.Success = true;
-
-            return response;
         }
 
-        public DesksResponse ListAllDesks(int id, int? take = null, int? skip = null)
+        public List<DeskDto> ListAllDesks(int id, int? take = null, int? skip = null)
         {
-            DesksResponse responseDeskList = new DesksResponse();
-            List<DeskDto> list = new List<DeskDto>();
+            List<DeskDto> result = new List<DeskDto>();
 
             List<Desk> desks = _deskRepository.GetOfficeDesks(id, includeCategory: true, take: take, skip: skip);
 
@@ -98,92 +88,65 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     }
                 });
 
-                DeskDto custom = new DeskDto()
-                {
-                    Id = desk.Id,
-                    IndexForOffice = desk.IndexForOffice,
-                    Reservations = _mapper.Map<List<ReservationDto>>(deskReservations)
-                };
+                DeskDto deskDto = _mapper.Map<DeskDto>(desk);
 
-                if (desk.Categorie != null)
-                {
-                    custom.Categories = _mapper.Map<CategoryDto>(desk.Categorie);
-                }
-
-                list.Add(custom);
+                result.Add(deskDto);
             }
 
-            responseDeskList.sucess = true;
-            responseDeskList.DeskList = list;
-
-            return responseDeskList;
+            return result;
         }
 
-        public DeleteResponse DeleteEntity(DeleteRequest request)
+        public void DeleteEntity(DeleteRequest request)
         {
-            DeleteResponse deleteResponse = new DeleteResponse();
-
-            if (request.TypeOfEntity == "D")
+            if (request.Type == (int)EntityTypes.Desk)
             {
-                Desk desk = _deskRepository.Get(request.IdOfEntity, includeReservations: true, includeReviews: true);
+                Desk desk = _deskRepository.Get(request.Id.Value, includeReservations: true, includeReviews: true);
 
                 if (desk == null)
                 {
-                    deleteResponse.Success = false;
-                    return deleteResponse;
+                    throw new NotFoundException($"Desk with ID: {request.Id} not found.");
                 }
 
                 MarkReservationsAsDeleted(desk.Reservations);
 
                 _deskRepository.SoftDelete(desk);
             }
-            else
+            else if (request.Type == (int)EntityTypes.ConferenceRoom)
             {
-                ConferenceRoom conferenceRoom = _conferenceRoomRepository.Get(request.IdOfEntity, includeReservations: true, includeReviews: true);
+                ConferenceRoom conferenceRoom = _conferenceRoomRepository.Get(request.Id.Value, includeReservations: true, includeReviews: true);
 
                 if (conferenceRoom == null)
                 {
-                    deleteResponse.Success = false;
-                    return deleteResponse;
+                    throw new NotFoundException($"Conference room with ID: {request.Id} not found.");
                 }
 
                 MarkReservationsAsDeleted(conferenceRoom.Reservations);
 
                 _conferenceRoomRepository.SoftDelete(conferenceRoom);
             }
-
-            deleteResponse.Success = true;
-
-            return deleteResponse;
         }
 
-        public ConferenceRoomsResponse ListAllConferenceRooms(int id, int? take = null, int? skip = null)
+        public List<ConferenceRoomDto> ListAllConferenceRooms(int id, int? take = null, int? skip = null)
         {
             List<ConferenceRoom> conferenceRooms = _conferenceRoomRepository.GetOfficeConferenceRooms(id, includeReservations: true, take: take, skip: skip);
-
-            return new ConferenceRoomsResponse()
-            {
-                ConferenceRoomsList = _mapper.Map<List<ConferenceRoomDto>>(conferenceRooms),
-                Sucess = true
-            };
+            return _mapper.Map<List<ConferenceRoomDto>>(conferenceRooms);
         }
 
-        public EntitiesResponse UpdateDesks(UpdateRequest request)
+        public void UpdateDesks(List<DeskDto> desks)
         {
-            EntitiesResponse entitiesResponse = new EntitiesResponse();
-
             using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                foreach (DeskToUpdate deskToUpdate in request.ListOfDesksToUpdate)
+                foreach (DeskDto deskToUpdate in desks)
                 {
-                    Desk desk = _deskRepository.Get(deskToUpdate.DeskId);
+                    Desk desk = _deskRepository.Get(deskToUpdate.Id.Value);
 
                     if (desk == null)
                     {
                         continue;
                     }
 
-                    Category existingDeskCategory = _categoriesRepository.Get(deskToUpdate.DualMonitor, deskToUpdate.NearWindow, deskToUpdate.SingleMonitor, deskToUpdate.Unavailable);
+                    Category existingDeskCategory = _categoriesRepository.Get(deskToUpdate.Category.DoubleMonitor, deskToUpdate.Category.NearWindow,
+                        deskToUpdate.Category.SingleMonitor, deskToUpdate.Category.Unavailable);
                     if (existingDeskCategory != null)
                     {
                         desk.CategorieId = existingDeskCategory.Id;
@@ -193,10 +156,10 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     {
                         Category category = new Category()
                         {
-                            DoubleMonitor = deskToUpdate.DualMonitor,
-                            SingleMonitor = deskToUpdate.SingleMonitor,
-                            NearWindow = deskToUpdate.NearWindow,
-                            Unavailable = deskToUpdate.Unavailable
+                            DoubleMonitor = deskToUpdate.Category.DoubleMonitor,
+                            SingleMonitor = deskToUpdate.Category.SingleMonitor,
+                            NearWindow = deskToUpdate.Category.NearWindow,
+                            Unavailable = deskToUpdate.Category.Unavailable
                         };
 
                         category.Desks.Add(desk);
@@ -206,10 +169,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
                 transaction.Complete();
             }
-
-            entitiesResponse.Success = true;
-
-            return entitiesResponse;
         }
 
         private void MarkReservationsAsDeleted(ICollection<Reservation> reservations)

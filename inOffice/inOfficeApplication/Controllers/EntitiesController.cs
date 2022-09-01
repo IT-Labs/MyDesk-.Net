@@ -1,13 +1,14 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using FluentValidation.Results;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class EntitiesController : Controller
     {
@@ -19,127 +20,117 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("entity/reviews/{id}")]
-        public ActionResult<AllReviewsForEntity> AllEntitiesForDesk(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReviewDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AllEntitiesForDesk(int id)
         {
-            AllReviewsForEntity response = _entitiesService.AllReviewsForEntity(id);
-            if (response.Success == true)
-            {
-                return Ok(response);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<ReviewDto> reviews = _entitiesService.AllReviewsForEntity(id);
+            return Ok(reviews);
         }
 
         [HttpPost("admin/office-entities/{id}")]
-        public ActionResult<EntitiesResponse> GenerateEntities(int id, EntitiesRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GenerateEntities(int id, [FromBody] EntitiesRequest entitiesRequest)
         {
-            if (dto.NumberOfDesks < 1 || dto.NumberOfDesks > 500)
+            EntitiesRequestValidation validationRules = new EntitiesRequestValidation();
+            ValidationResult validationResult = validationRules.Validate(entitiesRequest);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("Maximum number of desks to be created is 500");
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            EntitiesResponse response = _entitiesService.CreateNewDesks(id, dto.NumberOfDesks);
-
-            if (response.Success == true)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            _entitiesService.CreateNewDesks(id, entitiesRequest.NumberOfDesks);
+            return Ok();
         }
 
         [HttpGet("admin/office-desks/{id}")]
-        public ActionResult<DesksResponse> GetAllDesks(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<DeskDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllDesks(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            DesksResponse deskList = _entitiesService.ListAllDesks(id, take: take, skip: skip);
-            if (deskList.sucess == true)
-            {
-                return Ok(deskList);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<DeskDto> desks = _entitiesService.ListAllDesks(id, take: take, skip: skip);
+
+            return Ok(desks);
         }
 
         [HttpDelete("admin/entity")]
-        public ActionResult<DeleteResponse> DeleteEntity(DeleteRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult DeleteEntity([FromBody] DeleteRequest deleteRequest)
         {
-            DeleteResponse deleteResponse = _entitiesService.DeleteEntity(dto);
+            DeleteRequestValidation validationRules = new DeleteRequestValidation();
+            ValidationResult validationResult = validationRules.Validate(deleteRequest);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
 
-            if (deleteResponse.Success == true)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _entitiesService.DeleteEntity(deleteRequest);
+            return Ok();
         }
 
         [HttpPut("admin/office-entities")]
-        public ActionResult<EntitiesResponse> UpdateEntities(UpdateRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult UpdateEntities([FromBody] List<DeskDto> desks)
         {
-            EntitiesResponse entitiesResponse = _entitiesService.UpdateDesks(dto);
+            DeskDtosValidation validationRules = new DeskDtosValidation();
+            ValidationResult validationResult = validationRules.Validate(desks);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
 
-            if (entitiesResponse.Success == true)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            _entitiesService.UpdateDesks(desks);
+            return Ok();
         }
 
         [HttpGet("admin/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoomDto>> GetAllConferenceRooms(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ConferenceRoomDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllConferenceRooms(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
-            if (conferenceRoomList.Sucess == true)
-            {
-                return Ok(conferenceRoomList.ConferenceRoomsList);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<ConferenceRoomDto> conferenceRooms = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
+
+            return Ok(conferenceRooms);
         }
 
         [HttpGet("employee/office-conferencerooms/{id}")]
-        public ActionResult<IEnumerable<ConferenceRoomDto>> GetAllConferenceRoomsForEmployee(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ConferenceRoomDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllConferenceRoomsForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            ConferenceRoomsResponse conferenceRoomList = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
-            if (conferenceRoomList.Sucess == true)
-            {
-                return Ok(conferenceRoomList.ConferenceRoomsList);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<ConferenceRoomDto> conferenceRooms = _entitiesService.ListAllConferenceRooms(id, take: take, skip: skip);
+
+            return Ok(conferenceRooms);
         }
 
         [HttpGet("employee/office-desks/{id}")]
-        public ActionResult<IEnumerable<DeskDto>> GetAllDesksForEmployee(int id)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<DeskDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllDesksForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            DesksResponse deskList = _entitiesService.ListAllDesks(id, take: take, skip: skip);
-            if (deskList.sucess == true)
-            {
-                return Ok(deskList.DeskList);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            List<DeskDto> desks = _entitiesService.ListAllDesks(id, take: take, skip: skip);
+
+            return Ok(desks);
         }
     }
 }

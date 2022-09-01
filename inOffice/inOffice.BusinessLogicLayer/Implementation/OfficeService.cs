@@ -33,16 +33,14 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 throw new ConflictException("There is allready office with the same name");
             }
-            else
-            {
-                Office office = new Office()
-                {
-                    Name = officeDto.Name,
-                    OfficeImage = officeDto.OfficeImage
-                };
 
-                _officeRepository.Insert(office);
-            }
+            Office office = new Office()
+            {
+                Name = officeDto.Name,
+                OfficeImage = officeDto.OfficeImage
+            };
+
+            _officeRepository.Insert(office);
         }
 
         public void UpdateOffice(OfficeDto officeDto)
@@ -52,6 +50,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
             if (office == null)
             {
                 throw new NotFoundException($"Office with ID: {officeDto.Id} not found.");
+            }
+
+            Office existingOffice = _officeRepository.GetByName(officeDto.Name);
+
+            if (existingOffice != null)
+            {
+                throw new ConflictException("There is allready office with the same name");
             }
 
             office.Name = officeDto.Name;
