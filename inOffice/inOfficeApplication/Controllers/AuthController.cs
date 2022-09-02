@@ -15,7 +15,7 @@ using System.Text;
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
         private readonly IConfiguration _configuration;

@@ -9,34 +9,33 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly IOfficeService _officeService;
-
-        public EmployeeController(IOfficeService officeService)
+        private readonly IEmployeeService _employeeService;
+        public EmployeeController(IEmployeeService employeeService)
         {
-            _officeService = officeService;
+            _employeeService = employeeService;
         }
 
-        [HttpGet("employee/offices")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
+        [HttpGet("employee/all")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<EmployeeDto>))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetAllOffices()
+        public IActionResult AllEmployees()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            List<OfficeDto> offices = _officeService.GetAllOffices(take: take, skip: skip);
+            List<EmployeeDto> result = _employeeService.GetAll(take: take, skip: skip);
 
-            return Ok(offices);
+            return Ok(result);
         }
 
-        [HttpGet("employee/office/image/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [HttpPut("admin/employee/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ImageUrl(int id)
+        public IActionResult SetAsAdmin(int id)
         {
-            OfficeDto office = _officeService.GetDetailsForOffice(id);
-            return Ok(office.OfficeImage);
+            _employeeService.SetEmployeeAsAdmin(id);
+            return Ok();
         }
     }
 }

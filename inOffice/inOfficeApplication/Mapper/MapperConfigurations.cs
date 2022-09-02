@@ -35,7 +35,7 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.NearWindow, opt => opt.MapFrom(y => y.NearWindow))
                     .ForMember(x => x.SingleMonitor, opt => opt.MapFrom(y => y.SingleMonitor))
                     .ForMember(x => x.Unavailable, opt => opt.MapFrom(y => y.Unavailable))
-                    .ForMember(x => x.DeskId, opt => opt.MapFrom(y => GetFirstDeskId(y.Desks)));
+                    .ForMember(x => x.Desks, opt => opt.MapFrom(y => y.Desks));
 
                 config.CreateMap<Employee, EmployeeDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
@@ -65,18 +65,6 @@ namespace inOfficeApplication.Mapper
         }
 
         #region Private methods
-        private static int? GetFirstDeskId(ICollection<Desk> desks)
-        {
-            if (desks != null && desks.Count > 0)
-            {
-                return desks.First().Id;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         private static string GetReservationOfficeName(Reservation reservation)
         {
             string officeName = string.Empty;

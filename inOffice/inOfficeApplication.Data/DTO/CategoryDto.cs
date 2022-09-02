@@ -7,6 +7,6 @@
         public bool? NearWindow { get; set; }
         public bool? SingleMonitor { get; set; }
         public bool? Unavailable { get; set; }
-        public int? DeskId { get; set; }
+        public List<DeskDto>? Desks { get; set; }
     }
 }

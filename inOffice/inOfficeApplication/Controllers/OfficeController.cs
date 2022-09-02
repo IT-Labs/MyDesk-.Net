@@ -9,7 +9,7 @@ using System.Net;
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
-    public class OfficeController : Controller
+    public class OfficeController : ControllerBase
     {
         private readonly IOfficeService _officeService;
         private readonly OfficeDtoValidation _validationRules;
@@ -18,6 +18,18 @@ namespace inOfficeApplication.Controllers
         {
             _officeService = officeService;
             _validationRules = new OfficeDtoValidation();
+        }
+
+        [HttpGet("employee/offices")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllOfficesForEmployee()
+        {
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            List<OfficeDto> offices = _officeService.GetAllOffices(take: take, skip: skip);
+
+            return Ok(offices);
         }
 
         [HttpGet("admin/offices")]
@@ -30,6 +42,17 @@ namespace inOfficeApplication.Controllers
             List<OfficeDto> offices = _officeService.GetAllOffices(take: take, skip: skip);
 
             return Ok(offices);
+        }
+
+        [HttpGet("employee/office/image/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ImageUrlForEmployee(int id)
+        {
+            OfficeDto office = _officeService.GetDetailsForOffice(id);
+            return Ok(office.OfficeImage);
         }
 
         [HttpGet("admin/office/image/{id}")]

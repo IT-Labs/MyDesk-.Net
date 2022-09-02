@@ -12,51 +12,24 @@ using System.Net;
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
-    public class HomeController : ControllerBase
+    public class ReservationController : ControllerBase
     {
         private readonly IReservationService _reservationService;
-        private readonly IEmployeeService _employeeService;
-        private readonly IReviewService _reviewService;
-
-        public HomeController(IReservationService reservationService,
-            IEmployeeService employeeRepository,
-            IReviewService reviewService)
+        public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
-            _employeeService = employeeRepository;
-            _reviewService = reviewService;
         }
 
-        [HttpPost("employee/reserve/coworker")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Conflict)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult CoworkerReservation([FromBody]ReservationRequest reservationRequest)
-        {
-            ReservationRequestValidation validationRules = new ReservationRequestValidation();
-            ValidationResult validationResult = validationRules.Validate(reservationRequest);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
-            }
-
-            _reservationService.CoworkerReserve(reservationRequest);
-            return Ok($"Sucessfuly reserved desk for coworker with mail {reservationRequest.EmployeeEmail}");
-        }
-
-        [HttpGet("employee/all")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<EmployeeDto>))]
+        [HttpGet("employee/reservations/all")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AllEmployees()
+        public IActionResult ReservationsAll()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            List<EmployeeDto> result = _employeeService.GetAll(take: take, skip: skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.AllReservations(take: take, skip: skip);
 
-            return Ok(result);
+            return Ok(reservations);
         }
 
         [HttpGet("employee/future-reservation")]
@@ -81,33 +54,24 @@ namespace inOfficeApplication.Controllers
             return Ok(reservations);
         }
 
-        [HttpGet("employee/review/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ReviewDto))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ShowReview(int id)
-        {
-            ReviewDto review = _reviewService.ShowReview(id);
-            return Ok(review);
-        }
-
-        [HttpPost("employee/review")]
+        [HttpPost("employee/reserve/coworker")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult CreateReview([FromBody] ReviewDto reviewDto)
+        public IActionResult CoworkerReservation([FromBody] ReservationRequest reservationRequest)
         {
-            ReviewDtoValidation validationRules = new ReviewDtoValidation();
-            ValidationResult validationResult = validationRules.Validate(reviewDto);
+            ReservationRequestValidation validationRules = new ReservationRequestValidation();
+            ValidationResult validationResult = validationRules.Validate(reservationRequest);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            _reviewService.CreateReview(reviewDto);
-            return Ok();
+            _reservationService.CoworkerReserve(reservationRequest);
+            return Ok($"Sucessfuly reserved desk for coworker with mail {reservationRequest.EmployeeEmail}");
         }
 
         [HttpDelete("employee/reserve/{id}")]
@@ -118,17 +82,6 @@ namespace inOfficeApplication.Controllers
         public IActionResult CancelReservation(int id)
         {
             _reservationService.CancelReservation(id);
-            return Ok();
-        }
-
-        [HttpPut("admin/employee/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult SetAsAdmin(int id)
-        {
-            _employeeService.SetEmployeeAsAdmin(id);
             return Ok();
         }
 

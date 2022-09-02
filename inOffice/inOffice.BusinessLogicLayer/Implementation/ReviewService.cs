@@ -30,6 +30,14 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _mapper = mapper;
         }
 
+        public List<ReviewDto> GetReviewsForDesk(int id)
+        {
+            List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(id, includeReview: true);
+            List<Review> reviews = deskReservations.SelectMany(x => x.Reviews).ToList();
+
+            return _mapper.Map<List<ReviewDto>>(reviews);
+        }
+
         public ReviewDto ShowReview(int id)
         {
             Review review = _reviewRepository.Get(id);

@@ -32,10 +32,11 @@ builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 builder.Services.AddTransient<IOfficeService, OfficeService>();
-builder.Services.AddTransient<IEntitiesService, EntitiesService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, ReviewService>();
 builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
+builder.Services.AddTransient<IDeskService, DeskService>();
 
 // Configure mapper
 IMapper mapper = MapperConfigurations.CreateMapper();

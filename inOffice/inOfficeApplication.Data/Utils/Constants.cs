@@ -25,15 +25,16 @@ namespace inOfficeApplication.Data.Utils
         public static readonly IList<Tuple<string, string>> AdminEndpoints = new ReadOnlyCollection<Tuple<string, string>>(new List<Tuple<string, string>>()
         {
             Tuple.Create("GET", "/entity/reviews/{id}"),
-            Tuple.Create("POST", "/admin/office-entities/{id}"),
+            Tuple.Create("POST", "/admin/office-desks/{id}"),
             Tuple.Create("GET", "/admin/office-desks/{id}"),
-            Tuple.Create("DELETE", "/admin/entity"),
-            Tuple.Create("PUT", "/admin/office-entities"),
+            Tuple.Create("PUT", "/admin/office-desks"),
             Tuple.Create("GET", "/admin/office-conferencerooms/{id}"),
             Tuple.Create("POST", "/admin/office"),
             Tuple.Create("PUT", "/admin/office/{id}"),
             Tuple.Create("DELETE", "/admin/office/{id}"),
-            Tuple.Create("PUT", "/admin/employee/{id}")
+            Tuple.Create("PUT", "/admin/employee/{id}"),
+            Tuple.Create("DELETE", "/admin/office-conferencerooms/{id}"),
+            Tuple.Create("DELETE", "/admin/office-desks/{id}")
         });
         public static readonly IList<Tuple<string, string>> EmployeeEndpoints = new ReadOnlyCollection<Tuple<string, string>>(new List<Tuple<string, string>>()
         {
@@ -49,15 +50,5 @@ namespace inOfficeApplication.Data.Utils
         ADMIN,
         EMPLOYEE,
         ALL
-    }
-
-    public enum EntityTypes
-    {
-        Office,
-        Desk,
-        ConferenceRoom,
-        Reservation,
-        Review,
-        Employee
     }
 }
