@@ -20,8 +20,6 @@ namespace inOfficeApplication.Data.Entities.Configurations
 
             entity.Property(e => e.Name).IsRequired();
 
-            entity.Property(e => e.OfficeImage).IsRequired();
-
             OnConfigurePartial(entity);
         }
 
