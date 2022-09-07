@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Interface;
 using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Data.Utils;
 
 namespace inOffice.BusinessLogicLayer.Implementation
@@ -20,7 +20,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
             IEmployeeRepository employeeRepository,
             IDeskRepository deskRepository,
             IMapper mapper)
-
         {
             _reservationRepository = reservationRepository;
             _employeeRepository = employeeRepository;
@@ -28,15 +27,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _mapper = mapper;
         }
 
-        public CancelReservationResponse CancelReservation(int id)
+        public void CancelReservation(int id)
         {
-            CancelReservationResponse cancelReservationResponse = new CancelReservationResponse();
-
             Reservation reservationToDelete = _reservationRepository.Get(id, includeReviews: true);
             if (reservationToDelete == null)
             {
-                cancelReservationResponse.Success = false;
-                return cancelReservationResponse;
+                throw new NotFoundException($"Reservation with ID: {id} not found.");
             }
 
             foreach (Review review in reservationToDelete.Reviews)
@@ -45,74 +41,78 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
 
             _reservationRepository.SoftDelete(reservationToDelete);
-
-            cancelReservationResponse.Success = true;
-
-            return cancelReservationResponse;
         }
 
-        public EmployeeReservationsResponse EmployeeReservations(Employee employee)
+        public List<ReservationDto> EmployeeReservations(string employeeEmail)
         {
-            EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
+            Employee employee = _employeeRepository.GetByEmail(employeeEmail);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+            }
+
+            List<Reservation> futureReservations = new List<Reservation>();
 
             List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
             foreach (Reservation employeeReservation in employeeReservations)
             {
                 if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) > 0)
                 {
-                    ReservationDto reservation = _mapper.Map<ReservationDto>(employeeReservation);                    
-                    employeeReservationsResponse.CustomReservationResponses.Add(reservation);
+                    futureReservations.Add(employeeReservation);
                 }
             }
-            employeeReservationsResponse.Success = true;
 
-            return employeeReservationsResponse;
+            return _mapper.Map<List<ReservationDto>>(futureReservations);
         }
 
-        public EmployeeReservationsResponse PastReservations(Employee employee)
+        public List<ReservationDto> PastReservations(string employeeEmail)
         {
-            EmployeeReservationsResponse employeeReservationsResponse = new EmployeeReservationsResponse();
+            Employee employee = _employeeRepository.GetByEmail(employeeEmail);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+            }
+
+            List<Reservation> pastReservations = new List<Reservation>();
+
             List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true);
 
             foreach (Reservation employeeReservation in employeeReservations)
             {
                 if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(employeeReservation.EndDate, DateTime.Now) < 0)
                 {
-                    ReservationDto reservation = _mapper.Map<ReservationDto>(employeeReservation);
-                    employeeReservationsResponse.CustomReservationResponses.Add(reservation);
+                    pastReservations.Add(employeeReservation);
                 }
             }
-            employeeReservationsResponse.Success = true;
 
-            return employeeReservationsResponse;
+            return _mapper.Map<List<ReservationDto>>(pastReservations);
         }
 
-        public AllReservationsResponse AllReservations(int? take = null, int? skip = null)
+        public PaginationDto<ReservationDto> AllReservations(int? take = null, int? skip = null)
         {
-            AllReservationsResponse response = new AllReservationsResponse();
-
             Tuple<int?, List<Reservation>> result = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip);
 
-            response.Reservations = _mapper.Map<List<ReservationDto>>(result.Item2);
-            response.TotalReservations = result.Item1.HasValue ? result.Item1.Value : response.Reservations.Count();
-
-            response.Success = true;
-
-            return response;
+            return new PaginationDto<ReservationDto>()
+            {
+                Values = _mapper.Map<List<ReservationDto>>(result.Item2),
+                TotalCount = result.Item1.HasValue ? result.Item1.Value : result.Item2.Count()
+            };
         }
 
-        public ReservationResponse CoworkerReserve(CoworkerReservationRequest request)
+        public void CoworkerReserve(ReservationRequest request)
         {
-            ReservationResponse response = new ReservationResponse();
-
             Desk desk = _deskRepository.Get(request.DeskId);
             if (desk == null)
             {
-                response.Success = false;
-                return response;
+                throw new NotFoundException($"Desk with ID: {request.DeskId} not found.");
             }
 
-            Employee employee = _employeeRepository.GetByEmail(request.CoworkerMail);
+            Employee employee = _employeeRepository.GetByEmail(request.EmployeeEmail);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Employee with email: {request.EmployeeEmail} not found.");
+            }
+
             List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(request.DeskId);
 
             Reservation newReservation = new Reservation()
@@ -129,9 +129,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 if (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
                     newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate))
                 {
-                    response.Success = false;
-                    response.ErrorMessage = $"Reservation for that time period already exists for desk {desk.IndexForOffice}";
-                    return response;
+                    throw new ConflictException($"Reservation for that time period already exists for desk {desk.Id}");
                 }
             }
 
@@ -142,16 +140,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 if (desk.OfficeId == GetOfficeId(reservation) && (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
                     newReservation.StartDate.IsInRange(reservation.StartDate, reservation.EndDate) || newReservation.EndDate.IsInRange(reservation.StartDate, reservation.EndDate)))
                 {
-                    response.Success = false;
-                    response.ErrorMessage = $"Reservation for that time period already exists for {employee.Email}";
-                    return response;
+                    throw new ConflictException($"Reservation for that time period already exists for {employee.Email}");
                 }
             }
 
             _reservationRepository.Insert(newReservation);
-
-            response.Success = true;
-            return response;
         }
 
         private int GetOfficeId(Reservation reservation)

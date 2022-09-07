@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Responses;
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -23,24 +23,24 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _employeeRepository.Create(employee);
         }
 
-        public GenericResponse SetEmployeeAsAdmin(int id)
+        public void SetEmployeeAsAdmin(int id)
         {
             Employee employee = _employeeRepository.Get(id);
 
             if (employee == null)
             {
-                return new GenericResponse() { Success = false };
+                throw new NotFoundException($"Employee with ID:{id} not found.");
             }
 
             employee.IsAdmin = true;
             _employeeRepository.Update(employee);
-
-            return new GenericResponse() { Success = true };
         }
 
         public List<EmployeeDto> GetAll(int? take = null, int? skip = null)
         {
             List<Employee> employees = _employeeRepository.GetAll(take: take, skip: skip);
+            employees.ForEach(x => x.Password = null);
+
             List<EmployeeDto> result = _mapper.Map<List<EmployeeDto>>(employees);
 
             return result.DistinctBy(x => x.Email).ToList();
@@ -59,14 +59,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 return null;
             }
 
-            if (BCrypt.Net.BCrypt.Verify(password, employee.Password))
-            {
-                return employee;
-            }
-            else
-            {
-                return null;
-            }
+            return BCrypt.Net.BCrypt.Verify(password, employee.Password) ? employee : null;
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
-using inOffice.BusinessLogicLayer.Responses;
+﻿using AutoMapper;
+using inOffice.BusinessLogicLayer.Interface;
 using inOffice.Repository.Interface;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Helpers;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -15,103 +16,71 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
         private HttpClient client = new HttpClient();
 
         public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMapper mapper)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
-        public ReviewResponse ShowReview(int id)
+        public List<ReviewDto> GetReviewsForDesk(int id)
+        {
+            List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(id, includeReview: true);
+            List<Review> reviews = deskReservations.SelectMany(x => x.Reviews).ToList();
+
+            return _mapper.Map<List<ReviewDto>>(reviews);
+        }
+
+        public ReviewDto ShowReview(int id)
         {
             Review review = _reviewRepository.Get(id);
-
-            ReviewResponse reviewForGivenEntity = new ReviewResponse()
+            if (review == null)
             {
-                Review = review.Reviews,
-                Sucess = true
-            };
+                throw new NotFoundException($"Review with ID: {id} not found.");
+            }
 
-            return reviewForGivenEntity;
+            return _mapper.Map<ReviewDto>(review);
         }
 
-        public AllReviewsResponse AllReviews(int? take = null, int? skip = null)
+        public List<ReviewDto> AllReviews(int? take = null, int? skip = null)
         {
-            List<CustomReviews> list = new List<CustomReviews>();
-
             List<Review> reviews = _reviewRepository.GetAll(take: take, skip: skip);
 
             foreach (Review review in reviews)
             {
-                Reservation reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
-
-                if (reservation == null)
-                {
-                    continue;
-                }
-
-                string officeName = string.Empty;
-                int? deskIndex = null;
-                if (reservation.Desk != null)
-                {
-                    officeName = reservation.Desk.Office?.Name;
-                    deskIndex = reservation.Desk.IndexForOffice;
-                }
-                else if (reservation.ConferenceRoom != null)
-                {
-                    officeName = reservation.ConferenceRoom.Office?.Name;
-                }
-
-                CustomReviews custom = new CustomReviews()
-                {
-                    OfficeName = officeName,
-                    Review = review.Reviews,
-                    ReviewOutput = review.ReviewOutput,
-                    DeskIndex = deskIndex
-                };
-
-                list.Add(custom);
+                // EF will handle references
+                // We used foreach instead of SQL join in order to prevent inefficient queries
+                _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
             }
 
-            AllReviewsResponse allReviews = new AllReviewsResponse()
-            {
-                ListOfReviews = list,
-                Success = true
-            };
-
-            return allReviews;
+            return _mapper.Map<List<ReviewDto>>(reviews);
         }
 
-        public CreateReviewResponse CreateReview(CreateReviewRequest createReviewRequest)
+        public void CreateReview(ReviewDto reviewDto)
         {
-            CreateReviewResponse response = new CreateReviewResponse();
-
-            Reservation reservation = _reservationRepository.Get(createReviewRequest.ReservationId);
-
+            Reservation reservation = _reservationRepository.Get(reviewDto.Reservation.Id);
             if (reservation == null)
             {
-                response.Success = false;
-                return response;
+                throw new NotFoundException($"Reservation with ID: {reviewDto.Reservation?.Id} not found");
             }
 
-            Task<string> responseSentimentAnalysis = GetAnalysedReview(createReviewRequest.Review);
+            Task<string> responseSentimentAnalysis = GetAnalysedReview(reviewDto.Reviews);
             Review review = new Review()
             {
-                Reviews = createReviewRequest.Review,
-                ReservationId = createReviewRequest.ReservationId,
+                Reviews = reviewDto.Reviews,
+                ReservationId = reviewDto.Reservation.Id,
                 ReviewOutput = responseSentimentAnalysis.Result,
                 Reservation = reservation
             };
 
             _reviewRepository.Insert(review);
-
-            response.Success = true;
-
-            return response;
         }
 
         private async Task<string> GetAnalysedReview(string textReview)

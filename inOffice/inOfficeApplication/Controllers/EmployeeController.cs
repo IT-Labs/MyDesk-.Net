@@ -1,52 +1,41 @@
-﻿using inOffice.BusinessLogicLayer;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Responses;
+﻿using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
-    [Route("")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly IOfficeService _officeService;
-
-        public EmployeeController(IOfficeService officeService)
+        private readonly IEmployeeService _employeeService;
+        public EmployeeController(IEmployeeService employeeService)
         {
-            _officeService = officeService;
+            _employeeService = employeeService;
         }
 
-        [HttpGet("employee/offices")]
-        public ActionResult<IEnumerable<OfficeDto>> GetAllOffices()
+        [HttpGet("employee/all")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<EmployeeDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AllEmployees()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            OfficeListResponse offices = _officeService.GetAllOffices(take: take, skip: skip);
+            List<EmployeeDto> result = _employeeService.GetAll(take: take, skip: skip);
 
-            if (offices.Success == true)
-            {
-                return Ok(offices.Offices);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return Ok(result);
         }
 
-        [HttpGet("employee/office/image/{id}")]
-        public ActionResult<OfficeResponse> ImageUrl(int id)
+        [HttpPut("admin/employee/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult SetAsAdmin(int id)
         {
-            Office office = _officeService.GetDetailsForOffice(id);
-            if (office.OfficeImage != null)
-            {
-                return Ok(office.OfficeImage);
-            }
-            else
-            {
-                return BadRequest("Image not found");
-            }
+            _employeeService.SetEmployeeAsAdmin(id);
+            return Ok();
         }
     }
 }

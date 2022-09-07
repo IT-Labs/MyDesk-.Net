@@ -1,5 +1,4 @@
-﻿using inOffice.BusinessLogicLayer.Responses;
-using inOfficeApplication.Data.DTO;
+﻿using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Interface
@@ -10,6 +9,6 @@ namespace inOffice.BusinessLogicLayer.Interface
         Employee GetByEmailAndPassword(string email, string password);
         List<EmployeeDto> GetAll(int? take = null, int? skip = null);
         void Create(Employee employee);
-        GenericResponse SetEmployeeAsAdmin(int id);
+        void SetEmployeeAsAdmin(int id);
     }
 }
