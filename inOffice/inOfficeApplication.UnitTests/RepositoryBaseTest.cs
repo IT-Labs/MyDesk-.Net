@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace inOfficeApplication.UnitTests
 {
-    public class TestBase
+    public class RepositoryBaseTest
     {
         protected ApplicationDbContext _dbContext;
 

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace inOfficeApplication.UnitTests.Repository
 {
-    public class ReviewRepositoryTests : TestBase
+    public class ReviewRepositoryTests : RepositoryBaseTest
     {
         private IReviewRepository _reviewRepository;
 

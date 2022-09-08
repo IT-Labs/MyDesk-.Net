@@ -120,7 +120,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 StartDate = DateTime.ParseExact(request.StartDate, "dd-MM-yyyy", null),
                 EndDate = DateTime.ParseExact(request.EndDate, "dd-MM-yyyy", null),
                 EmployeeId = employee.Id,
-                DeskId = request.DeskId
+                DeskId = desk.Id
             };
 
             // Check if there are existing reservations for that desk in that time-frame

@@ -42,7 +42,8 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.FirstName, opt => opt.MapFrom(y => y.FirstName))
                     .ForMember(x => x.LastName, opt => opt.MapFrom(y => y.LastName))
                     .ForMember(x => x.Email, opt => opt.MapFrom(y => y.Email))
-                    .ForMember(x => x.JobTitle, opt => opt.MapFrom(y => y.JobTitle));
+                    .ForMember(x => x.JobTitle, opt => opt.MapFrom(y => y.JobTitle))
+                    .ReverseMap();
 
                 config.CreateMap<Review, ReviewDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))

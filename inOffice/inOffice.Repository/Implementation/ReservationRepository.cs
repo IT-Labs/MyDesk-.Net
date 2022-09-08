@@ -81,24 +81,7 @@ namespace inOffice.Repository.Implementation
                 query = query.Skip(skip.Value).Take(take.Value);
             }
 
-            List<Reservation> result = query.ToList();
-            foreach (Reservation reservation in result)
-            {
-                if (reservation.Employee != null && reservation.Employee.IsDeleted == true)
-                {
-                    reservation.Employee = null;
-                }
-                if (reservation.Desk != null && reservation.Desk.IsDeleted == true)
-                {
-                    reservation.Desk = null;
-                }
-                else if (reservation.Desk != null && !reservation.Desk.IsDeleted == true && reservation.Desk.Office != null && reservation.Desk.Office.IsDeleted == true)
-                {
-                    reservation.Desk.Office = null;
-                }
-            }
-
-            return Tuple.Create(totalCount, result);
+            return Tuple.Create(totalCount, query.ToList());
         }
 
         public List<Reservation> GetEmployeeReservations(int employeeId,

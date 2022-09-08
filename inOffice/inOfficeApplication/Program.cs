@@ -37,6 +37,9 @@ builder.Services.AddTransient<IReviewService, ReviewService>();
 builder.Services.AddTransient<IEmployeeService, EmployeeService>();
 builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
 builder.Services.AddTransient<IDeskService, DeskService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
+
+builder.Services.AddHttpClient();
 
 // Configure mapper
 IMapper mapper = MapperConfigurations.CreateMapper();
