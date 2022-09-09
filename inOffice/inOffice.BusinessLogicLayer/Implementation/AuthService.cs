@@ -1,7 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,10 +11,10 @@ namespace inOffice.BusinessLogicLayer.Implementation
 {
     public class AuthService : IAuthService
     {
-        private readonly IConfiguration _configuration;
-        public AuthService(IConfiguration configuration)
+        private readonly IApplicationParmeters _applicationParmeters;
+        public AuthService(IApplicationParmeters applicationParmeters)
         {
-            _configuration = configuration;
+            _applicationParmeters = applicationParmeters;
         }
 
         public string GetToken(EmployeeDto employee)
@@ -34,13 +33,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(_configuration["Settings:CustomBearerTokenSigningKey"]);
+            byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetSettingsCustomBearerTokenSigningKey());
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Expires = DateTime.UtcNow.AddHours(2),
-                Issuer = _configuration["JwtInfo:Issuer"],
-                Audience = _configuration["JwtInfo:Audience"],
+                Issuer = _applicationParmeters.GetJwtIssuer(),
+                Audience = _applicationParmeters.GetJwtAudience(),
                 Subject = claimsIdentity
             };
 
@@ -59,9 +58,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             TokenValidationParameters parameters;
 
-            if (bool.Parse(_configuration["Settings:UseCustomBearerToken"]))
+            if (bool.Parse(_applicationParmeters.GetSettingsUseCustomBearerToken()))
             {
-                byte[] key = Encoding.ASCII.GetBytes(_configuration["Settings:CustomBearerTokenSigningKey"]);
+                byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetSettingsCustomBearerTokenSigningKey());
                 parameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -69,8 +68,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    ValidIssuer = _configuration["JwtInfo:Issuer"],
-                    ValidAudience = _configuration["JwtInfo:Audience"]
+                    ValidIssuer = _applicationParmeters.GetJwtIssuer(),
+                    ValidAudience = _applicationParmeters.GetJwtAudience()
                 };
             }
             else
@@ -82,8 +81,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    ValidIssuer = _configuration["JwtInfo:Issuer"],
-                    ValidAudience = _configuration["JwtInfo:Audience"]
+                    ValidIssuer = _applicationParmeters.GetJwtIssuer(),
+                    ValidAudience = _applicationParmeters.GetJwtAudience()
                 };
             }
 

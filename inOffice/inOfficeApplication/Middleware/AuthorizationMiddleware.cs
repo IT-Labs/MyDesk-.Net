@@ -12,19 +12,18 @@ namespace inOfficeApplication.Middleware
     public class AuthorizationMiddleware
     {
         private readonly RequestDelegate _requestDelegate;
-        private readonly IConfiguration _configuration;
         private readonly IAuthService _authService;
         private readonly OpenIdConnectConfiguration _openIdConfiguration;
 
-        public AuthorizationMiddleware(RequestDelegate requestDelegate, IConfiguration configuration, IAuthService authService)
+        public AuthorizationMiddleware(RequestDelegate requestDelegate, IApplicationParmeters applicationParmeters, IAuthService authService)
         {
             _requestDelegate = requestDelegate;
-            _configuration = configuration;
             _authService = authService;
 
-            if (!_configuration.GetValue<bool>("Settings:UseCustomBearerToken"))
+            if (!bool.Parse(applicationParmeters.GetSettingsUseCustomBearerToken()))
             {
-                IConfigurationManager<OpenIdConnectConfiguration> configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(_configuration["Settings:MetadataAddress"], new OpenIdConnectConfigurationRetriever());
+                IConfigurationManager<OpenIdConnectConfiguration> configurationManager = 
+                    new ConfigurationManager<OpenIdConnectConfiguration>(applicationParmeters.GetSettingsMetadataAddress(), new OpenIdConnectConfigurationRetriever());
                 _openIdConfiguration = configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
             }
         }

@@ -1,7 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Implementation;
 using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NUnit.Framework;
@@ -11,7 +10,7 @@ namespace inOfficeApplication.UnitTests.Service
     public class AuthServiceTests
     {
         private IAuthService _authService;
-        private IConfiguration _configuration;
+        private IApplicationParmeters _applicationParmeters;
 
         private string issuer = "it labs";
         private string audience = "app";
@@ -20,12 +19,12 @@ namespace inOfficeApplication.UnitTests.Service
         [OneTimeSetUp]
         public void Setup()
         {
-            _configuration = Substitute.For<IConfiguration>();
-            _configuration[Arg.Is<string>(x => x == "JwtInfo:Issuer")].Returns(issuer);
-            _configuration[Arg.Is<string>(x => x == "JwtInfo:Audience")].Returns(audience);
-            _configuration[Arg.Is<string>(x => x == "Settings:CustomBearerTokenSigningKey")].Returns(signingKey);
+            _applicationParmeters = Substitute.For<IApplicationParmeters>();
+            _applicationParmeters.GetJwtIssuer().Returns(issuer);
+            _applicationParmeters.GetJwtAudience().Returns(audience);
+            _applicationParmeters.GetSettingsCustomBearerTokenSigningKey().Returns(signingKey);
 
-            _authService = new AuthService(_configuration);
+            _authService = new AuthService(_applicationParmeters);
         }
 
         [TestCase(false)]
@@ -43,7 +42,7 @@ namespace inOfficeApplication.UnitTests.Service
                 IsAdmin = isAdmin
             };
 
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns("true");
+            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
 
             // Act
             string token = _authService.GetToken(employeeDto);
@@ -76,7 +75,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns("true");
+            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
 
             // Act
             string token = _authService.GetToken(employeeDto);
@@ -100,7 +99,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns("false");
+            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("false");
 
             // Act
             string token = _authService.GetToken(employeeDto);
