@@ -28,7 +28,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public string GetSettingsSentimentEndpoint()
         {
-            return _configuration["Settings:SentimentEndpoint"];
+            return _configuration["SentimentEndpoint"];
         }
 
         public string GetSettingsUseCustomBearerToken()
