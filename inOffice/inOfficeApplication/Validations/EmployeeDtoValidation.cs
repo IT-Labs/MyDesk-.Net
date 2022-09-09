@@ -20,7 +20,7 @@ namespace inOfficeApplication.Validations
 
                     if (!email.Contains("@it-labs.com"))
                     {
-                        context.AddFailure("Invalid email adress");
+                        context.AddFailure("Invalid email adress.");
                     }
                 });
             });

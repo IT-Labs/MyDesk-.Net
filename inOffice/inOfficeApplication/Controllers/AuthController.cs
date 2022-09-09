@@ -51,7 +51,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
-            if (!_configuration.GetValue<bool>("Settings:UseCustomBearerToken") || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
+            if (!bool.Parse(_configuration["Settings:UseCustomBearerToken"]) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
             {
                 return BadRequest();
             }
