@@ -5,7 +5,6 @@ using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Helpers;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -15,19 +14,19 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IApplicationParmeters _applicationParmeters;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
 
         public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
-            IConfiguration configuration,
+            IApplicationParmeters applicationParmeters,
             IMapper mapper,
             IHttpClientFactory clientFactory)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
-            _configuration = configuration;
+            _applicationParmeters = applicationParmeters;
             _mapper = mapper;
             _httpClient = clientFactory.CreateClient();
         }
@@ -93,7 +92,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             HttpRequestMessage request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(_configuration["Settings:SentimentEndpoint"]),
+                RequestUri = new Uri(_applicationParmeters.GetSettingsSentimentEndpoint()),
                 Content = new StringContent(data, Encoding.UTF8, "application/json")
             };
             HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);

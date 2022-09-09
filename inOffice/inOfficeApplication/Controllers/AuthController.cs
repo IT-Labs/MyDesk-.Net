@@ -17,13 +17,13 @@ namespace inOfficeApplication.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private readonly IAuthService _authService;
-        private readonly IConfiguration _configuration;
+        private readonly IApplicationParmeters _applicationParmeters;
 
-        public AuthController(IEmployeeService employeeRepository, IAuthService authService, IConfiguration configuration)
+        public AuthController(IEmployeeService employeeRepository, IAuthService authService, IApplicationParmeters applicationParmeters)
         {
             _employeeService = employeeRepository;
             _authService = authService;
-            _configuration = configuration;
+            _applicationParmeters = applicationParmeters;
         }
 
         [HttpPost("authentication")]
@@ -51,7 +51,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
-            if (!bool.Parse(_configuration["Settings:UseCustomBearerToken"]) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
+            if (!bool.Parse(_applicationParmeters.GetSettingsUseCustomBearerToken()) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
             {
                 return BadRequest();
             }

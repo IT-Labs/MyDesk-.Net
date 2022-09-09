@@ -2,7 +2,6 @@
 using inOfficeApplication.Controllers;
 using inOfficeApplication.Data.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 using System.Text;
@@ -14,16 +13,16 @@ namespace inOfficeApplication.UnitTests.Controller
         private AuthController _authController;
         private IEmployeeService _employeeService;
         private IAuthService _authService;
-        private IConfiguration _configuration;
+        private IApplicationParmeters _applicationParmeters;
 
         [OneTimeSetUp]
         public void Setup()
         {
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
-            _configuration = Substitute.For<IConfiguration>();
+            _applicationParmeters = Substitute.For<IApplicationParmeters>();
 
-            _authController = new AuthController(_employeeService, _authService, _configuration);
+            _authController = new AuthController(_employeeService, _authService, _applicationParmeters);
         }
 
         [Test]
@@ -33,10 +32,10 @@ namespace inOfficeApplication.UnitTests.Controller
             // Arrange
             string token = "jwt token";
             string password = "new_test";
-            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(password);
+            byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
             string encodedPassword =  Convert.ToBase64String(plainTextBytes);
 
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns("true");
+            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
             EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
@@ -58,8 +57,8 @@ namespace inOfficeApplication.UnitTests.Controller
         public void GetToken_BadRequest(bool useCustomBearerToken, string email, string password)
         {
             // Arrange
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns(useCustomBearerToken.ToString());
             EmployeeDto employeeDto = new EmployeeDto() { Email = email, Password = password };
+            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns(useCustomBearerToken.ToString());
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);

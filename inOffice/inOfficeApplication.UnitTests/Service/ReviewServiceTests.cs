@@ -5,7 +5,6 @@ using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 using System.Text;
@@ -17,7 +16,7 @@ namespace inOfficeApplication.UnitTests.Service
         private IReviewService _reviewService;
         private IReviewRepository _reviewRepository;
         private IReservationRepository _reservationRepository;
-        private IConfiguration _configuration;
+        private IApplicationParmeters _applicationParmeters;
         private IMapper _mapper;
         private IHttpClientFactory _clientFactory;
 
@@ -26,13 +25,13 @@ namespace inOfficeApplication.UnitTests.Service
         {
             _reviewRepository = Substitute.For<IReviewRepository>();
             _reservationRepository = Substitute.For<IReservationRepository>();
-            _configuration = Substitute.For<IConfiguration>();
+            _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _mapper = Substitute.For<IMapper>();
             _clientFactory = Substitute.For<IHttpClientFactory>();
 
             _clientFactory.CreateClient().Returns(new MockedHttpClient());
 
-            _reviewService = new ReviewService(_reviewRepository, _reservationRepository, _configuration, _mapper, _clientFactory);
+            _reviewService = new ReviewService(_reviewRepository, _reservationRepository, _applicationParmeters, _mapper, _clientFactory);
         }
 
         [Test]
@@ -48,7 +47,7 @@ namespace inOfficeApplication.UnitTests.Service
 
             Reservation reservation = new Reservation() { Id = 1 };
 
-            _configuration[Arg.Any<string>()].Returns("http://test.com");
+            _applicationParmeters.GetSettingsSentimentEndpoint().Returns("http://test.com");
             _reservationRepository.Get(reviewDto.Reservation.Id).Returns(reservation);
 
             // Act
