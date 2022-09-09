@@ -16,7 +16,7 @@ namespace inOfficeApplication.UnitTests.Controller
         public void Setup()
         {
             _employeeService = Substitute.For<IEmployeeService>();
-            _employeeController = new EmployeeController(_employeeService, null);
+            _employeeController = new EmployeeController(_employeeService);
         }
 
         [TestCase(null, null)]

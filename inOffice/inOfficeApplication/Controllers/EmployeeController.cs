@@ -10,22 +10,9 @@ namespace inOfficeApplication.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private readonly IApplicationParmeters applicationParmeters;
-        public EmployeeController(IEmployeeService employeeService, IApplicationParmeters applicationParmeters)
+        public EmployeeController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
-            this.applicationParmeters = applicationParmeters;
-        }
-
-        [HttpGet("params/all")]
-        public IActionResult Test()
-        {
-            string issuer = applicationParmeters.GetJwtIssuer();
-            string useCustomToken = applicationParmeters.GetSettingsUseCustomBearerToken();
-            string signingKey = applicationParmeters.GetSettingsCustomBearerTokenSigningKey();
-            string sentimentAPI = applicationParmeters.GetSettingsSentimentEndpoint();
-
-            return Ok($"Issuer: {issuer}, UseCustomBearerToken: {useCustomToken}, CustomBearerTokenSigningKey: {signingKey}, SentimentEndpoint: {sentimentAPI}");
         }
 
         [HttpGet("employee/all")]
