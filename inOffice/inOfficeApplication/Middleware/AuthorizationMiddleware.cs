@@ -1,14 +1,11 @@
-﻿using inOfficeApplication.Data.Utils;
+﻿using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.Utils;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace inOfficeApplication.Middleware
 {
@@ -16,12 +13,14 @@ namespace inOfficeApplication.Middleware
     {
         private readonly RequestDelegate _requestDelegate;
         private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
         private readonly OpenIdConnectConfiguration _openIdConfiguration;
 
-        public AuthorizationMiddleware(RequestDelegate requestDelegate, IConfiguration configuration)
+        public AuthorizationMiddleware(RequestDelegate requestDelegate, IConfiguration configuration, IAuthService authService)
         {
             _requestDelegate = requestDelegate;
             _configuration = configuration;
+            _authService = authService;
 
             if (!_configuration.GetValue<bool>("Settings:UseCustomBearerToken"))
             {
@@ -60,100 +59,12 @@ namespace inOfficeApplication.Middleware
                 string authHeader = context.Request.Headers[HeaderNames.Authorization];
                 string jwtToken = authHeader.Substring(7);
 
-                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-                tokenHandler.ValidateToken(jwtToken, GetTokenValidationParameters(), out SecurityToken validatedToken);
-
-                return HasRoles(context, validatedToken);
+                return _authService.ValidateToken(jwtToken, context.Request.Path.Value, context.Request.Method, _openIdConfiguration?.SigningKeys);
             }
             catch (SecurityTokenValidationException exception)
             {
                 message = exception.Message;
                 return false;
-            }
-        }
-
-        private TokenValidationParameters GetTokenValidationParameters()
-        {
-            TokenValidationParameters parameters;
-
-            if (_configuration.GetValue<bool>("Settings:UseCustomBearerToken"))
-            {
-                byte[] key = Encoding.ASCII.GetBytes(_configuration["Settings:CustomBearerTokenSigningKey"]);
-                parameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = _configuration["JwtInfo:Issuer"],
-                    ValidAudience = _configuration["JwtInfo:Audience"]
-                };
-            }
-            else
-            {
-                parameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKeys = _openIdConfiguration.SigningKeys,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = _configuration["JwtInfo:Issuer"],
-                    ValidAudience = _configuration["JwtInfo:Audience"]
-                };
-            }
-
-            return parameters;
-        }
-
-        private bool HasRoles(HttpContext context, SecurityToken securityToken)
-        {
-            RoleTypes requiredRole = GetRequiredRole(context);
-
-            JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)securityToken;
-            List<Claim> roleClaims = jwtSecurityToken.Claims.Where(x => x.Type == "roles").ToList();
-            if (requiredRole == RoleTypes.ADMIN)
-            {
-                return roleClaims.Any(x => x.Value == RoleTypes.ADMIN.ToString());
-            }
-            else if (requiredRole == RoleTypes.EMPLOYEE)
-            {
-                return roleClaims.Any(x => x.Value == RoleTypes.EMPLOYEE.ToString());
-            }
-            else
-            {
-                return roleClaims.Any();
-            }
-        }
-
-        private RoleTypes GetRequiredRole(HttpContext context)
-        {
-            string path = context.Request.Path.Value.TrimEnd('/');
-            string pathId = Regex.Match(path, @"\d+").Value;
-
-            if (!string.IsNullOrEmpty(pathId))
-            {
-                path = path.Replace(pathId, "{id}");
-            }
-
-            Tuple<string, string> roles = Tuple.Create(context.Request.Method.ToUpper(), path.ToLower());
-            if (Constants.AdminEndpoints.Contains(roles))
-            {
-                return RoleTypes.ADMIN;
-            }
-            else if (Constants.EmployeeEndpoints.Contains(roles))
-            {
-                return RoleTypes.EMPLOYEE;
-            }
-            else if (Constants.AllEndpoints.Contains(roles))
-            {
-                return RoleTypes.ALL;
-            }
-            else
-            {
-                throw new Exception("Required endpoint doesn't exist");
             }
         }
 

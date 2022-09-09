@@ -7,7 +7,7 @@ namespace inOfficeApplication.Validations
     {
         public EntitiesRequestValidation()
         {
-            RuleFor(x => x.NumberOfDesks).GreaterThan(0).LessThanOrEqualTo(500).WithMessage("Maximum number of desks to be created is 500");
+            RuleFor(x => x.NumberOfDesks).GreaterThan(0).LessThanOrEqualTo(500).WithMessage("Maximum number of desks to be created is 500.");
         }
     }
 }

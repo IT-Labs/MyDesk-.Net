@@ -10,9 +10,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inOfficeApplication", "inOf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inOfficeApplication.Data", "..\inOfficeApplication.Data\inOfficeApplication.Data.csproj", "{29E2A66C-4CDC-4736-8388-E48FBAF52971}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inOffice.BusinessLogicLayer", "..\inOffice.BusinessLogicLayer\inOffice.BusinessLogicLayer.csproj", "{CAD9E0BC-379D-43D4-9E36-3BF3B6BD3A6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inOffice.BusinessLogicLayer", "..\inOffice.BusinessLogicLayer\inOffice.BusinessLogicLayer.csproj", "{CAD9E0BC-379D-43D4-9E36-3BF3B6BD3A6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inOffice.Repository", "..\inOffice.Repository\inOffice.Repository.csproj", "{8210F923-5CFE-4AAF-B5BE-C304DC4D5D39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inOffice.Repository", "..\inOffice.Repository\inOffice.Repository.csproj", "{8210F923-5CFE-4AAF-B5BE-C304DC4D5D39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "inOfficeApplication.UnitTests", "..\inOfficeApplication.UnitTests\inOfficeApplication.UnitTests.csproj", "{6AEE47F7-8001-4177-90D1-CAF851665B81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{8210F923-5CFE-4AAF-B5BE-C304DC4D5D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8210F923-5CFE-4AAF-B5BE-C304DC4D5D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8210F923-5CFE-4AAF-B5BE-C304DC4D5D39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AEE47F7-8001-4177-90D1-CAF851665B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AEE47F7-8001-4177-90D1-CAF851665B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AEE47F7-8001-4177-90D1-CAF851665B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AEE47F7-8001-4177-90D1-CAF851665B81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,12 +12,9 @@ namespace inOfficeApplication.Controllers
     public class OfficeController : ControllerBase
     {
         private readonly IOfficeService _officeService;
-        private readonly OfficeDtoValidation _validationRules;
-
         public OfficeController(IOfficeService officeService)
         {
             _officeService = officeService;
-            _validationRules = new OfficeDtoValidation();
         }
 
         [HttpGet("employee/offices")]
@@ -74,7 +71,8 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult AddNewOffice([FromBody] OfficeDto officeDto)
         {
-            ValidationResult validationResult = _validationRules.Validate(officeDto);
+            OfficeDtoValidation validationRules = new OfficeDtoValidation();
+            ValidationResult validationResult = validationRules.Validate(officeDto);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
@@ -93,7 +91,8 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Edit(int id, [FromBody] OfficeDto officeDto)
         {
-            ValidationResult validationResult = _validationRules.Validate(officeDto);
+            OfficeDtoValidation validationRules = new OfficeDtoValidation();
+            ValidationResult validationResult = validationRules.Validate(officeDto);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));

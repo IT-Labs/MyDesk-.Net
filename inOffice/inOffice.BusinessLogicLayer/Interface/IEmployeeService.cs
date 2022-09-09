@@ -1,14 +1,13 @@
 ﻿using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Entities;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
     public interface IEmployeeService
     {
-        Employee GetByEmail(string email);
-        Employee GetByEmailAndPassword(string email, string password);
+        EmployeeDto GetByEmail(string email);
+        EmployeeDto GetByEmailAndPassword(string email, string password);
         List<EmployeeDto> GetAll(int? take = null, int? skip = null);
-        void Create(Employee employee);
+        void Create(EmployeeDto employeeDto);
         void SetEmployeeAsAdmin(int id);
     }
 }

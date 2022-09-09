@@ -18,8 +18,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _mapper = mapper;
         }
 
-        public void Create(Employee employee)
+        public void Create(EmployeeDto employeeDto)
         {
+            Employee employee = _mapper.Map<Employee>(employeeDto);
             _employeeRepository.Create(employee);
         }
 
@@ -46,20 +47,22 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return result.DistinctBy(x => x.Email).ToList();
         }
 
-        public Employee GetByEmail(string email)
-        {
-            return _employeeRepository.GetByEmail(email);
-        }
-
-        public Employee GetByEmailAndPassword(string email, string password)
+        public EmployeeDto GetByEmail(string email)
         {
             Employee employee = _employeeRepository.GetByEmail(email);
-            if (employee == null)
+            return employee == null ? null : _mapper.Map<EmployeeDto>(employee);
+        }
+
+        public EmployeeDto GetByEmailAndPassword(string email, string password)
+        {
+            Employee employee = _employeeRepository.GetByEmail(email);
+
+            if (employee == null || !BCrypt.Net.BCrypt.Verify(password, employee.Password))
             {
-                return null;
+                throw new NotFoundException($"Employee with email: {email} not found.");
             }
 
-            return BCrypt.Net.BCrypt.Verify(password, employee.Password) ? employee : null;
+            return _mapper.Map<EmployeeDto>(employee);
         }
     }
 }

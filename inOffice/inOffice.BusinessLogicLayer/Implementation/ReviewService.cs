@@ -17,17 +17,19 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IReservationRepository _reservationRepository;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
-        private HttpClient client = new HttpClient();
+        private readonly HttpClient _httpClient;
 
         public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
             IConfiguration configuration,
-            IMapper mapper)
+            IMapper mapper,
+            IHttpClientFactory clientFactory)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
             _configuration = configuration;
             _mapper = mapper;
+            _httpClient = clientFactory.CreateClient();
         }
 
         public List<ReviewDto> GetReviewsForDesk(int id)
@@ -71,27 +73,31 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Reservation with ID: {reviewDto.Reservation?.Id} not found");
             }
 
-            Task<string> responseSentimentAnalysis = GetAnalysedReview(reviewDto.Reviews);
             Review review = new Review()
             {
                 Reviews = reviewDto.Reviews,
                 ReservationId = reviewDto.Reservation.Id,
-                ReviewOutput = responseSentimentAnalysis.Result,
+                ReviewOutput = GetAnalysedReview(reviewDto.Reviews),
                 Reservation = reservation
             };
 
             _reviewRepository.Insert(review);
         }
 
-        private async Task<string> GetAnalysedReview(string textReview)
+        private string GetAnalysedReview(string textReview)
         {
             string review = string.Empty;
-            Dictionary<string, string> dictionaryData = new Dictionary<string, string>();
-            dictionaryData.Add("text", textReview);
+            Dictionary<string, string> dictionaryData = new Dictionary<string, string>() { { "text", textReview } };
             string data = JsonConvert.SerializeObject(dictionaryData);
 
-            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(_configuration["Settings:SentimentEndpoint"], content);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(_configuration["Settings:SentimentEndpoint"]),
+                Content = new StringContent(data, Encoding.UTF8, "application/json")
+            };
+            HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);
+
             string stringResponse = response.Content.ReadAsStringAsync().Result;
             ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
             if (response.IsSuccessStatusCode)

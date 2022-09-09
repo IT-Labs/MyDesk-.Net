@@ -11,7 +11,7 @@ namespace inOfficeApplication.Validations
             RuleFor(x => x.Reservation).NotEmpty().WithMessage("Review must be related to a reservation.");
             When(x => x.Reservation != null, () =>
             {
-                RuleFor(x => x.Reservation.Id).GreaterThan(0).WithMessage("Review must be related to a reservation");
+                RuleFor(x => x.Reservation.Id).GreaterThan(0).WithMessage("Review must be related to a reservation.");
             });
         }
     }
