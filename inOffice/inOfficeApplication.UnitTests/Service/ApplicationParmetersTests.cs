@@ -24,7 +24,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string issuer = "issuer";
-            _configuration[Arg.Is<string>(x => x == "JwtInfo.Issuer")].Returns(issuer);
+            _configuration[Arg.Is<string>(x => x == "JwtInfo:Issuer")].Returns(issuer);
 
             // Act
             string result = _applicationParmeters.GetJwtIssuer();
@@ -39,7 +39,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string audience = "audience";
-            _configuration[Arg.Is<string>(x => x == "JwtInfo.Audience")].Returns(audience);
+            _configuration[Arg.Is<string>(x => x == "JwtInfo:Audience")].Returns(audience);
 
             // Act
             string result = _applicationParmeters.GetJwtAudience();
@@ -54,7 +54,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string metadataAddress = "metadata address";
-            _configuration[Arg.Is<string>(x => x == "Settings.MetadataAddress")].Returns(metadataAddress);
+            _configuration[Arg.Is<string>(x => x == "Settings:MetadataAddress")].Returns(metadataAddress);
 
             // Act
             string result = _applicationParmeters.GetSettingsMetadataAddress();
@@ -69,7 +69,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string sentimentEndpoint = "sentiment endpoint";
-            _configuration[Arg.Is<string>(x => x == "Settings.SentimentEndpoint")].Returns(sentimentEndpoint);
+            _configuration[Arg.Is<string>(x => x == "Settings:SentimentEndpoint")].Returns(sentimentEndpoint);
 
             // Act
             string result = _applicationParmeters.GetSettingsSentimentEndpoint();
@@ -84,7 +84,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string useCustomBearerToken = "true";
-            _configuration[Arg.Is<string>(x => x == "Settings.UseCustomBearerToken")].Returns(useCustomBearerToken);
+            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns(useCustomBearerToken);
 
             // Act
             string result = _applicationParmeters.GetSettingsUseCustomBearerToken();
@@ -99,7 +99,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string signingKey = "key";
-            _configuration[Arg.Is<string>(x => x == "Settings.CustomBearerTokenSigningKey")].Returns(signingKey);
+            _configuration[Arg.Is<string>(x => x == "Settings:CustomBearerTokenSigningKey")].Returns(signingKey);
 
             // Act
             string result = _applicationParmeters.GetSettingsCustomBearerTokenSigningKey();

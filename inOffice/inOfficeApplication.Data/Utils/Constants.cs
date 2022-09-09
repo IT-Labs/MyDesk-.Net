@@ -4,7 +4,7 @@ namespace inOfficeApplication.Data.Utils
 {
     public class Constants
     {
-        public static readonly IList<string> AnonimousEndpoints = new ReadOnlyCollection<string> (new List<string>() { "/token", "/register" });
+        public static readonly IList<string> AnonimousEndpoints = new ReadOnlyCollection<string> (new List<string>() { "/token", "/register", "/param" });
         public static readonly IList<Tuple<string, string>> AllEndpoints = new ReadOnlyCollection<Tuple<string, string>>(new List<Tuple<string, string>>() 
         {
             Tuple.Create("POST", "/authentication"),
