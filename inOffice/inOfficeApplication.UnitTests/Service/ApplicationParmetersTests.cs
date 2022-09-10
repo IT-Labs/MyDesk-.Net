@@ -24,7 +24,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string issuer = "issuer";
-            _configuration[Arg.Is<string>(x => x == "JwtInfo:Issuer")].Returns(issuer);
+            _configuration[Arg.Is<string>(x => x == "JwtIssuer")].Returns(issuer);
 
             // Act
             string result = _applicationParmeters.GetJwtIssuer();
@@ -39,7 +39,7 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string audience = "audience";
-            _configuration[Arg.Is<string>(x => x == "JwtInfo:Audience")].Returns(audience);
+            _configuration[Arg.Is<string>(x => x == "JwtAudience")].Returns(audience);
 
             // Act
             string result = _applicationParmeters.GetJwtAudience();
@@ -54,10 +54,10 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string metadataAddress = "metadata address";
-            _configuration[Arg.Is<string>(x => x == "Settings:MetadataAddress")].Returns(metadataAddress);
+            _configuration[Arg.Is<string>(x => x == "MetadataAddress")].Returns(metadataAddress);
 
             // Act
-            string result = _applicationParmeters.GetSettingsMetadataAddress();
+            string result = _applicationParmeters.GetMetadataAddress();
 
             // Assert
             Assert.IsTrue(result == metadataAddress);
@@ -69,10 +69,10 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string sentimentEndpoint = "sentiment endpoint";
-            _configuration[Arg.Is<string>(x => x == "Settings:SentimentEndpoint")].Returns(sentimentEndpoint);
+            _configuration[Arg.Is<string>(x => x == "SentimentEndpoint")].Returns(sentimentEndpoint);
 
             // Act
-            string result = _applicationParmeters.GetSettingsSentimentEndpoint();
+            string result = _applicationParmeters.GetSentimentEndpoint();
 
             // Assert
             Assert.IsTrue(result == sentimentEndpoint);
@@ -84,10 +84,10 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string useCustomBearerToken = "true";
-            _configuration[Arg.Is<string>(x => x == "Settings:UseCustomBearerToken")].Returns(useCustomBearerToken);
+            _configuration[Arg.Is<string>(x => x == "UseCustomBearerToken")].Returns(useCustomBearerToken);
 
             // Act
-            string result = _applicationParmeters.GetSettingsUseCustomBearerToken();
+            string result = _applicationParmeters.GetUseCustomBearerToken();
 
             // Assert
             Assert.IsTrue(result == useCustomBearerToken);
@@ -99,10 +99,10 @@ namespace inOfficeApplication.UnitTests.Service
         {
             // Arrange
             string signingKey = "key";
-            _configuration[Arg.Is<string>(x => x == "Settings:CustomBearerTokenSigningKey")].Returns(signingKey);
+            _configuration[Arg.Is<string>(x => x == "CustomBearerTokenSigningKey")].Returns(signingKey);
 
             // Act
-            string result = _applicationParmeters.GetSettingsCustomBearerTokenSigningKey();
+            string result = _applicationParmeters.GetCustomBearerTokenSigningKey();
 
             // Assert
             Assert.IsTrue(result == signingKey);

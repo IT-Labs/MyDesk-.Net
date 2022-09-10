@@ -20,10 +20,10 @@ namespace inOfficeApplication.Middleware
             _requestDelegate = requestDelegate;
             _authService = authService;
 
-            if (!bool.Parse(applicationParmeters.GetSettingsUseCustomBearerToken()))
+            if (!bool.Parse(applicationParmeters.GetUseCustomBearerToken()))
             {
                 IConfigurationManager<OpenIdConnectConfiguration> configurationManager = 
-                    new ConfigurationManager<OpenIdConnectConfiguration>(applicationParmeters.GetSettingsMetadataAddress(), new OpenIdConnectConfigurationRetriever());
+                    new ConfigurationManager<OpenIdConnectConfiguration>(applicationParmeters.GetMetadataAddress(), new OpenIdConnectConfigurationRetriever());
                 _openIdConfiguration = configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
             }
         }

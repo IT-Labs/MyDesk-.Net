@@ -92,7 +92,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             HttpRequestMessage request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(_applicationParmeters.GetSettingsSentimentEndpoint()),
+                RequestUri = new Uri(_applicationParmeters.GetSentimentEndpoint()),
                 Content = new StringContent(data, Encoding.UTF8, "application/json")
             };
             HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);

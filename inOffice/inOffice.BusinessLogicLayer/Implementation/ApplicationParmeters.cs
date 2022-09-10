@@ -13,32 +13,32 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public string GetJwtIssuer()
         {
-            return _configuration["JwtInfo:Issuer"]; 
+            return _configuration["JwtIssuer"]; 
         }
 
         public string GetJwtAudience()
         {
-            return _configuration["JwtInfo:Audience"];
+            return _configuration["JwtAudience"];
         }
 
-        public string GetSettingsMetadataAddress()
+        public string GetMetadataAddress()
         {
-            return _configuration["Settings:MetadataAddress"];
+            return _configuration["MetadataAddress"];
         }
 
-        public string GetSettingsSentimentEndpoint()
+        public string GetSentimentEndpoint()
         {
             return _configuration["SentimentEndpoint"];
         }
 
-        public string GetSettingsUseCustomBearerToken()
+        public string GetUseCustomBearerToken()
         {
-            return _configuration["Settings:UseCustomBearerToken"];
+            return _configuration["UseCustomBearerToken"];
         }
 
-        public string GetSettingsCustomBearerTokenSigningKey()
+        public string GetCustomBearerTokenSigningKey()
         {
-            return _configuration["Settings:CustomBearerTokenSigningKey"];
+            return _configuration["CustomBearerTokenSigningKey"];
         }
     }
 }
