@@ -15,7 +15,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration["ConnectionString"], b => b.MigrationsAssembly("inOfficeApplication.Data")));
+                    builder.Configuration.GetConnectionString("inOfficeDb"), b => b.MigrationsAssembly("inOfficeApplication.Data")));
 
 
 builder.Services.AddCors();
