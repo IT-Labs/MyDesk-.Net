@@ -33,7 +33,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetSettingsCustomBearerTokenSigningKey());
+            byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetCustomBearerTokenSigningKey());
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -58,9 +58,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             TokenValidationParameters parameters;
 
-            if (bool.Parse(_applicationParmeters.GetSettingsUseCustomBearerToken()))
+            if (bool.Parse(_applicationParmeters.GetUseCustomBearerToken()))
             {
-                byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetSettingsCustomBearerTokenSigningKey());
+                byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetCustomBearerTokenSigningKey());
                 parameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,

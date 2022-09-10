@@ -35,7 +35,7 @@ namespace inOfficeApplication.UnitTests.Controller
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
             string encodedPassword =  Convert.ToBase64String(plainTextBytes);
 
-            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
+            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
             EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
@@ -58,7 +58,7 @@ namespace inOfficeApplication.UnitTests.Controller
         {
             // Arrange
             EmployeeDto employeeDto = new EmployeeDto() { Email = email, Password = password };
-            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns(useCustomBearerToken.ToString());
+            _applicationParmeters.GetUseCustomBearerToken().Returns(useCustomBearerToken.ToString());
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);

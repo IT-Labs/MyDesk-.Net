@@ -29,7 +29,7 @@ namespace inOfficeApplication.Controllers
         [HttpGet("param")]
         public IActionResult GetParam()
         {
-            string param = _applicationParmeters.GetSettingsSentimentEndpoint();
+            string param = _applicationParmeters.GetSentimentEndpoint();
             return Ok(param);
         }
 
@@ -58,7 +58,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
-            if (!bool.Parse(_applicationParmeters.GetSettingsUseCustomBearerToken()) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
+            if (!bool.Parse(_applicationParmeters.GetUseCustomBearerToken()) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
             {
                 return BadRequest();
             }

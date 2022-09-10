@@ -22,7 +22,7 @@ namespace inOfficeApplication.UnitTests.Service
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _applicationParmeters.GetJwtIssuer().Returns(issuer);
             _applicationParmeters.GetJwtAudience().Returns(audience);
-            _applicationParmeters.GetSettingsCustomBearerTokenSigningKey().Returns(signingKey);
+            _applicationParmeters.GetCustomBearerTokenSigningKey().Returns(signingKey);
 
             _authService = new AuthService(_applicationParmeters);
         }
@@ -42,7 +42,7 @@ namespace inOfficeApplication.UnitTests.Service
                 IsAdmin = isAdmin
             };
 
-            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
+            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
 
             // Act
             string token = _authService.GetToken(employeeDto);
@@ -75,7 +75,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("true");
+            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
 
             // Act
             string token = _authService.GetToken(employeeDto);
@@ -99,7 +99,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _applicationParmeters.GetSettingsUseCustomBearerToken().Returns("false");
+            _applicationParmeters.GetUseCustomBearerToken().Returns("false");
 
             // Act
             string token = _authService.GetToken(employeeDto);

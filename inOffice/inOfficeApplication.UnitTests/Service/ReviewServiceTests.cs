@@ -47,7 +47,7 @@ namespace inOfficeApplication.UnitTests.Service
 
             Reservation reservation = new Reservation() { Id = 1 };
 
-            _applicationParmeters.GetSettingsSentimentEndpoint().Returns("http://test.com");
+            _applicationParmeters.GetSentimentEndpoint().Returns("http://test.com");
             _reservationRepository.Get(reviewDto.Reservation.Id).Returns(reservation);
 
             // Act
