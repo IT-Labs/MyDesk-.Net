@@ -26,13 +26,6 @@ namespace inOfficeApplication.Controllers
             _applicationParmeters = applicationParmeters;
         }
 
-        [HttpGet("param")]
-        public IActionResult GetParam()
-        {
-            string param = _applicationParmeters.GetSentimentEndpoint();
-            return Ok(param);
-        }
-
         [HttpPost("authentication")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
