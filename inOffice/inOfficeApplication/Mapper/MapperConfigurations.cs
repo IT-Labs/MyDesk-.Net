@@ -35,7 +35,7 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.NearWindow, opt => opt.MapFrom(y => y.NearWindow))
                     .ForMember(x => x.SingleMonitor, opt => opt.MapFrom(y => y.SingleMonitor))
                     .ForMember(x => x.Unavailable, opt => opt.MapFrom(y => y.Unavailable))
-                    .ForMember(x => x.Desks, opt => opt.MapFrom(y => y.Desks));
+                    .ForMember(x => x.Desks, opt => opt.Ignore());
 
                 config.CreateMap<Employee, EmployeeDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
