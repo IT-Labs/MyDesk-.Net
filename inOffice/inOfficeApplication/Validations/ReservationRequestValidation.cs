@@ -12,7 +12,7 @@ namespace inOfficeApplication.Validations
             RuleFor(x => x.StartDate).Custom((startDate, context) =>
             {
                 DateTime date = DateTime.ParseExact(startDate, "dd-MM-yyyy", null);
-                if (DateTime.Compare(date, DateTime.Now) < 0)
+                if (DateTime.Compare(date, DateTime.Now.Date) < 0)
                 {
                     context.AddFailure("Reservation's start date must be in the future.");
                 }
@@ -20,7 +20,7 @@ namespace inOfficeApplication.Validations
             RuleFor(x => x.EndDate).Custom((endDate, context) =>
             {
                 DateTime date = DateTime.ParseExact(endDate, "dd-MM-yyyy", null);
-                if (DateTime.Compare(date, DateTime.Now) < 0)
+                if (DateTime.Compare(date, DateTime.Now.Date) < 0)
                 {
                     context.AddFailure("Reservation's end date must be in the future.");
                 }
