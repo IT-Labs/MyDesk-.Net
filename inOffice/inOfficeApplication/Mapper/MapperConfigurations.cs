@@ -43,6 +43,7 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.LastName, opt => opt.MapFrom(y => y.LastName))
                     .ForMember(x => x.Email, opt => opt.MapFrom(y => y.Email))
                     .ForMember(x => x.JobTitle, opt => opt.MapFrom(y => y.JobTitle))
+                    .ForMember(x => x.Password, opt => opt.Ignore())
                     .ReverseMap();
 
                 config.CreateMap<Review, ReviewDto>()
@@ -58,29 +59,10 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.Reviews, opt => opt.MapFrom(y => y.Reviews))
                     .ForMember(x => x.Employee, opt => opt.MapFrom(y => y.Employee))
                     .ForMember(x => x.Desk, opt => opt.MapFrom(y => y.Desk))
-                    .ForMember(x => x.ConferenceRoom, opt => opt.MapFrom(y => y.ConferenceRoom))
-                    .ForMember(x => x.OfficeName, opt => opt.MapFrom(y => GetReservationOfficeName(y)));
+                    .ForMember(x => x.ConferenceRoom, opt => opt.MapFrom(y => y.ConferenceRoom));
             });
 
             return configuration.CreateMapper();
         }
-
-        #region Private methods
-        private static string GetReservationOfficeName(Reservation reservation)
-        {
-            string officeName = string.Empty;
-
-            if (reservation.Desk != null)
-            {
-                officeName = reservation.Desk.Office?.Name;
-            }
-            else if (reservation.ConferenceRoom != null)
-            {
-                officeName = reservation.ConferenceRoom.Office?.Name;
-            }
-
-            return officeName;
-        }
-        #endregion
     }
 }

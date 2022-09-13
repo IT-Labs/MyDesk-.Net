@@ -13,8 +13,8 @@ namespace inOffice.Repository.Implementation
         {
             _context = context;
         }
-        
-        public Reservation Get(int id, 
+
+        public Reservation Get(int id,
             bool? includeDesk = null,
             bool? includeOffice = null,
             bool? includeonferenceRoom = null,
@@ -37,7 +37,7 @@ namespace inOffice.Repository.Implementation
             {
                 query = query.Include(x => x.ConferenceRoom);
             }
-            else if(includeonferenceRoom == true && includeOffice == true)
+            else if (includeonferenceRoom == true && includeOffice == true)
             {
                 query = query
                     .Include(x => x.ConferenceRoom)
@@ -52,7 +52,7 @@ namespace inOffice.Repository.Implementation
             return query.FirstOrDefault();
         }
 
-        public Tuple<int?,List<Reservation>> GetAll(bool? includeEmployee = null, 
+        public Tuple<int?, List<Reservation>> GetAll(bool? includeEmployee = null,
             bool? includeDesk = null,
             bool? includeOffice = null,
             int? take = null,
@@ -86,11 +86,62 @@ namespace inOffice.Repository.Implementation
 
         public List<Reservation> GetEmployeeReservations(int employeeId,
             bool? includeDesk = null,
+            bool? includeConferenceRoom = null)
+        {
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && (x.StartDate >= DateTime.Now.Date || x.EndDate >= DateTime.Now.Date));
+
+            if (includeDesk == true)
+            {
+                query = query.Include(x => x.Desk);
+            }
+
+            if (includeConferenceRoom == true)
+            {
+                query = query.Include(x => x.ConferenceRoom);
+            }
+
+            return query.ToList();
+        }
+
+        public List<Reservation> GetEmployeeFutureReservations(int employeeId,
+            bool? includeDesk = null,
+            bool? includeConferenceRoom = null,
+            bool? includeOffice = null)
+        {
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date);
+
+            if (includeDesk == true && includeOffice != true)
+            {
+                query = query.Include(x => x.Desk);
+            }
+            else if (includeDesk == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.Desk)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (includeConferenceRoom == true && includeOffice != true)
+            {
+                query = query.Include(x => x.ConferenceRoom);
+            }
+            else if (includeConferenceRoom == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.ConferenceRoom)
+                    .ThenInclude(x => x.Office);
+            }
+
+            return query.ToList();
+        }
+
+        public List<Reservation> GetEmployeePastReservations(int employeeId,
+            bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
             bool? includeReviews = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
 
             if (includeDesk == true && includeOffice != true)
             {

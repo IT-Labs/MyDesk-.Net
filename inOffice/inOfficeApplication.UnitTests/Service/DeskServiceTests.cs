@@ -133,12 +133,12 @@ namespace inOfficeApplication.UnitTests.Service
                 new DeskDto() 
                 { 
                     Id = 1,
-                    Category = new CategoryDto() { DoubleMonitor = true, SingleMonitor = false, NearWindow = true, Unavailable = false }
+                    Category = new CategoryDto() { Id = 1, DoubleMonitor = true, SingleMonitor = false, NearWindow = true, Unavailable = false, Desks = new List<DeskDto>() }
                 }, 
                 new DeskDto() 
                 { 
                     Id = 2,
-                    Category = new CategoryDto() { DoubleMonitor = false, SingleMonitor = true, NearWindow = true, Unavailable = false }
+                    Category = new CategoryDto() { Id = 2, DoubleMonitor = false, SingleMonitor = true, NearWindow = true, Unavailable = false, Desks = new List<DeskDto>() }
                 }, 
                 new DeskDto() 
                 { 

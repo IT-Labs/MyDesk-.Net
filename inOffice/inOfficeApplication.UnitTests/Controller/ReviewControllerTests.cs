@@ -82,7 +82,16 @@ namespace inOfficeApplication.UnitTests.Controller
             ReviewDto reviewDto = new ReviewDto()
             {
                 Reviews = "review",
-                Reservation = new ReservationDto() { Id = 1 }
+                Reservation = new ReservationDto()
+                {
+                    Id = 1,
+                    StartDate = DateTime.Now.AddDays(-1).Date,
+                    EndDate = DateTime.Now.AddDays(1).Date,
+                    Employee = new EmployeeDto(),
+                    ConferenceRoom = new ConferenceRoomDto(),
+                    Desk = new DeskDto(),
+                    Reviews = new List<ReviewDto>()
+                }
             };
 
             // Act

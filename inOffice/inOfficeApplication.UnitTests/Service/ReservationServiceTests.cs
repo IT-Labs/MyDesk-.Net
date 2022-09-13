@@ -90,11 +90,11 @@ namespace inOfficeApplication.UnitTests.Service
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 2 } };
 
             _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true).Returns(reservations);
-            _mapper.Map<List<ReservationDto>>(Arg.Is<List<Reservation>>(x => x.Count == 1 && x.Single().Id == 2)).Returns(reservationDtos);
+            _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true).Returns(reservations);
+            _mapper.Map<List<ReservationDto>>(Arg.Is<List<Reservation>>(x => x.Count == 2)).Returns(reservationDtos);
 
             // Act
-            List<ReservationDto> result = _reservationService.EmployeeReservations(employee.Email);
+            List<ReservationDto> result = _reservationService.FutureReservations(employee.Email);
 
             // Assert
             Assert.IsTrue(result.Count == 1);
@@ -108,7 +108,7 @@ namespace inOfficeApplication.UnitTests.Service
             string email = "test email";
 
             // Act + Assert
-            NotFoundException exception = Assert.Throws<NotFoundException>(() => _reservationService.EmployeeReservations(email));
+            NotFoundException exception = Assert.Throws<NotFoundException>(() => _reservationService.FutureReservations(email));
             Assert.IsTrue(exception.Message == $"Employee with email: {email} not found.");
         }
 
@@ -137,8 +137,8 @@ namespace inOfficeApplication.UnitTests.Service
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 6 } };
 
             _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeeReservations(employee.Id, true, true, true, true).Returns(reservations);
-            _mapper.Map<List<ReservationDto>>(Arg.Is<List<Reservation>>(x => x.Count == 1 && x.Single().Id == 6)).Returns(reservationDtos);
+            _reservationRepository.GetEmployeePastReservations(employee.Id, true, true, true, true).Returns(reservations);
+            _mapper.Map<List<ReservationDto>>(Arg.Any<List<Reservation>>()).Returns(reservationDtos);
 
             // Act
             List<ReservationDto> result = _reservationService.PastReservations(employee.Email);

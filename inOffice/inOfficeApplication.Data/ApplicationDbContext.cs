@@ -7,10 +7,6 @@ namespace inOfficeApplication.Data
 {
     public partial class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext()
-        {
-        }
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -26,9 +22,6 @@ namespace inOfficeApplication.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

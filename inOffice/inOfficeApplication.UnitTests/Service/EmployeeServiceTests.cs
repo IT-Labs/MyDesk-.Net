@@ -169,8 +169,8 @@ namespace inOfficeApplication.UnitTests.Service
 
             // Assert
             Assert.IsTrue(result.Count == 2);
+            Assert.IsTrue(result.All(x => string.IsNullOrEmpty(x.Password)));
             _employeeRepository.Received(1).GetAll(take, skip);
-            _mapper.Received().Map<List<EmployeeDto>>(Arg.Is<List<Employee>>(x => x.All(y => string.IsNullOrEmpty(y.Password))));
         }
 
         [Test]
