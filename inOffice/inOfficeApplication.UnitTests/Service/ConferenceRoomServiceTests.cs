@@ -56,13 +56,17 @@ namespace inOfficeApplication.UnitTests.Service
                 {
                     Id = 1,
                     Capacity = 10,
-                    IndexForOffice = 1
+                    IndexForOffice = 1,
+                    Office = new OfficeDto(),
+                    Reservations = new List<ReservationDto>()
                 },
                 new ConferenceRoomDto()
                 {
                     Id = 2,
                     Capacity = 20,
-                    IndexForOffice = 2
+                    IndexForOffice = 2,
+                    Office = new OfficeDto(),
+                    Reservations = new List<ReservationDto>()
                 }
             };
 

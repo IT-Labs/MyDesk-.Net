@@ -63,7 +63,7 @@ namespace inOfficeApplication.UnitTests.Repository
             }
             else
             {
-                Assert.IsTrue(reviews.Count == 2);
+                Assert.IsTrue(reviews.Count == 4);
             }
             
             reviews.ForEach(x => Assert.IsTrue(x.IsDeleted == false));

@@ -122,7 +122,17 @@ namespace inOfficeApplication.UnitTests.Controller
         public void Update_Success()
         {
             // Arrange
-            List<DeskDto> deskDtos = new List<DeskDto>() { new DeskDto() { Id = 1, Category = new CategoryDto() } };
+            List<DeskDto> deskDtos = new List<DeskDto>() 
+            { 
+                new DeskDto() 
+                { 
+                    Id = 1,
+                    IndexForOffice = 1,
+                    Office = new OfficeDto(),
+                    Category = new CategoryDto(),
+                    Reservations = new List<ReservationDto>()
+                }
+            };
 
             // Act
             IActionResult result = _deskController.Update(deskDtos);

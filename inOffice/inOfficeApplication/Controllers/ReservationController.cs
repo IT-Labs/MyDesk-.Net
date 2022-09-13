@@ -39,7 +39,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult EmployeeReservations()
         {
-            List<ReservationDto> reservations = _reservationService.EmployeeReservations(GetEmployeeEmail());
+            List<ReservationDto> reservations = _reservationService.FutureReservations(GetEmployeeEmail());
             return Ok(reservations);
         }
 

@@ -43,7 +43,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _reservationRepository.SoftDelete(reservationToDelete);
         }
 
-        public List<ReservationDto> EmployeeReservations(string employeeEmail)
+        public List<ReservationDto> FutureReservations(string employeeEmail)
         {
             Employee employee = _employeeRepository.GetByEmail(employeeEmail);
             if (employee == null)
@@ -51,18 +51,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> futureReservations = new List<Reservation>();
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
 
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
-            foreach (Reservation employeeReservation in employeeReservations)
-            {
-                if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) > 0)
-                {
-                    futureReservations.Add(employeeReservation);
-                }
-            }
-
-            return _mapper.Map<List<ReservationDto>>(futureReservations);
+            return _mapper.Map<List<ReservationDto>>(employeeReservations);
         }
 
         public List<ReservationDto> PastReservations(string employeeEmail)
@@ -73,17 +64,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> pastReservations = new List<Reservation>();
-
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true);
-
-            foreach (Reservation employeeReservation in employeeReservations)
-            {
-                if (DateTime.Compare(employeeReservation.StartDate, DateTime.Now) < 0 && DateTime.Compare(employeeReservation.EndDate, DateTime.Now) < 0)
-                {
-                    pastReservations.Add(employeeReservation);
-                }
-            }
+            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true);
 
             return _mapper.Map<List<ReservationDto>>(pastReservations);
         }

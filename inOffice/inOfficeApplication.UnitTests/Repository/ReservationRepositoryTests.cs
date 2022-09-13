@@ -109,11 +109,11 @@ namespace inOfficeApplication.UnitTests.Repository
             // Assert
             if (take.HasValue && skip.HasValue)
             {
-                Assert.IsTrue(reservations.Item1 == 3 && reservations.Item2.Count == take);
+                Assert.IsTrue(reservations.Item1 == 6 && reservations.Item2.Count == take);
             }
             else
             {
-                Assert.IsTrue(reservations.Item1 == null && reservations.Item2.Count == 3);
+                Assert.IsTrue(reservations.Item1 == null && reservations.Item2.Count == 6);
             }
 
             foreach (Reservation reservation in reservations.Item2)
@@ -146,26 +146,117 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
+        [TestCase(null, null)]
+        [TestCase(true, null)]
+        [TestCase(null, true)]
+        [TestCase(true, true)]
+        [Order(4)]
+        public void GetEmployeeReservations_Success(bool? includeDesk, bool? includeConferenceRoom)
+        {
+            // Arrange + Act
+            List<Reservation> reservations = _reservationRepository.GetEmployeeReservations(2, includeDesk: includeDesk,
+                includeConferenceRoom: includeConferenceRoom);
+
+            // Assert
+            Assert.IsTrue(reservations.Count == 4);
+            Assert.IsTrue(reservations.All(x => x.StartDate >= DateTime.Now.Date || x.EndDate >= DateTime.Now.Date));
+
+            foreach (Reservation reservation in reservations)
+            {
+                if (includeDesk == true && reservation.DeskId.HasValue)
+                {
+                    Assert.NotNull(reservation.Desk);
+                }
+                else
+                {
+                    Assert.IsNull(reservation.Desk);
+                }
+
+                if (includeConferenceRoom == true && reservation.ConferenceRoomId.HasValue)
+                {
+                    Assert.NotNull(reservation.ConferenceRoom);
+                }
+                else
+                {
+                    Assert.IsNull(reservation.ConferenceRoom);
+                }
+            }
+        }
+
+        [TestCase(null, null, null)]
+        [TestCase(true, null, null)]
+        [TestCase(true, null, true)]
+        [TestCase(null, true, null)]
+        [TestCase(null, true, true)]
+        [Order(5)]
+        public void GetEmployeeFutureReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice)
+        {
+            // Arrange + Act
+            List<Reservation> reservations = _reservationRepository.GetEmployeeFutureReservations(2, includeDesk: includeDesk, 
+                includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice);
+
+            // Assert
+            Assert.IsTrue(reservations.Count == 2);
+            Assert.IsTrue(reservations.All(x => x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date));
+
+            foreach (Reservation reservation in reservations)
+            {
+                if (includeDesk == true && reservation.DeskId.HasValue)
+                {
+                    Assert.NotNull(reservation.Desk);
+                    if (includeOffice == true)
+                    {
+                        Assert.NotNull(reservation.Desk.Office);
+                    }
+                    else
+                    {
+                        Assert.IsNull(reservation.Desk.Office);
+                    }
+                }
+                else
+                {
+                    Assert.IsNull(reservation.Desk);
+                }
+
+                if (includeConferenceRoom == true && reservation.ConferenceRoomId.HasValue)
+                {
+                    Assert.NotNull(reservation.ConferenceRoom);
+                    if (includeOffice == true)
+                    {
+                        Assert.NotNull(reservation.ConferenceRoom.Office);
+                    }
+                    else
+                    {
+                        Assert.IsNull(reservation.ConferenceRoom.Office);
+                    }
+                }
+                else
+                {
+                    Assert.IsNull(reservation.ConferenceRoom);
+                }
+            }
+        }
+
         [TestCase(null, null, null, null)]
         [TestCase(true, null, null, null)]
         [TestCase(true, null, true, null)]
         [TestCase(null, true, null, null)]
         [TestCase(null, true, true, null)]
         [TestCase(null, true, true, true)]
-        [Order(4)]
-        public void GetEmployeeReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews)
+        [Order(6)]
+        public void GetEmployeePastReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews)
         {
             // Arrange + Act
-            List<Reservation> reservations = _reservationRepository.GetEmployeeReservations(2, includeDesk: includeDesk, 
+            List<Reservation> reservations = _reservationRepository.GetEmployeePastReservations(2, includeDesk: includeDesk,
                 includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, includeReviews: includeReviews);
 
             // Assert
-            Assert.IsTrue(reservations.Count == 3);
+            Assert.IsTrue(reservations.Count == 2);
+            Assert.IsTrue(reservations.All(x => x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date));
 
             foreach (Reservation reservation in reservations)
             {
-                // Reservation with Id = 3 doesn't have reviews
-                if (includeReviews == true && reservation.Id != 3)
+                if (includeReviews == true)
                 {
                     Assert.IsTrue(reservation.Reviews.Count == 1);
                 }
@@ -214,7 +305,7 @@ namespace inOfficeApplication.UnitTests.Repository
         [TestCase(true, null)]
         [TestCase(null, true)]
         [TestCase(true, true)]
-        [Order(5)]
+        [Order(7)]
         public void GetDeskReservations_Success(bool? includeReview, bool? includeEmployee)
         {
             // Arrange + Act
@@ -225,8 +316,7 @@ namespace inOfficeApplication.UnitTests.Repository
 
             foreach (Reservation reservation in reservations)
             {
-                // Reservation with Id = 1 has reviews
-                if (includeReview == true && reservation.Id == 1)
+                if (includeReview == true)
                 {
                     Assert.IsTrue(reservation.Reviews.Count == 1);
                 }
@@ -247,7 +337,7 @@ namespace inOfficeApplication.UnitTests.Repository
         }
 
         [Test]
-        [Order(6)]
+        [Order(8)]
         public void Insert_Success()
         {
             // Arrange
@@ -271,7 +361,7 @@ namespace inOfficeApplication.UnitTests.Repository
         }
 
         [Test]
-        [Order(7)]
+        [Order(9)]
         public void SoftDelete_Success()
         {
             // Arrange

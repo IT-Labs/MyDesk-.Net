@@ -227,8 +227,8 @@ namespace inOfficeApplication.UnitTests
                 new Reservation()
                 {
                     Id = 1,
-                    StartDate = DateTime.Now.AddDays(-2),
-                    EndDate = DateTime.Now.AddDays(-1),
+                    StartDate = DateTime.Now.AddDays(-2).Date,
+                    EndDate = DateTime.Now.AddDays(-1).Date,
                     DeskId = 1,
                     EmployeeId = 2,
                     IsDeleted = false
@@ -236,8 +236,8 @@ namespace inOfficeApplication.UnitTests
                 new Reservation()
                 {
                     Id = 2,
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddDays(1),
+                    StartDate = DateTime.Now.Date,
+                    EndDate = DateTime.Now.AddDays(1).Date,
                     DeskId = 1,
                     EmployeeId = 2,
                     IsDeleted = true
@@ -245,8 +245,8 @@ namespace inOfficeApplication.UnitTests
                 new Reservation()
                 {
                     Id = 3,
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddDays(1),
+                    StartDate = DateTime.Now.AddDays(3).Date,
+                    EndDate = DateTime.Now.AddDays(5).Date,
                     DeskId = 1,
                     EmployeeId = 2,
                     IsDeleted = false
@@ -254,9 +254,36 @@ namespace inOfficeApplication.UnitTests
                 new Reservation()
                 {
                     Id = 4,
-                    StartDate = DateTime.Now.AddDays(1),
-                    EndDate = DateTime.Now.AddDays(3),
+                    StartDate = DateTime.Now.AddDays(1).Date,
+                    EndDate = DateTime.Now.AddDays(3).Date,
                     ConferenceRoomId = 1,
+                    EmployeeId = 2,
+                    IsDeleted = false
+                },
+                new Reservation()
+                {
+                    Id = 5,
+                    StartDate = DateTime.Now.AddDays(-5).Date,
+                    EndDate = DateTime.Now.AddDays(-3).Date,
+                    ConferenceRoomId = 3,
+                    EmployeeId = 2,
+                    IsDeleted = false
+                },
+                new Reservation()
+                {
+                    Id = 6,
+                    StartDate = DateTime.Now.Date,
+                    EndDate = DateTime.Now.AddDays(1).Date,
+                    DeskId = 3,
+                    EmployeeId = 2,
+                    IsDeleted = false
+                },
+                new Reservation()
+                {
+                    Id = 7,
+                    StartDate = DateTime.Now.AddDays(-1).Date,
+                    EndDate = DateTime.Now.AddDays(1).Date,
+                    ConferenceRoomId = 3,
                     EmployeeId = 2,
                     IsDeleted = false
                 }
@@ -289,6 +316,22 @@ namespace inOfficeApplication.UnitTests
                     Reviews = "Test review 3",
                     ReviewOutput = "Neutral",
                     ReservationId = 4,
+                    IsDeleted = false
+                },
+                new Review()
+                {
+                    Id = 4,
+                    Reviews = "Test review 4",
+                    ReviewOutput = "Neutral",
+                    ReservationId = 3,
+                    IsDeleted = false
+                },
+                new Review()
+                {
+                    Id = 5,
+                    Reviews = "Test review 5",
+                    ReviewOutput = "Neutral",
+                    ReservationId = 5,
                     IsDeleted = false
                 }
             };

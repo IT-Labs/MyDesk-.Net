@@ -5,7 +5,6 @@
         public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string? OfficeName { get; set; }
         public EmployeeDto? Employee { get; set; }
         public DeskDto? Desk { get; set; }
         public ConferenceRoomDto? ConferenceRoom { get; set; }

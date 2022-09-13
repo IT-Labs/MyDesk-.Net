@@ -40,8 +40,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public List<EmployeeDto> GetAll(int? take = null, int? skip = null)
         {
             List<Employee> employees = _employeeRepository.GetAll(take: take, skip: skip);
-            employees.ForEach(x => x.Password = null);
-
             List<EmployeeDto> result = _mapper.Map<List<EmployeeDto>>(employees);
 
             return result.DistinctBy(x => x.Email).ToList();
