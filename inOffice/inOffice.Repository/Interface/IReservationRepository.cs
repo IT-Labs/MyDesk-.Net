@@ -9,7 +9,8 @@ namespace inOffice.Repository.Interface
         List<Reservation> GetEmployeeReservations(int employeeId, bool? includeDesk = null, bool? includeConferenceRoom = null);
         List<Reservation> GetEmployeeFutureReservations(int employeeId, bool? includeDesk = null, bool? includeConferenceRoom = null, bool? includeOffice = null);
         List<Reservation> GetEmployeePastReservations(int employeeId, bool? includeDesk = null, bool? includeConferenceRoom = null, bool? includeOffice = null, bool? includeReviews = null);
-        List<Reservation> GetDeskReservations(int deskId, bool? includeReview = null, bool? includeEmployee = null);
+        List<Reservation> GetDeskReservations(int deskId, bool? includeEmployee = null);
+        List<Reservation> GetPastDeskReservations(int deskId, bool? includeReview = null);
         void Insert(Reservation reservation);
         void SoftDelete(Reservation reservation);
     }

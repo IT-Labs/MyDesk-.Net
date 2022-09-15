@@ -301,43 +301,52 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
-        [TestCase(null, null)]
-        [TestCase(true, null)]
-        [TestCase(null, true)]
-        [TestCase(true, true)]
+        [TestCase(null)]
+        [TestCase(true)]
         [Order(7)]
-        public void GetDeskReservations_Success(bool? includeReview, bool? includeEmployee)
+        public void GetDeskReservations_Success(bool? includeEmployee)
         {
             // Arrange + Act
-            List<Reservation> reservations = _reservationRepository.GetDeskReservations(1, includeReview: includeReview, includeEmployee: includeEmployee);
+            List<Reservation> result = _reservationRepository.GetDeskReservations(1, includeEmployee: includeEmployee);
 
             // Assert
-            Assert.IsTrue(reservations.Count == 2);
+            Assert.IsTrue(result.Count == 1);
 
-            foreach (Reservation reservation in reservations)
+            Reservation reservation = result.Single();
+            if (includeEmployee == true)
             {
-                if (includeReview == true)
-                {
-                    Assert.IsTrue(reservation.Reviews.Count == 1);
-                }
-                else
-                {
-                    Assert.IsTrue(reservation.Reviews.Count == 0);
-                }
+                Assert.NotNull(reservation.Employee);
+            }
+            else
+            {
+                Assert.IsNull(reservation.Employee);
+            }
+        }
 
-                if (includeEmployee == true)
-                {
-                    Assert.NotNull(reservation.Employee);
-                }
-                else
-                {
-                    Assert.IsNull(reservation.Employee);
-                }
+        [TestCase(null)]
+        [TestCase(true)]
+        [Order(8)]
+        public void GetPastDeskReservations_Success(bool? includeReview)
+        {
+            // Arrange + Act
+            List<Reservation> result = _reservationRepository.GetPastDeskReservations(1, includeReview: includeReview);
+
+            // Assert
+            Assert.IsTrue(result.Count == 1);
+
+            Reservation reservation = result.Single();
+            if (includeReview == true)
+            {
+                Assert.NotNull(reservation.Reviews.Count == 1);
+            }
+            else
+            {
+                Assert.IsNull(reservation.Employee);
             }
         }
 
         [Test]
-        [Order(8)]
+        [Order(9)]
         public void Insert_Success()
         {
             // Arrange
@@ -361,7 +370,7 @@ namespace inOfficeApplication.UnitTests.Repository
         }
 
         [Test]
-        [Order(9)]
+        [Order(10)]
         public void SoftDelete_Success()
         {
             // Arrange

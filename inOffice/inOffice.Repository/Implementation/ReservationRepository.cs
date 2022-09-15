@@ -173,19 +173,25 @@ namespace inOffice.Repository.Implementation
             return query.ToList();
         }
 
-        public List<Reservation> GetDeskReservations(int deskId, 
-            bool? includeReview = null,
-            bool? includeEmployee = null)
+        public List<Reservation> GetDeskReservations(int deskId, bool? includeEmployee = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId && x.IsDeleted == false);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId && x.IsDeleted == false && (x.StartDate >= DateTime.Now.Date || x.EndDate >= DateTime.Now.Date));
+
+            if (includeEmployee == true)
+            {
+                query = query.Include(x => x.Employee);
+            }
+
+            return query.ToList();
+        }
+
+        public List<Reservation> GetPastDeskReservations(int deskId, bool? includeReview = null)
+        {
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.DeskId == deskId && x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
 
             if (includeReview == true)
             {
                 query = query.Include(x => x.Reviews.Where(y => y.IsDeleted == false));
-            }
-            if (includeEmployee == true)
-            {
-                query = query.Include(x => x.Employee);
             }
 
             return query.ToList();
