@@ -1,4 +1,5 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -69,10 +70,10 @@ namespace inOfficeApplication.Middleware
 
         private Task HandleUnauthorized(HttpContext context, string message)
         {
-            string result = JsonConvert.SerializeObject(new
+            string result = JsonConvert.SerializeObject(new ErrorDto()
             {
-                url = context.Request.Path,
-                error = message
+                Url = context.Request.Path,
+                ErrorMessage = message
             });
 
             context.Response.ContentType = "application/json";

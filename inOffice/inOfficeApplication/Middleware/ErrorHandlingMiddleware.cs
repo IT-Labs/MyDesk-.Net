@@ -1,4 +1,5 @@
-﻿using inOfficeApplication.Data.Exceptions;
+﻿using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Exceptions;
 using Newtonsoft.Json;
 using System.Net;
 
@@ -46,10 +47,10 @@ namespace inOfficeApplication.Middleware
                 errorMessage = exception.ToString();
             }
 
-            string result = JsonConvert.SerializeObject(new 
+            string result = JsonConvert.SerializeObject(new ErrorDto()
             {
-                url = context.Request.Path,
-                error = errorMessage
+                Url = context.Request.Path,
+                ErrorMessage = errorMessage
             });
 
             context.Response.ContentType = "application/json";
