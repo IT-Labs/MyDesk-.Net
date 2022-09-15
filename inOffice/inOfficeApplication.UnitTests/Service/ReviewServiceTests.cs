@@ -171,7 +171,7 @@ namespace inOfficeApplication.UnitTests.Service
                     }
                 }
             };
-            _reservationRepository.GetDeskReservations(deskId, includeReview: true).Returns(reservations);
+            _reservationRepository.GetPastDeskReservations(deskId, includeReview: true).Returns(reservations);
 
             // Act
             _reviewService.GetReviewsForDesk(deskId);
