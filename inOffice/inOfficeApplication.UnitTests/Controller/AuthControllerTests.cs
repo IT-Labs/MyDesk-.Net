@@ -20,9 +20,8 @@ namespace inOfficeApplication.UnitTests.Controller
         {
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
 
-            _authController = new AuthController(_employeeService, _authService, _applicationParmeters);
+            _authController = new AuthController(_employeeService, _authService);
         }
 
         [Test]
@@ -33,9 +32,8 @@ namespace inOfficeApplication.UnitTests.Controller
             string token = "jwt token";
             string password = "new_test";
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
-            string encodedPassword =  Convert.ToBase64String(plainTextBytes);
+            string encodedPassword = Convert.ToBase64String(plainTextBytes);
 
-            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
             EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
@@ -50,15 +48,13 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(objectResult.Value.ToString() == token);
         }
 
-        [TestCase(false, "email", "pass")]
-        [TestCase(true, "", "pass")]
-        [TestCase(true, "email", "")]
+        [TestCase("", "pass")]
+        [TestCase("email", "")]
         [Order(2)]
-        public void GetToken_BadRequest(bool useCustomBearerToken, string email, string password)
+        public void GetToken_BadRequest(string email, string password)
         {
             // Arrange
             EmployeeDto employeeDto = new EmployeeDto() { Email = email, Password = password };
-            _applicationParmeters.GetUseCustomBearerToken().Returns(useCustomBearerToken.ToString());
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);
@@ -79,7 +75,7 @@ namespace inOfficeApplication.UnitTests.Controller
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
             string encodedPassword = Convert.ToBase64String(plainTextBytes);
 
-            EmployeeDto employeeDto = new EmployeeDto() 
+            EmployeeDto employeeDto = new EmployeeDto()
             {
                 FirstName = "John",
                 LastName = "Doe",
@@ -132,7 +128,7 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.NotNull(objectResult.Value);
             Assert.IsTrue(objectResult.Value is IEnumerable<string>);
             IEnumerable<string> values = (IEnumerable<string>)objectResult.Value;
-            Assert.IsTrue(values.Any(x => x == "Employee must have an email address.") || 
+            Assert.IsTrue(values.Any(x => x == "Employee must have an email address.") ||
                 values.Any(x => x == "Email length should be between 3 and 254.") || values.Any(x => x == "Invalid email adress."));
             _employeeService.DidNotReceive().GetByEmail(Arg.Any<string>());
             _employeeService.DidNotReceive().Create(Arg.Any<EmployeeDto>());

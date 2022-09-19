@@ -39,7 +39,8 @@ builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
 builder.Services.AddTransient<IDeskService, DeskService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 
-builder.Services.AddTransient<IApplicationParmeters, ApplicationParmeters>();
+builder.Services.AddSingleton<IOpenIdConnectConfigurationFactory, OpenIdConnectConfigurationFactory>();
+builder.Services.AddSingleton<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
 

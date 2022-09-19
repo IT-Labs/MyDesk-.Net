@@ -80,21 +80,6 @@ namespace inOfficeApplication.UnitTests.Service
 
         [Test]
         [Order(5)]
-        public void GetSettingsUseCustomBearerToken_Success()
-        {
-            // Arrange
-            string useCustomBearerToken = "true";
-            _configuration[Arg.Is<string>(x => x == "UseCustomBearerToken")].Returns(useCustomBearerToken);
-
-            // Act
-            string result = _applicationParmeters.GetUseCustomBearerToken();
-
-            // Assert
-            Assert.IsTrue(result == useCustomBearerToken);
-        }
-
-        [Test]
-        [Order(6)]
         public void GetSettingsCustomBearerTokenSigningKey_Success()
         {
             // Arrange

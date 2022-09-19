@@ -6,7 +6,6 @@
         public string GetJwtAudience();
         public string GetMetadataAddress();
         public string GetSentimentEndpoint();
-        public string GetUseCustomBearerToken();
         public string GetCustomBearerTokenSigningKey();
     }
 }

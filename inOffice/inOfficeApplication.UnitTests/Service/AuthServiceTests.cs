@@ -42,23 +42,21 @@ namespace inOfficeApplication.UnitTests.Service
                 IsAdmin = isAdmin
             };
 
-            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
-
             // Act
             string token = _authService.GetToken(employeeDto);
 
             // Assert
             string jwtToken = token.Substring(7);
-            Assert.IsTrue(_authService.ValidateToken(jwtToken, "/employee/offices", "get", null));
-            Assert.IsTrue(_authService.ValidateToken(jwtToken, "/admin/offices", "get", null));
+            Assert.IsTrue(_authService.ValidateToken(jwtToken, "/employee/offices", "get", useCustomLogin: true, null));
+            Assert.IsTrue(_authService.ValidateToken(jwtToken, "/admin/offices", "get", useCustomLogin: true, null));
 
             if (isAdmin)
             {
-                Assert.IsTrue(_authService.ValidateToken(jwtToken, "/employee/offices", "get", null));
+                Assert.IsTrue(_authService.ValidateToken(jwtToken, "/employee/offices", "get", useCustomLogin: true, null));
             }
             else
             {
-                Assert.IsFalse(_authService.ValidateToken(jwtToken, "/admin/office-desks/5", "post", null));
+                Assert.IsFalse(_authService.ValidateToken(jwtToken, "/admin/office-desks/5", "post", useCustomLogin: true, null));
             }
         }
 
@@ -75,14 +73,12 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
-
             // Act
             string token = _authService.GetToken(employeeDto);
 
             // Assert
             string jwtToken = token.Substring(7);
-            Exception exception = Assert.Throws<Exception>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", null));
+            Exception exception = Assert.Throws<Exception>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", useCustomLogin: true, null));
             Assert.IsTrue(exception.Message == "Required endpoint doesn't exist.");
         }
 
@@ -99,14 +95,13 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _applicationParmeters.GetUseCustomBearerToken().Returns("false");
 
             // Act
             string token = _authService.GetToken(employeeDto);
 
             // Assert
             string jwtToken = token.Substring(7);
-            SecurityTokenSignatureKeyNotFoundException exception = Assert.Throws<SecurityTokenSignatureKeyNotFoundException>(() => _authService.ValidateToken(jwtToken, "/employee/offices", "get", null));
+            SecurityTokenSignatureKeyNotFoundException exception = Assert.Throws<SecurityTokenSignatureKeyNotFoundException>(() => _authService.ValidateToken(jwtToken, "/employee/offices", "get", useCustomLogin: false, null));
             Assert.IsTrue(exception.Message == "IDX10500: Signature validation failed. No security keys were provided to validate the signature.");
         }
     }
