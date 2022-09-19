@@ -21,7 +21,7 @@ steps:
   displayName: 'Run tests'
   inputs:
     command: 'test'
-    projects: './inOffice/inOfficeApplication.UnitTests/*.csproj'
+    projects: './inOffice/inOfficeApplication.UnitTests/inOfficeApplication.UnitTests.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Init EF Core'
