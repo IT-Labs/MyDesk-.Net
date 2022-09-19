@@ -1,7 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
-using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -16,17 +15,11 @@ namespace inOfficeApplication.Middleware
         private readonly IAuthService _authService;
         private readonly OpenIdConnectConfiguration _openIdConfiguration;
 
-        public AuthorizationMiddleware(RequestDelegate requestDelegate, IApplicationParmeters applicationParmeters, IAuthService authService)
+        public AuthorizationMiddleware(RequestDelegate requestDelegate, IOpenIdConnectConfigurationFactory openIdConnectConfigurationFactory, IAuthService authService)
         {
             _requestDelegate = requestDelegate;
             _authService = authService;
-
-            if (!bool.Parse(applicationParmeters.GetUseCustomBearerToken()))
-            {
-                IConfigurationManager<OpenIdConnectConfiguration> configurationManager = 
-                    new ConfigurationManager<OpenIdConnectConfiguration>(applicationParmeters.GetMetadataAddress(), new OpenIdConnectConfigurationRetriever());
-                _openIdConfiguration = configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
-            }
+            _openIdConfiguration = openIdConnectConfigurationFactory.Create();
         }
 
         public async Task Invoke(HttpContext context)
@@ -40,7 +33,7 @@ namespace inOfficeApplication.Middleware
             }
             else
             {
-                if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, out string message))
+                if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, false, out string message))
                 {
                     await _requestDelegate(context);
                 }
@@ -51,7 +44,7 @@ namespace inOfficeApplication.Middleware
             }
         }
 
-        private bool IsValidToken(HttpContext context, out string message)
+        private bool IsValidToken(HttpContext context, bool useCustomLogin, out string message)
         {
             try
             {
@@ -59,7 +52,17 @@ namespace inOfficeApplication.Middleware
                 string authHeader = context.Request.Headers[HeaderNames.Authorization];
                 string jwtToken = authHeader.Substring(7);
 
-                return _authService.ValidateToken(jwtToken, context.Request.Path.Value, context.Request.Method, _openIdConfiguration?.SigningKeys);
+                return _authService.ValidateToken(jwtToken, context.Request.Path.Value, context.Request.Method, useCustomLogin: useCustomLogin, _openIdConfiguration?.SigningKeys);
+            }
+            catch (SecurityTokenSignatureKeyNotFoundException exception)
+            {
+                if (useCustomLogin == false)
+                {
+                    return IsValidToken(context, true, out message);
+                }
+
+                message = exception.Message;
+                return false;
             }
             catch (SecurityTokenValidationException exception)
             {

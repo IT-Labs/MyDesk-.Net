@@ -31,11 +31,6 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return _configuration["SentimentEndpoint"];
         }
 
-        public string GetUseCustomBearerToken()
-        {
-            return _configuration["UseCustomBearerToken"];
-        }
-
         public string GetCustomBearerTokenSigningKey()
         {
             return _configuration["CustomBearerTokenSigningKey"];

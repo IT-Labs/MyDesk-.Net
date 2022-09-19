@@ -15,14 +15,13 @@ namespace inOfficeApplication.UnitTests.Middleware
 {
     public class AuthorizationMiddlewareTests
     {
-        private IApplicationParmeters _applicationParmeters;
+        private IOpenIdConnectConfigurationFactory _openIdConnectConfigurationFactory;
         private IAuthService _authService;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
-            _applicationParmeters.GetUseCustomBearerToken().Returns("true");
+            _openIdConnectConfigurationFactory = Substitute.For<IOpenIdConnectConfigurationFactory>();
             _authService = Substitute.For<IAuthService>();
         }
 
@@ -34,7 +33,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             AuthorizationMiddleware authorizationMiddleware = new AuthorizationMiddleware((x) =>
             {
                 return Task.CompletedTask;
-            }, _applicationParmeters, _authService);
+            }, _openIdConnectConfigurationFactory, _authService);
 
             DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
             defaultHttpContext.Request.Method = "options";
@@ -64,7 +63,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             {
                 x.Response.Headers.Add(parameterName, parameterValue);
                 return Task.CompletedTask;
-            }, _applicationParmeters, _authService);
+            }, _openIdConnectConfigurationFactory, _authService);
 
             DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
             defaultHttpContext.Request.Path = "/register";
@@ -88,7 +87,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             {
                 x.Response.Headers.Add(parameterName, parameterValue);
                 return Task.CompletedTask;
-            }, _applicationParmeters, _authService);
+            }, _openIdConnectConfigurationFactory, _authService);
 
             string authHeader = "test 1234 test 4321";
             string httpMethod = "POST";
@@ -99,7 +98,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             defaultHttpContext.Request.Path = url;
             defaultHttpContext.Request.Headers[HeaderNames.Authorization] = authHeader;
 
-            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, null).Returns(true);
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: false, null).Returns(true);
 
             // Act
             await authorizationMiddleware.Invoke(defaultHttpContext);
@@ -114,10 +113,7 @@ namespace inOfficeApplication.UnitTests.Middleware
         public async Task Invoke_HandleSecurityTokenValidationException()
         {
             // Arrange
-            AuthorizationMiddleware authorizationMiddleware = new AuthorizationMiddleware((x) =>
-            {
-                return Task.CompletedTask;
-            }, _applicationParmeters, _authService);
+            AuthorizationMiddleware authorizationMiddleware = new AuthorizationMiddleware(null, _openIdConnectConfigurationFactory, _authService);
 
             string authHeader = "test 1234 test 4321";
             string httpMethod = "POST";
@@ -130,7 +126,78 @@ namespace inOfficeApplication.UnitTests.Middleware
             defaultHttpContext.Request.Path = url;
             defaultHttpContext.Request.Headers[HeaderNames.Authorization] = authHeader;
 
-            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, null).Throws(new SecurityTokenValidationException(exceptionMessage));
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: false, null).Throws(new SecurityTokenValidationException(exceptionMessage));
+
+            // Act
+            await authorizationMiddleware.Invoke(defaultHttpContext);
+
+            // Assert
+            Assert.IsTrue(defaultHttpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized);
+
+            defaultHttpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            StreamReader reader = new StreamReader(defaultHttpContext.Response.Body);
+            string payload = reader.ReadToEnd();
+
+            ErrorDto errorDto = JsonConvert.DeserializeObject<ErrorDto>(payload);
+            Assert.NotNull(errorDto);
+            Assert.IsTrue(errorDto.Url == url && errorDto.ErrorMessage == exceptionMessage);
+        }
+
+        [Test]
+        [Order(5)]
+        public async Task Invoke_SecurityTokenSignatureKeyNotFoundException_Success()
+        {
+            // Arrange
+            string parameterName = "test name";
+            string parameterValue = "test value";
+            AuthorizationMiddleware authorizationMiddleware = new AuthorizationMiddleware((x) =>
+            {
+                x.Response.Headers.Add(parameterName, parameterValue);
+                return Task.CompletedTask;
+            }, _openIdConnectConfigurationFactory, _authService);
+
+            string authHeader = "test 1234 test 4321";
+            string httpMethod = "GET";
+            string url = "/admin/offices";
+            string exceptionMessage = "exception message";
+
+            DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
+            defaultHttpContext.Response.Body = new MemoryStream();
+            defaultHttpContext.Request.Method = httpMethod;
+            defaultHttpContext.Request.Path = url;
+            defaultHttpContext.Request.Headers[HeaderNames.Authorization] = authHeader;
+
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: false, null).Throws(new SecurityTokenSignatureKeyNotFoundException(exceptionMessage));
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: true, null).Returns(true);
+
+            // Act
+            await authorizationMiddleware.Invoke(defaultHttpContext);
+
+            // Assert
+            defaultHttpContext.Response.Headers.TryGetValue(parameterName, out StringValues value);
+            Assert.IsTrue(value.ToString() == parameterValue);
+        }
+
+        [Test]
+        [Order(6)]
+        public async Task Invoke_SecurityTokenSignatureKeyNotFoundException_Failure()
+        {
+            // Arrange
+            AuthorizationMiddleware authorizationMiddleware = new AuthorizationMiddleware(null, _openIdConnectConfigurationFactory, _authService);
+
+            string authHeader = "test 1234 test 4321";
+            string httpMethod = "PUT";
+            string url = "/admin/office-desks";
+            string exceptionMessage = "exception message";
+
+            DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
+            defaultHttpContext.Response.Body = new MemoryStream();
+            defaultHttpContext.Request.Method = httpMethod;
+            defaultHttpContext.Request.Path = url;
+            defaultHttpContext.Request.Headers[HeaderNames.Authorization] = authHeader;
+
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: false, null).Throws(new SecurityTokenSignatureKeyNotFoundException());
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, useCustomLogin: true, null).Throws(new SecurityTokenSignatureKeyNotFoundException(exceptionMessage));
 
             // Act
             await authorizationMiddleware.Invoke(defaultHttpContext);

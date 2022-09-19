@@ -47,18 +47,18 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return $"Bearer {tokenHandler.WriteToken(token)}";
         }
 
-        public bool ValidateToken(string jwtToken, string url, string httpMethod, ICollection<SecurityKey> signingKeys)
+        public bool ValidateToken(string jwtToken, string url, string httpMethod, bool useCustomLogin, ICollection<SecurityKey> signingKeys)
         {
-            new JwtSecurityTokenHandler().ValidateToken(jwtToken, GetTokenValidationParameters(signingKeys), out SecurityToken validatedToken);
+            new JwtSecurityTokenHandler().ValidateToken(jwtToken, GetTokenValidationParameters(useCustomLogin, signingKeys), out SecurityToken validatedToken);
             return HasRoles(url, httpMethod, validatedToken);
         }
 
         #region Private methods
-        private TokenValidationParameters GetTokenValidationParameters(ICollection<SecurityKey> signingKeys)
+        private TokenValidationParameters GetTokenValidationParameters(bool useCustomLogin, ICollection<SecurityKey> signingKeys)
         {
             TokenValidationParameters parameters;
 
-            if (bool.Parse(_applicationParmeters.GetUseCustomBearerToken()))
+            if (useCustomLogin)
             {
                 byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetCustomBearerTokenSigningKey());
                 parameters = new TokenValidationParameters

@@ -17,13 +17,11 @@ namespace inOfficeApplication.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private readonly IAuthService _authService;
-        private readonly IApplicationParmeters _applicationParmeters;
 
-        public AuthController(IEmployeeService employeeRepository, IAuthService authService, IApplicationParmeters applicationParmeters)
+        public AuthController(IEmployeeService employeeRepository, IAuthService authService)
         {
             _employeeService = employeeRepository;
             _authService = authService;
-            _applicationParmeters = applicationParmeters;
         }
 
         [HttpPost("authentication")]
@@ -51,7 +49,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
-            if (!bool.Parse(_applicationParmeters.GetUseCustomBearerToken()) || string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
+            if (string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
             {
                 return BadRequest();
             }
