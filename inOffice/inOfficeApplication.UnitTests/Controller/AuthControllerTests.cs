@@ -78,7 +78,7 @@ namespace inOfficeApplication.UnitTests.Controller
             EmployeeDto employeeDto = new EmployeeDto()
             {
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 Email = "john.doe@it-labs.com",
                 JobTitle = "employee"
             };
@@ -154,7 +154,7 @@ namespace inOfficeApplication.UnitTests.Controller
 
         private bool IsValidResponse(EmployeeDto result, EmployeeDto employeeDto, bool hasPassword)
         {
-            bool validBasicData = result.FirstName == employeeDto.FirstName && result.LastName == employeeDto.LastName &&
+            bool validBasicData = result.FirstName == employeeDto.FirstName && result.Surname == employeeDto.Surname &&
                 result.Email == employeeDto.Email && result.JobTitle == employeeDto.JobTitle;
 
             if (hasPassword)

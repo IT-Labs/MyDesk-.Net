@@ -40,7 +40,7 @@ namespace inOfficeApplication.Mapper
                 config.CreateMap<Employee, EmployeeDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
                     .ForMember(x => x.FirstName, opt => opt.MapFrom(y => y.FirstName))
-                    .ForMember(x => x.LastName, opt => opt.MapFrom(y => y.LastName))
+                    .ForMember(x => x.Surname, opt => opt.MapFrom(y => y.LastName))
                     .ForMember(x => x.Email, opt => opt.MapFrom(y => y.Email))
                     .ForMember(x => x.JobTitle, opt => opt.MapFrom(y => y.JobTitle))
                     .ForMember(x => x.Password, opt => opt.Ignore())

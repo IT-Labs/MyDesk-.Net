@@ -34,7 +34,7 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Email = "test@test.com",
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 JobTitle = "Admin"
             };
 
@@ -140,7 +140,7 @@ namespace inOfficeApplication.UnitTests.Service
                     Id = 1,
                     Email = "john.doe@test.com",
                     FirstName = "John",
-                    LastName = "Doe",
+                    Surname = "Doe",
                     JobTitle = "Admin"
                 },
                 new EmployeeDto()
@@ -148,7 +148,7 @@ namespace inOfficeApplication.UnitTests.Service
                     Id = 2,
                     Email = "jane.doe@test.com",
                     FirstName = "Jane",
-                    LastName = "Doe",
+                    Surname = "Doe",
                     JobTitle = "Admin"
                 },
                 new EmployeeDto()
@@ -156,7 +156,7 @@ namespace inOfficeApplication.UnitTests.Service
                     Id = 3,
                     Email = "jane.doe@test.com",
                     FirstName = "Jane",
-                    LastName = "Doe",
+                    Surname = "Doe",
                     JobTitle = "Admin"
                 }
             };
@@ -194,7 +194,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Id = 1,
                 Email = email,
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 JobTitle = "Admin"
             };
 
@@ -248,7 +248,7 @@ namespace inOfficeApplication.UnitTests.Service
                 Id = 1,
                 Email = email,
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 JobTitle = "Admin"
             };
 

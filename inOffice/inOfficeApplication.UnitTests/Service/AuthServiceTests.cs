@@ -37,7 +37,7 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Id = 1,
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 Email = "john.doe@it-labs.com",
                 IsAdmin = isAdmin
             };
@@ -69,7 +69,7 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Id = 1,
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 Email = "john.doe@it-labs.com"
             };
 
@@ -91,7 +91,7 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Id = 1,
                 FirstName = "John",
-                LastName = "Doe",
+                Surname = "Doe",
                 Email = "john.doe@it-labs.com"
             };
 

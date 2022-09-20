@@ -22,7 +22,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
             {
                 new Claim("id", employee.Id.ToString()),
-                new Claim("name", $"{employee.FirstName} {employee.LastName}"),
+                new Claim("name", $"{employee.FirstName} {employee.Surname}"),
                 new Claim("preferred_username", employee.Email),
                 new Claim("roles", RoleTypes.EMPLOYEE.ToString())
             });
