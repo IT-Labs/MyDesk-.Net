@@ -31,6 +31,7 @@ namespace inOfficeApplication.UnitTests.Service
 
             // Assert
             Assert.IsTrue(result == issuer);
+            Assert.Fail();
         }
 
         [Test]
