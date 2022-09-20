@@ -12,3 +12,9 @@ variables:
 steps:
 - script: dotnet build ./inOffice/inOfficeApplication --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run tests'
+  inputs:
+    command: 'test'
+    projects: './inOffice/inOfficeApplication.UnitTests/inOfficeApplication.UnitTests.csproj'
