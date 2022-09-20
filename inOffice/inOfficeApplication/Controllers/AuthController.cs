@@ -105,7 +105,7 @@ namespace inOfficeApplication.Controllers
             employee = new EmployeeDto
             {
                 FirstName = employeeDto.FirstName,
-                LastName = employeeDto.LastName,
+                Surname = employeeDto.Surname,
                 Email = employeeDto.Email,
                 JobTitle = employeeDto.JobTitle,
                 Password = password,
