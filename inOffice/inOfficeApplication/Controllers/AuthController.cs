@@ -75,7 +75,7 @@ namespace inOfficeApplication.Controllers
             EmployeeDto employee = _employeeService.GetByEmail(employeeDto.Email);
             if (employee != null)
             {
-                return Ok("User allready exists, redirect depending on the role");
+                return Ok("User already exists, redirect depending on the role");
             }
 
             string password;

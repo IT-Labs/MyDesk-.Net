@@ -148,7 +148,7 @@ namespace inOfficeApplication.UnitTests.Controller
             // Assert
             Assert.IsTrue(result is OkObjectResult);
             OkObjectResult objectResult = (OkObjectResult)result;
-            Assert.IsTrue(objectResult.Value.ToString() == "User allready exists, redirect depending on the role");
+            Assert.IsTrue(objectResult.Value.ToString() == "User already exists, redirect depending on the role");
             _employeeService.DidNotReceive().Create(Arg.Any<EmployeeDto>());
         }
 
