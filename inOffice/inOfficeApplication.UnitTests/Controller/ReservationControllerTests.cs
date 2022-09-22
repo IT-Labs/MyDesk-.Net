@@ -53,7 +53,7 @@ namespace inOfficeApplication.UnitTests.Controller
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
 
             _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext() };
-            _reservationService.FutureReservations("aleksandar.djurovski@it-labs.com").Returns(reservationDtos);
+            _reservationService.FutureReservations("test@it-labs.com").Returns(reservationDtos);
 
             // Act
             IActionResult result = _reservationController.EmployeeReservations();
@@ -72,7 +72,7 @@ namespace inOfficeApplication.UnitTests.Controller
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
 
             _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext() };
-            _reservationService.PastReservations("aleksandar.djurovski@it-labs.com").Returns(reservationDtos);
+            _reservationService.PastReservations("test@it-labs.com").Returns(reservationDtos);
 
             // Act
             IActionResult result = _reservationController.PastReservations();
