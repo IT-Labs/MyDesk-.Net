@@ -14,9 +14,16 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public OpenIdConnectConfiguration Create()
         {
-            IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
-                    new ConfigurationManager<OpenIdConnectConfiguration>(_applicationParmeters.GetMetadataAddress(), new OpenIdConnectConfigurationRetriever());
-            return configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
+            string metadataAddress = _applicationParmeters.GetMetadataAddress();
+
+            if (!string.IsNullOrEmpty(metadataAddress))
+            {
+                IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
+                        new ConfigurationManager<OpenIdConnectConfiguration>(metadataAddress, new OpenIdConnectConfigurationRetriever());
+                return configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
+            }
+
+            return null;
         }
     }
 }
