@@ -12,7 +12,7 @@ This application is back-end part of inOffice project that enables administrator
 
 ## Technologies
 
-This is .NET web API project that uses Entity Framework 6 to communicate with Azure SQL DB. Database will be automatically created, by executing EF migrations, upon application's first launch. Repository contains Azure pipeline scripts that can be used for setting up CI/CD on Azure. The application uses JWT tokens for authentication and authorization.
+This is .NET web API project that uses Entity Framework 6 to communicate with Azure SQL DB. Database will be automatically created, by executing EF migrations, upon application's first launch. Repository contains Azure pipeline scripts that can be used for setting up CI/CD on Azure. The application uses JWT tokens for authentication/authorization. If application cannot be deployed on Azure, the SQL Server RDBMS should be used and application will use self-issued JWT tokens for authentication/authorization.
 
 ## Steps for running the application locally
 
@@ -20,11 +20,11 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
 * Clone repository from Git
 * Open the solution in Visual Studio 2022
 * In **appsettings.json** file add following properties:
-  - **JwtIssuer:** string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
+  - **JwtIssuer:** String in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
   - **JwtAudience:** Application (client) ID from Azure
-  - **MetadataAddress:** string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
+  - **MetadataAddress:** String in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
   - **SentimentEndpoint:** URL of the external API that will determine sentiment of the reservation's review
-  - **CustomBearerTokenSigningKey:** random string that will be used for signing and validating of locally-issued JWT tokens
+  - **CustomBearerTokenSigningKey:** Random string that will be used for signing and validating of self-issued JWT tokens
 * Run application locally
 
 ## How to contribute to the project
