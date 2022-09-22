@@ -3,8 +3,8 @@
 ## Table of contents
 * [General info](#introduction)
 * [Technologies](#technologies)
-* [Setup](#steps for running the application locally)
-* [How to contribute](#how to contribute to the project)
+* [Setup](#steps-for-running-the-application-locally)
+* [How to contribute](#how-to-contribute-to-the-project)
 
 ## Introduction
 
@@ -16,23 +16,23 @@ This is .NET web API project that uses EntityFramework 6 to communicate with Azu
 
 ## Steps for running the application locally
 
-+ ### Install SQl server locally (express version will do fine)
-+ ### Clone repository from Git
-+ ### Open the solution in Visual Studio 2022
-+ ### In appsettings.json file add following properties:
-+ #### JwtIssuer: string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
-+ #### JwtAudience: Application (client) ID from Azure
-+ #### MetadataAddress: string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
-+ #### SentimentEndpoint: URL of the external API that will determine sentiment of the reservation's review
-+ #### CustomBearerTokenSigningKey: random string that will be used for signing and validating of locally-issued JWT tokens
-+ ### Run application locally
+* Install SQL server locally (express version will do fine)
+* Clone repository from Git
+* Open the solution in Visual Studio 2022
+* In appsettings.json file add following properties:
+  - JwtIssuer: string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
+  - JwtAudience: Application (client) ID from Azure
+  - MetadataAddress: string in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
+  - SentimentEndpoint: URL of the external API that will determine sentiment of the reservation's review
+  - CustomBearerTokenSigningKey: random string that will be used for signing and validating of locally-issued JWT tokens
+* Run application locally
 
 ## How to contribute to the project
 
-+ ### Fork this repository
-+ ### Clone your forked repository
-+ ### Add your changes
-+ ### Commit and push
-+ ### Create a pull request
-+ ### Star this repository
-+ ### Wait for pull request to merge
+* Fork this repository
+* Clone your forked repository
+* Add your changes
+* Commit and push
+* Create a pull request
+* Star this repository
+* Wait for pull request to merge
