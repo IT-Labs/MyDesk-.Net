@@ -20,10 +20,10 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
 * Clone repository from Git
 * Open the solution in Visual Studio 2022
 * In **appsettings.json** file add following properties:
-  - **JwtIssuer:** String in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
-  - **JwtAudience:** Application (client) ID from Azure
-  - **MetadataAddress:** String in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
-  - **SentimentEndpoint:** URL of the external API that will determine sentiment of the reservation's review
+  - **JwtIssuer:** String that defines valid issuer of the token. If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
+  - **JwtAudience:** String that defines valid audience of the token. If application is deployed on Azure, it should be GUID from **Application (client) ID** from Azure
+  - **MetadataAddress (optional):** If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
+  - **SentimentEndpoint (optional):** URL of the external API that will determine sentiment of the reservation's review
   - **CustomBearerTokenSigningKey:** Random string that will be used for signing and validating of self-issued JWT tokens
 * Run application locally
 
