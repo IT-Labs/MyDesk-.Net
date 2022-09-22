@@ -86,23 +86,29 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private string GetAnalysedReview(string textReview)
         {
             string review = string.Empty;
-            Dictionary<string, string> dictionaryData = new Dictionary<string, string>() { { "text", textReview } };
-            string data = JsonConvert.SerializeObject(dictionaryData);
+            string sentimentEndpoint = _applicationParmeters.GetSentimentEndpoint();
 
-            HttpRequestMessage request = new HttpRequestMessage()
+            if (!string.IsNullOrEmpty(sentimentEndpoint))
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(_applicationParmeters.GetSentimentEndpoint()),
-                Content = new StringContent(data, Encoding.UTF8, "application/json")
-            };
-            HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);
+                Dictionary<string, string> dictionaryData = new Dictionary<string, string>() { { "text", textReview } };
+                string data = JsonConvert.SerializeObject(dictionaryData);
 
-            string stringResponse = response.Content.ReadAsStringAsync().Result;
-            ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
-            if (response.IsSuccessStatusCode)
-            {
-                review = result.Sentiment;
+                HttpRequestMessage request = new HttpRequestMessage()
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(sentimentEndpoint),
+                    Content = new StringContent(data, Encoding.UTF8, "application/json")
+                };
+                HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);
+
+                string stringResponse = response.Content.ReadAsStringAsync().Result;
+                ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
+                if (response.IsSuccessStatusCode)
+                {
+                    review = result.Sentiment;
+                }
             }
+
             return review;
         }
     }
