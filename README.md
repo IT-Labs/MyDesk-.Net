@@ -20,6 +20,7 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
 * Clone repository from Git
 * Open the solution in Visual Studio 2022
 * In **appsettings.json** file add following properties:
+  - **ConnectionString:** Connection string for your database
   - **JwtIssuer:** String that defines valid issuer of the token. If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
   - **JwtAudience:** String that defines valid audience of the token. If application is deployed on Azure, it should be GUID from **Application (client) ID** from Azure
   - **MetadataAddress (optional):** If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
