@@ -3,7 +3,8 @@
 ## Table of contents
 * [General info](#introduction)
 * [Technologies](#technologies)
-* [Setup](#steps-for-running-the-application-locally)
+* [Setup locally](#steps-for-running-the-application-locally)
+* [Setup on Azure](#setting-up-the-application-on-Azure)
 * [How to contribute](#how-to-contribute-to-the-project)
 
 ## Introduction
@@ -27,6 +28,10 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
   - **SentimentEndpoint (optional):** URL of the external API that will determine sentiment of the reservation's review
   - **CustomBearerTokenSigningKey:** Random string that will be used for signing and validating of self-issued JWT tokens
 * Run application locally
+
+## Setting up the application on Azure
+
+In order to setup API on Azure, App Service should be created on Azure portal. When creating the App Service, if **Code** publish type is selected, then connection to Git should be defined so Azure would know from where to pull the code. On the other hand, if **Docker Container** publish type is selected, **inoffice/api** image from **Docker Hub** can be used. In either case, after creating App Service, application parameters described [above](#setting-up-the-application-on-Azure) should be added to **Application settings** on **Configuration** menu option.
 
 ## How to contribute to the project
 
