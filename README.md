@@ -31,7 +31,7 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
 
 ## Setting up the application on Azure
 
-In order to setup API on Azure, App Service should be created on Azure portal. When creating the App Service, if **Code** publish type is selected, then connection to Git should be defined so Azure would know from where to pull the code. On the other hand, if **Docker Container** publish type is selected, **inoffice/api** image from **Docker Hub** can be used. In either case, after creating App Service, application parameters described [above](#setting-up-the-application-on-Azure) should be added to **Application settings** on **Configuration** menu option.
+In order to setup API on Azure, App Service should be created on Azure portal. When creating the App Service, if **Code** publish type is selected, then connection to Git should be defined and pipelines should be used to enable CI/CD. On the other hand, if **Docker Container** publish type is selected, **inoffice/api** image from **Docker Hub** can be used. In either case, after creating App Service, application parameters described [above](#setting-up-the-application-on-Azure) should be added to **Application settings** on **Configuration** menu option.
 
 ## How to contribute to the project
 
