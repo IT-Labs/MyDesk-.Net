@@ -30,20 +30,6 @@ steps:
     custom: tool
     arguments: 'install --global dotnet-ef'
 
-- task: DownloadSecureFile@1
-  name: deploymentAppSettings
-  displayName: 'Download appsettings for Azure'
-  inputs:
-    secureFile: 'appsettings.Production.json'
-- task: CmdLine@2
-  displayName: 'Move prod app settings'
-  inputs:
-    script: |
-      ls
-      mv $(deploymentAppSettings.secureFilePath) ./inOffice/inOfficeApplication
-      cd ./inOffice/inOfficeApplication && ls
-      cd ../inOfficeApplication.Data && dotnet ef database update -s ../inOfficeApplication
-
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
