@@ -4,7 +4,7 @@
 * [General info](#introduction)
 * [Technologies](#technologies)
 * [Setup locally](#steps-for-running-the-application-locally)
-* [Setup on Azure](#setting-up-the-application-on-Azure)
+* [Setup on Azure](#setting-up-the-application-on-azure)
 * [How to contribute](#how-to-contribute-to-the-project)
 
 ## Introduction
