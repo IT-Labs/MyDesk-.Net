@@ -59,7 +59,14 @@ namespace inOfficeApplication.Mapper
                     .ForMember(x => x.Reviews, opt => opt.MapFrom(y => y.Reviews))
                     .ForMember(x => x.Employee, opt => opt.MapFrom(y => y.Employee))
                     .ForMember(x => x.Desk, opt => opt.MapFrom(y => y.Desk))
-                    .ForMember(x => x.ConferenceRoom, opt => opt.MapFrom(y => y.ConferenceRoom));
+                    .ForMember(x => x.ConferenceRoom, opt => opt.MapFrom(y => y.ConferenceRoom))
+                    .BeforeMap((entity, dto) =>
+                    {
+                        if (entity.Desk != null && entity.Desk.Reservations != null)
+                        {
+                            entity.Desk.Reservations.Clear();
+                        }
+                    });
             });
 
             return configuration.CreateMapper();
