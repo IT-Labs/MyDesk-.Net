@@ -195,8 +195,8 @@ namespace inOfficeApplication.UnitTests.Middleware
             defaultHttpContext.Request.Headers[HeaderNames.Authorization] = authHeader;
 
             _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, AuthTypes.Azure).Throws(new SecurityTokenSignatureKeyNotFoundException());
-            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, AuthTypes.Google).Throws(new SecurityTokenSignatureKeyNotFoundException());
-            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, AuthTypes.Custom).Throws(new SecurityTokenSignatureKeyNotFoundException(exceptionMessage));
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, AuthTypes.Custom).Throws(new SecurityTokenSignatureKeyNotFoundException());
+            _authService.ValidateToken(authHeader.Substring(7), url, httpMethod, AuthTypes.Google).Throws(new SecurityTokenSignatureKeyNotFoundException(exceptionMessage));
 
             // Act
             await authorizationMiddleware.Invoke(defaultHttpContext, _authService);

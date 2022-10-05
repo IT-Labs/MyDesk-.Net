@@ -15,11 +15,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
     {
         private readonly IApplicationParmeters _applicationParmeters;
         private readonly IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly Func<IEmployeeRepository> _employeeRepository;
 
         public AuthService(IApplicationParmeters applicationParmeters,
             IOpenIdConfigurationKeysFactory openIdConfigurationKeysFactory,
-            IEmployeeRepository employeeRepository)
+            Func<IEmployeeRepository> employeeRepository)
         {
             _applicationParmeters = applicationParmeters;
             _openIdConfigurationKeysFactory = openIdConfigurationKeysFactory;
@@ -74,7 +74,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 email = jwtSecurityToken.Claims.First(x => x.Type == "preferred_username").Value;
             }
 
-            Employee employee = _employeeRepository.GetByEmail(email);
+            Employee employee = _employeeRepository().GetByEmail(email);
             if (employee == null)
             {
                 throw new SecurityTokenValidationException($"Employee with email {email} was not found in DB.");

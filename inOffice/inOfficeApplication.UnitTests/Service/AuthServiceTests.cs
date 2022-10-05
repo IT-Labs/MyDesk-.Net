@@ -32,7 +32,7 @@ namespace inOfficeApplication.UnitTests.Service
             _applicationParmeters.GetJwtAudience().Returns(audience);
             _applicationParmeters.GetCustomBearerTokenSigningKey().Returns(signingKey);
 
-            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, _employeeRepository);
+            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, () => _employeeRepository);
         }
 
         [TestCase(false)]

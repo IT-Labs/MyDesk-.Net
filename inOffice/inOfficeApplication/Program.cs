@@ -30,6 +30,7 @@ builder.Services.AddTransient<IDeskRepository, DeskRepository>();
 builder.Services.AddTransient<IConferenceRoomRepository, ConferenceRoomRepository>();
 builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<IReviewRepository, ReviewRepository>();
+builder.Services.AddTransient<Func<IEmployeeRepository>>(provider => () => provider.GetService<IEmployeeRepository>());
 
 builder.Services.AddScoped<IOfficeService, OfficeService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();

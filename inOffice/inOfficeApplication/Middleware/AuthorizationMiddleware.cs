@@ -58,11 +58,11 @@ namespace inOfficeApplication.Middleware
                 {
                     if (authType == AuthTypes.Azure)
                     {
-                        return IsValidToken(context, AuthTypes.Google, out message);
-                    }
-                    else if (authType == AuthTypes.Google)
-                    {
                         return IsValidToken(context, AuthTypes.Custom, out message);
+                    }
+                    else if (authType == AuthTypes.Custom)
+                    {
+                        return IsValidToken(context, AuthTypes.Google, out message);
                     }
                 }
 
