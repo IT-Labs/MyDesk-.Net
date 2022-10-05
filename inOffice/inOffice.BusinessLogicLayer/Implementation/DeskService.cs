@@ -31,19 +31,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public List<DeskDto> GetOfficeDesks(int id, int? take = null, int? skip = null)
         {
-            List<DeskDto> result = new List<DeskDto>();
-
-            List<Desk> desks = _deskRepository.GetOfficeDesks(id, includeCategory: true, take: take, skip: skip);
-
-            foreach (Desk desk in desks)
-            {
-                _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true);
-                DeskDto deskDto = _mapper.Map<DeskDto>(desk);
-
-                result.Add(deskDto);
-            }
-
-            return result;
+            List<Desk> desks = _deskRepository.GetOfficeDesks(id, includeCategory: true, includeReservations: true, includeEmployees: true, take: take, skip: skip);
+            return _mapper.Map<List<DeskDto>>(desks);
         }
 
         public void Create(int officeId, int numberOfInstancesToCreate)
