@@ -25,6 +25,8 @@ namespace inOfficeApplication.Data.Entities.Configurations
 
             entity.Property(e => e.Password).IsRequired();
 
+            entity.HasIndex(e => e.Email, "IX_Employee_Email").IsUnique();
+
             OnConfigurePartial(entity);
         }
 
