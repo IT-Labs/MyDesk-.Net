@@ -55,33 +55,27 @@ namespace inOfficeApplication.UnitTests.Service
                 }
             };
 
-            foreach (Desk desk in desks)
+            List<DeskDto> deskDtos = new List<DeskDto>()
             {
-                _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true).Returns(new List<Reservation>()
+                new DeskDto()
                 {
-                    new Reservation()
-                    {
-                        StartDate = DateTime.Now.AddDays(1),
-                        Employee = new Employee()
-                        {
-                            Email = "test@it-labs.com",
-                            Password = "remove"
-                        }
-                    }
-                });
+                    Id = 1
+                },
+                new DeskDto()
+                {
+                    Id = 2
+                }
+            };
 
-                _mapper.Map<DeskDto>(desk).Returns(new DeskDto() { Id = desk.Id });
-            }
-
-            _deskRepository.GetOfficeDesks(officeId, true, take: take, skip: skip).Returns(desks);
+            _deskRepository.GetOfficeDesks(officeId, true, true, true, take: take, skip: skip).Returns(desks);
+            _mapper.Map<List<DeskDto>>(desks).Returns(deskDtos);
 
             // Act
             List<DeskDto> result = _deskService.GetOfficeDesks(officeId, take: take, skip: skip);
 
             // Assert
             Assert.IsTrue(result.Count == 2);
-            _reservationRepository.Received(2).GetDeskReservations(Arg.Any<int>(), includeEmployee: true);
-            _mapper.Received(2).Map<DeskDto>(Arg.Any<Desk>());
+            Assert.IsTrue(result == deskDtos);
         }
 
         [Test]

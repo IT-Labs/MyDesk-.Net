@@ -38,14 +38,26 @@ namespace inOffice.Repository.Implementation
             return result.HasValue ? result.Value : 0;
         }
 
-        public List<Desk> GetOfficeDesks(int officeId, bool? includeCategory = null, int? take = null, int? skip = null)
+        public List<Desk> GetOfficeDesks(int officeId, bool? includeCategory = null, bool? includeReservations = null, bool? includeEmployees = null, int? take = null, int? skip = null)
         {
             IQueryable<Desk> query = _context.Desks.Where(x => x.OfficeId == officeId && x.IsDeleted == false);
 
-            if (includeCategory.HasValue)
+            if (includeCategory == true)
             {
                 query = query.Include(x => x.Categorie);
             }
+
+            if (includeReservations == true && includeEmployees != true)
+            {
+                query = query.Include(x => x.Reservations);
+            }
+            else if (includeReservations == true && includeEmployees == true)
+            {
+                query = query
+                    .Include(x => x.Reservations)
+                    .ThenInclude(x => x.Employee);
+            }
+
             if (take.HasValue && skip.HasValue)
             {
                 query = query.Skip(skip.Value).Take(take.Value);

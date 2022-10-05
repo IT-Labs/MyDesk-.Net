@@ -75,14 +75,15 @@ namespace inOfficeApplication.UnitTests.Repository
             Assert.IsTrue(index == 3);
         }
 
-        [TestCase(null, null, null)]
-        [TestCase(true, null, null)]
-        [TestCase(true, 1, 0)]
+        [TestCase(null, null, null, null, null)]
+        [TestCase(true, null, null, null, null)]
+        [TestCase(true, true, false, 1, 0)]
+        [TestCase(true, true, true, 1, 0)]
         [Order(4)]
-        public void GetOfficeDesks_Success(bool? includeCategory, int? take, int? skip)
+        public void GetOfficeDesks_Success(bool? includeCategory, bool? includeReservations, bool? includeEmployees, int? take, int? skip)
         {
             // Arrange + Act
-            List<Desk> desks = _deskRepository.GetOfficeDesks(1, includeCategory: includeCategory, take: take, skip: skip);
+            List<Desk> desks = _deskRepository.GetOfficeDesks(1, includeCategory: includeCategory, includeReservations: includeReservations, includeEmployees: includeEmployees, take: take, skip: skip);
 
             // Assert
             if (take.HasValue && skip.HasValue)
@@ -99,6 +100,17 @@ namespace inOfficeApplication.UnitTests.Repository
                 foreach (Desk desk in desks)
                 {
                     Assert.NotNull(desk.Categorie);
+                }
+            }
+
+            if (includeReservations == true)
+            {
+                Assert.IsTrue(desks.Count == 1);
+                Assert.IsTrue(desks.Single().Reservations.Count == 3);
+
+                if (includeEmployees == true)
+                {
+                    Assert.IsTrue(desks.Single().Reservations.All(x => x.Employee != null));
                 }
             }
         }
