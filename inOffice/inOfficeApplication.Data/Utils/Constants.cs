@@ -51,4 +51,11 @@ namespace inOfficeApplication.Data.Utils
         EMPLOYEE,
         ALL
     }
+
+    public enum AuthTypes
+    {
+        Azure,
+        Google,
+        Custom
+    }
 }

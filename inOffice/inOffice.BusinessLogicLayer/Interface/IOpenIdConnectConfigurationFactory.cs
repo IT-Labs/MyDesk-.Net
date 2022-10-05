@@ -1,9 +1,10 @@
-﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+﻿using inOfficeApplication.Data.Utils;
+using Microsoft.IdentityModel.Tokens;
 
 namespace inOffice.BusinessLogicLayer.Interface
 {
-    public interface IOpenIdConnectConfigurationFactory
+    public interface IOpenIdConfigurationKeysFactory
     {
-        OpenIdConnectConfiguration Create();
+        IEnumerable<SecurityKey> GetKeys(AuthTypes authType);
     }
 }
