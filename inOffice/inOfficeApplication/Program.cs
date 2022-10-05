@@ -23,23 +23,23 @@ builder.Services.AddCors();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
-builder.Services.AddScoped<IDeskRepository, DeskRepository>();
-builder.Services.AddScoped<IConferenceRoomRepository, ConferenceRoomRepository>();
-builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddTransient<IReservationRepository, ReservationRepository>();
+builder.Services.AddTransient<IOfficeRepository, OfficeRepository>();
+builder.Services.AddTransient<IDeskRepository, DeskRepository>();
+builder.Services.AddTransient<IConferenceRoomRepository, ConferenceRoomRepository>();
+builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddTransient<IReviewRepository, ReviewRepository>();
 
-builder.Services.AddScoped<IOfficeService, OfficeService>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
-builder.Services.AddScoped<IDeskService, DeskService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IOfficeService, OfficeService>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReviewService, ReviewService>();
+builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
+builder.Services.AddTransient<IDeskService, DeskService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
 
-builder.Services.AddScoped<IOpenIdConfigurationKeysFactory, OpenIdConfigurationKeysFactory>();
+builder.Services.AddTransient<IOpenIdConfigurationKeysFactory, OpenIdConfigurationKeysFactory>();
 builder.Services.AddSingleton<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
