@@ -37,7 +37,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             foreach (Desk desk in desks)
             {
-                List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true).ToList();
+                _reservationRepository.GetDeskReservations(desk.Id, includeEmployee: true);
                 DeskDto deskDto = _mapper.Map<DeskDto>(desk);
 
                 result.Add(deskDto);
