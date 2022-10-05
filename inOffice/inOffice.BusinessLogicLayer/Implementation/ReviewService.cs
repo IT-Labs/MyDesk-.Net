@@ -101,10 +101,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 };
                 HttpResponseMessage response = _httpClient.Send(request, CancellationToken.None);
 
-                string stringResponse = response.Content.ReadAsStringAsync().Result;
-                ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
                 if (response.IsSuccessStatusCode)
                 {
+                    string stringResponse = response.Content.ReadAsStringAsync().Result;
+                    ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
+
                     review = result.Sentiment;
                 }
             }

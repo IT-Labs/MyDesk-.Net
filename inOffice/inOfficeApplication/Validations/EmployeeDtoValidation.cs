@@ -18,7 +18,7 @@ namespace inOfficeApplication.Validations
                         context.AddFailure("Email length should be between 3 and 254.");
                     }
 
-                    if (!email.Contains("@it-labs.com"))
+                    if (!email.Contains("@it-labs.com") && !email.Contains("@gmail.com"))
                     {
                         context.AddFailure("Invalid email adress.");
                     }

@@ -1,7 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -12,18 +11,17 @@ namespace inOfficeApplication.Middleware
     public class AuthorizationMiddleware
     {
         private readonly RequestDelegate _requestDelegate;
-        private readonly IAuthService _authService;
-        private readonly OpenIdConnectConfiguration _openIdConfiguration;
+        private IAuthService _authService;
 
-        public AuthorizationMiddleware(RequestDelegate requestDelegate, IOpenIdConnectConfigurationFactory openIdConnectConfigurationFactory, IAuthService authService)
+        public AuthorizationMiddleware(RequestDelegate requestDelegate)
         {
             _requestDelegate = requestDelegate;
-            _authService = authService;
-            _openIdConfiguration = openIdConnectConfigurationFactory.Create();
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IAuthService authService)
         {
+            _authService = authService;
+
             if (context.Request.Method.ToUpper() == "OPTIONS")
             {
                 context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
@@ -33,7 +31,7 @@ namespace inOfficeApplication.Middleware
             }
             else
             {
-                if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, false, out string message))
+                if (Constants.AnonimousEndpoints.Contains(context.Request.Path) || IsValidToken(context, AuthTypes.Azure, out string message))
                 {
                     await _requestDelegate(context);
                 }
@@ -44,7 +42,7 @@ namespace inOfficeApplication.Middleware
             }
         }
 
-        private bool IsValidToken(HttpContext context, bool useCustomLogin, out string message)
+        private bool IsValidToken(HttpContext context, AuthTypes authType, out string message)
         {
             try
             {
@@ -52,20 +50,22 @@ namespace inOfficeApplication.Middleware
                 string authHeader = context.Request.Headers[HeaderNames.Authorization];
                 string jwtToken = authHeader.Substring(7);
 
-                return _authService.ValidateToken(jwtToken, context.Request.Path.Value, context.Request.Method, useCustomLogin: useCustomLogin, _openIdConfiguration?.SigningKeys);
-            }
-            catch (SecurityTokenSignatureKeyNotFoundException exception)
-            {
-                if (useCustomLogin == false)
-                {
-                    return IsValidToken(context, true, out message);
-                }
-
-                message = exception.Message;
-                return false;
+                return _authService.ValidateToken(jwtToken, context.Request.Path.Value, context.Request.Method, authType);
             }
             catch (SecurityTokenValidationException exception)
             {
+                if (exception is SecurityTokenSignatureKeyNotFoundException || exception is SecurityTokenUnableToValidateException)
+                {
+                    if (authType == AuthTypes.Azure)
+                    {
+                        return IsValidToken(context, AuthTypes.Google, out message);
+                    }
+                    else if (authType == AuthTypes.Google)
+                    {
+                        return IsValidToken(context, AuthTypes.Custom, out message);
+                    }
+                }
+
                 message = exception.Message;
                 return false;
             }

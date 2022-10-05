@@ -29,7 +29,7 @@ namespace inOfficeApplication.UnitTests.Service
             _mapper = Substitute.For<IMapper>();
             _clientFactory = Substitute.For<IHttpClientFactory>();
 
-            _clientFactory.CreateClient().Returns(new MockedHttpClient());
+            _clientFactory.CreateClient().Returns(new ReviewMockedHttpClient());
 
             _reviewService = new ReviewService(_reviewRepository, _reservationRepository, _applicationParmeters, _mapper, _clientFactory);
         }
@@ -182,7 +182,7 @@ namespace inOfficeApplication.UnitTests.Service
         }
     }
 
-    public class MockedHttpClient : HttpClient
+    public class ReviewMockedHttpClient : HttpClient
     {
         public override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
         {

@@ -1,5 +1,7 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
+using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Utils;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,9 +14,16 @@ namespace inOffice.BusinessLogicLayer.Implementation
     public class AuthService : IAuthService
     {
         private readonly IApplicationParmeters _applicationParmeters;
-        public AuthService(IApplicationParmeters applicationParmeters)
+        private readonly IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
+        private readonly IEmployeeRepository _employeeRepository;
+
+        public AuthService(IApplicationParmeters applicationParmeters,
+            IOpenIdConfigurationKeysFactory openIdConfigurationKeysFactory,
+            IEmployeeRepository employeeRepository)
         {
             _applicationParmeters = applicationParmeters;
+            _openIdConfigurationKeysFactory = openIdConfigurationKeysFactory;
+            _employeeRepository = employeeRepository;
         }
 
         public string GetToken(EmployeeDto employee)
@@ -47,18 +56,39 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return $"Bearer {tokenHandler.WriteToken(token)}";
         }
 
-        public bool ValidateToken(string jwtToken, string url, string httpMethod, bool useCustomLogin, ICollection<SecurityKey> signingKeys)
+        public bool ValidateToken(string jwtToken, string url, string httpMethod, AuthTypes authType)
         {
-            new JwtSecurityTokenHandler().ValidateToken(jwtToken, GetTokenValidationParameters(useCustomLogin, signingKeys), out SecurityToken validatedToken);
-            return HasRoles(url, httpMethod, validatedToken);
+            IEnumerable<SecurityKey> securityKeys = _openIdConfigurationKeysFactory.GetKeys(authType);
+
+            new JwtSecurityTokenHandler().ValidateToken(jwtToken, GetTokenValidationParameters(authType, securityKeys), out SecurityToken validatedToken);
+
+            string email = string.Empty;
+            JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)validatedToken;
+
+            if (authType == AuthTypes.Google)
+            {
+                email = jwtSecurityToken.Claims.First(x => x.Type == "email").Value;
+            }
+            else
+            {
+                email = jwtSecurityToken.Claims.First(x => x.Type == "preferred_username").Value;
+            }
+
+            Employee employee = _employeeRepository.GetByEmail(email);
+            if (employee == null)
+            {
+                throw new SecurityTokenValidationException($"Employee with email {email} was not found in DB.");
+            }
+
+            return HasRoles(url, httpMethod, jwtSecurityToken, employee, authType);
         }
 
         #region Private methods
-        private TokenValidationParameters GetTokenValidationParameters(bool useCustomLogin, ICollection<SecurityKey> signingKeys)
+        private TokenValidationParameters GetTokenValidationParameters(AuthTypes authType, IEnumerable<SecurityKey> securityKeys)
         {
-            TokenValidationParameters parameters;
+            TokenValidationParameters parameters = null;
 
-            if (useCustomLogin)
+            if (authType == AuthTypes.Custom)
             {
                 byte[] key = Encoding.ASCII.GetBytes(_applicationParmeters.GetCustomBearerTokenSigningKey());
                 parameters = new TokenValidationParameters
@@ -72,12 +102,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
                     ValidAudience = _applicationParmeters.GetJwtAudience()
                 };
             }
-            else
+            else if (authType == AuthTypes.Azure || authType == AuthTypes.Google)
             {
                 parameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKeys = signingKeys,
+                    IssuerSigningKeys = securityKeys,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
@@ -89,23 +119,34 @@ namespace inOffice.BusinessLogicLayer.Implementation
             return parameters;
         }
 
-        private bool HasRoles(string url, string httpMethod, SecurityToken securityToken)
+        private bool HasRoles(string url, string httpMethod, JwtSecurityToken jwtSecurityToken, Employee employee, AuthTypes authType)
         {
             RoleTypes requiredRole = GetRequiredRole(url, httpMethod);
 
-            JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)securityToken;
-            List<Claim> roleClaims = jwtSecurityToken.Claims.Where(x => x.Type == "roles").ToList();
-            if (requiredRole == RoleTypes.ADMIN)
+            if (authType == AuthTypes.Google)
             {
-                return roleClaims.Any(x => x.Value == RoleTypes.ADMIN.ToString());
-            }
-            else if (requiredRole == RoleTypes.EMPLOYEE)
-            {
-                return roleClaims.Any(x => x.Value == RoleTypes.EMPLOYEE.ToString());
+                if (requiredRole == RoleTypes.ADMIN)
+                {
+                    return employee.IsAdmin.Value;
+                }
+
+                return true;
             }
             else
             {
-                return roleClaims.Any();
+                List<Claim> roleClaims = jwtSecurityToken.Claims.Where(x => x.Type == "roles").ToList();
+                if (requiredRole == RoleTypes.ADMIN)
+                {
+                    return roleClaims.Any(x => x.Value == RoleTypes.ADMIN.ToString());
+                }
+                else if (requiredRole == RoleTypes.EMPLOYEE)
+                {
+                    return roleClaims.Any(x => x.Value == RoleTypes.EMPLOYEE.ToString());
+                }
+                else
+                {
+                    return roleClaims.Any();
+                }
             }
         }
 

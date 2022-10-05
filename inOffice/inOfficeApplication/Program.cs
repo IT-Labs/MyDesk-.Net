@@ -31,18 +31,19 @@ builder.Services.AddScoped<IConferenceRoomRepository, ConferenceRoomRepository>(
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
-builder.Services.AddTransient<IOfficeService, OfficeService>();
-builder.Services.AddTransient<IReservationService, ReservationService>();
-builder.Services.AddTransient<IReviewService, ReviewService>();
-builder.Services.AddTransient<IEmployeeService, EmployeeService>();
-builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
-builder.Services.AddTransient<IDeskService, DeskService>();
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<IOfficeService, OfficeService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
+builder.Services.AddScoped<IDeskService, DeskService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddSingleton<IOpenIdConnectConfigurationFactory, OpenIdConnectConfigurationFactory>();
+builder.Services.AddScoped<IOpenIdConfigurationKeysFactory, OpenIdConfigurationKeysFactory>();
 builder.Services.AddSingleton<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
 
 // Configure mapper
 IMapper mapper = MapperConfigurations.CreateMapper();
