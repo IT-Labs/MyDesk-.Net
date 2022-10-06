@@ -72,6 +72,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public PaginationDto<ReservationDto> AllReservations(int? take = null, int? skip = null)
         {
             Tuple<int?, List<Reservation>> result = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip);
+            result.Item2.ForEach(x => x.Desk?.Reservations?.Clear());
 
             return new PaginationDto<ReservationDto>()
             {
