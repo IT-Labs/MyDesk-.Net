@@ -49,12 +49,12 @@ namespace inOffice.Repository.Implementation
 
             if (includeReservations == true && includeEmployees != true)
             {
-                query = query.Include(x => x.Reservations);
+                query = query.Include(x => x.Reservations.Where(y => y.IsDeleted == false));
             }
             else if (includeReservations == true && includeEmployees == true)
             {
                 query = query
-                    .Include(x => x.Reservations)
+                    .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
                     .ThenInclude(x => x.Employee);
             }
 

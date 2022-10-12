@@ -106,7 +106,7 @@ namespace inOfficeApplication.UnitTests.Repository
             if (includeReservations == true)
             {
                 Assert.IsTrue(desks.Count == 1);
-                Assert.IsTrue(desks.Single().Reservations.Count == 3);
+                Assert.IsTrue(desks.Single().Reservations.Count == 2);
 
                 if (includeEmployees == true)
                 {
