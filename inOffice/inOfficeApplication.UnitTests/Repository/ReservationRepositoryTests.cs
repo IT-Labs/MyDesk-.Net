@@ -183,20 +183,29 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
-        [TestCase(null, null, null)]
-        [TestCase(true, null, null)]
-        [TestCase(true, null, true)]
-        [TestCase(null, true, null)]
-        [TestCase(null, true, true)]
+        [TestCase(null, null, null, null, null)]
+        [TestCase(true, null, null, null, null)]
+        [TestCase(true, null, true, null, null)]
+        [TestCase(null, true, null, null, null)]
+        [TestCase(null, true, true, 1, 0)]
+        [TestCase(null, true, true, 2, 0)]
         [Order(5)]
-        public void GetEmployeeFutureReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice)
+        public void GetEmployeeFutureReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, int? take, int? skip)
         {
             // Arrange + Act
             List<Reservation> reservations = _reservationRepository.GetEmployeeFutureReservations(2, includeDesk: includeDesk, 
-                includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice);
+                includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, take: take, skip: skip);
 
             // Assert
-            Assert.IsTrue(reservations.Count == 2);
+            if (take.HasValue && skip.HasValue)
+            {
+                Assert.IsTrue(reservations.Count == take.Value);
+            }
+            else
+            {
+                Assert.IsTrue(reservations.Count == 2);
+            }
+            
             Assert.IsTrue(reservations.All(x => x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date));
 
             foreach (Reservation reservation in reservations)
@@ -237,21 +246,29 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
-        [TestCase(null, null, null, null)]
-        [TestCase(true, null, null, null)]
-        [TestCase(true, null, true, null)]
-        [TestCase(null, true, null, null)]
-        [TestCase(null, true, true, null)]
-        [TestCase(null, true, true, true)]
+        [TestCase(null, null, null, null, null, null)]
+        [TestCase(true, null, null, null, null, null)]
+        [TestCase(true, null, true, null, null, null)]
+        [TestCase(null, true, null, null, null, null)]
+        [TestCase(null, true, true, null, null, null)]
+        [TestCase(null, true, true, true, 1, 0)]
         [Order(6)]
-        public void GetEmployeePastReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews)
+        public void GetEmployeePastReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews, int? take, int? skip)
         {
             // Arrange + Act
             List<Reservation> reservations = _reservationRepository.GetEmployeePastReservations(2, includeDesk: includeDesk,
-                includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, includeReviews: includeReviews);
+                includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, includeReviews: includeReviews, take: take, skip: skip);
 
             // Assert
-            Assert.IsTrue(reservations.Count == 2);
+            if (take.HasValue && skip.HasValue)
+            {
+                Assert.IsTrue(reservations.Count == take.Value);
+            }
+            else
+            {
+                Assert.IsTrue(reservations.Count == 2);
+            }
+            
             Assert.IsTrue(reservations.All(x => x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date));
 
             foreach (Reservation reservation in reservations)

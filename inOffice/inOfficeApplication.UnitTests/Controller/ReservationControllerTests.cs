@@ -45,15 +45,16 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(objectResult.Value == reservationDtos);
         }
 
-        [Test]
+        [TestCase(null, null)]
+        [TestCase(10, 0)]
         [Order(2)]
-        public void EmployeeReservations_Success()
+        public void EmployeeReservations_Success(int? take, int? skip)
         {
             // Arrange
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
 
-            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext() };
-            _reservationService.FutureReservations("test@it-labs.com").Returns(reservationDtos);
+            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
+            _reservationService.FutureReservations("test@it-labs.com", take: take, skip: skip).Returns(reservationDtos);
 
             // Act
             IActionResult result = _reservationController.EmployeeReservations();
@@ -64,15 +65,16 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(objectResult.Value == reservationDtos);
         }
 
-        [Test]
+        [TestCase(null, null)]
+        [TestCase(10, 0)]
         [Order(3)]
-        public void PastReservations_Success()
+        public void PastReservations_Success(int? take, int? skip)
         {
             // Arrange
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
 
-            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext() };
-            _reservationService.PastReservations("test@it-labs.com").Returns(reservationDtos);
+            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
+            _reservationService.PastReservations("test@it-labs.com", take: take, skip: skip).Returns(reservationDtos);
 
             // Act
             IActionResult result = _reservationController.PastReservations();

@@ -69,7 +69,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             Reservation reservation = _reservationRepository.Get(reviewDto.Reservation.Id);
             if (reservation == null)
             {
-                throw new NotFoundException($"Reservation with ID: {reviewDto.Reservation?.Id} not found");
+                throw new NotFoundException($"Reservation with ID: {reviewDto.Reservation.Id} not found");
             }
 
             Review review = new Review()

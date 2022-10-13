@@ -106,7 +106,9 @@ namespace inOffice.Repository.Implementation
         public List<Reservation> GetEmployeeFutureReservations(int employeeId,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
-            bool? includeOffice = null)
+            bool? includeOffice = null,
+            int? take = null,
+            int? skip = null)
         {
             IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date);
 
@@ -132,6 +134,11 @@ namespace inOffice.Repository.Implementation
                     .ThenInclude(x => x.Office);
             }
 
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
             return query.ToList();
         }
 
@@ -139,7 +146,9 @@ namespace inOffice.Repository.Implementation
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
-            bool? includeReviews = null)
+            bool? includeReviews = null,
+            int? take = null,
+            int? skip = null)
         {
             IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
 
@@ -168,6 +177,11 @@ namespace inOffice.Repository.Implementation
             if (includeReviews == true)
             {
                 query = query.Include(x => x.Reviews.Where(y => y.IsDeleted == false));
+            }
+
+            if (take.HasValue && skip.HasValue)
+            {
+                query = query.Skip(skip.Value).Take(take.Value);
             }
 
             return query.ToList();

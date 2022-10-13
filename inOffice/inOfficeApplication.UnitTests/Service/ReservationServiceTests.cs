@@ -67,9 +67,10 @@ namespace inOfficeApplication.UnitTests.Service
             Assert.IsTrue(exception.Message == $"Reservation with ID: {id} not found.");
         }
 
-        [Test]
+        [TestCase(null, null)]
+        [TestCase(1, 1)]
         [Order(3)]
-        public void EmployeeReservations_Success()
+        public void EmployeeReservations_Success(int? take, int? skip)
         {
             // Arrange
             Employee employee = new Employee() { Id = 11, Email = "test@it-labs.com" };
@@ -90,7 +91,7 @@ namespace inOfficeApplication.UnitTests.Service
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 2 } };
 
             _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true).Returns(reservations);
+            _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
             _mapper.Map<List<ReservationDto>>(Arg.Is<List<Reservation>>(x => x.Count == 2)).Returns(reservationDtos);
 
             // Act
@@ -112,9 +113,10 @@ namespace inOfficeApplication.UnitTests.Service
             Assert.IsTrue(exception.Message == $"Employee with email: {email} not found.");
         }
 
-        [Test]
+        [TestCase(null, null)]
+        [TestCase(1, 1)]
         [Order(5)]
-        public void PastReservations_Success()
+        public void PastReservations_Success(int? take, int? skip)
         {
             // Arrange
             Employee employee = new Employee() { Id = 4, Email = "test@it-labs.com" };
@@ -137,7 +139,7 @@ namespace inOfficeApplication.UnitTests.Service
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 6 } };
 
             _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeePastReservations(employee.Id, true, true, true, true).Returns(reservations);
+            _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
             _mapper.Map<List<ReservationDto>>(Arg.Any<List<Reservation>>()).Returns(reservationDtos);
 
             // Act

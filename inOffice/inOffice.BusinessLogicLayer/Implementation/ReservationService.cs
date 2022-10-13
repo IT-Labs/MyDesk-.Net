@@ -43,7 +43,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             _reservationRepository.SoftDelete(reservationToDelete);
         }
 
-        public List<ReservationDto> FutureReservations(string employeeEmail)
+        public List<ReservationDto> FutureReservations(string employeeEmail, int? take = null, int? skip = null)
         {
             Employee employee = _employeeRepository.GetByEmail(employeeEmail);
             if (employee == null)
@@ -51,12 +51,13 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true);
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, 
+                includeOffice: true, take: take, skip: skip);
 
             return _mapper.Map<List<ReservationDto>>(employeeReservations);
         }
 
-        public List<ReservationDto> PastReservations(string employeeEmail)
+        public List<ReservationDto> PastReservations(string employeeEmail, int? take = null, int? skip = null)
         {
             Employee employee = _employeeRepository.GetByEmail(employeeEmail);
             if (employee == null)
@@ -64,7 +65,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true);
+            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, 
+                includeOffice: true, includeReviews: true, take: take, skip: skip);
 
             return _mapper.Map<List<ReservationDto>>(pastReservations);
         }
