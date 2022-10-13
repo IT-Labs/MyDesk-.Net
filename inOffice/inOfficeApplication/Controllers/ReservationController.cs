@@ -39,7 +39,8 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult EmployeeReservations()
         {
-            List<ReservationDto> reservations = _reservationService.FutureReservations(GetEmployeeEmail());
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            List<ReservationDto> reservations = _reservationService.FutureReservations(GetEmployeeEmail(), take: take, skip: skip);
             return Ok(reservations);
         }
 
@@ -50,7 +51,8 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult PastReservations()
         {
-            List<ReservationDto> reservations = _reservationService.PastReservations(GetEmployeeEmail());
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            List<ReservationDto> reservations = _reservationService.PastReservations(GetEmployeeEmail(), take: take, skip: skip);
             return Ok(reservations);
         }
 
