@@ -58,7 +58,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 // EF will handle references
                 // We used foreach instead of SQL join in order to prevent inefficient queries
-                _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
+                review.Reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
             }
 
             return _mapper.Map<List<ReviewDto>>(reviews);

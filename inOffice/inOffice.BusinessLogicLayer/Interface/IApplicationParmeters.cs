@@ -2,10 +2,11 @@
 {
     public interface IApplicationParmeters
     {
-        public string GetJwtIssuer();
-        public string GetJwtAudience();
-        public string GetMetadataAddress();
-        public string GetSentimentEndpoint();
-        public string GetCustomBearerTokenSigningKey();
+        string GetJwtIssuer();
+        string GetJwtAudience();
+        string GetMetadataAddress();
+        string GetSentimentEndpoint();
+        string GetCustomBearerTokenSigningKey();
+        string GetTenantClaimKey();
     }
 }
