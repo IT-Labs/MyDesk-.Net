@@ -35,5 +35,10 @@ namespace inOffice.BusinessLogicLayer.Implementation
         {
             return _configuration["CustomBearerTokenSigningKey"];
         }
+
+        public string GetTenantClaimKey()
+        {
+            return _configuration["TenantClaimKey"];
+        }
     }
 }
