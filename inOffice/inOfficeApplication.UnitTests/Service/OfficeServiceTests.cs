@@ -131,19 +131,26 @@ namespace inOfficeApplication.UnitTests.Service
                 OfficeImage = "Changed image"
             };
 
-            Office office = new Office()
+            Office sameExistingOffice = new Office()
             {
                 Id = 1,
                 Name = "Test office",
                 OfficeImage = "image"
             };
 
-            _officeRepository.Get(officeDto.Id.Value).Returns(office);
-            _officeRepository.GetByName(officeDto.Name).Returns(office);
+            Office differentExistingOffice = new Office()
+            {
+                Id = 2,
+                Name = "Changed office",
+                OfficeImage = "Some other image"
+            };
+
+            _officeRepository.Get(officeDto.Id.Value).Returns(sameExistingOffice);
+            _officeRepository.GetByName(officeDto.Name).Returns(differentExistingOffice);
 
             // Act + Assert
             ConflictException exception = Assert.Throws<ConflictException>(() => _officeService.UpdateOffice(officeDto));
-            Assert.IsTrue(exception.Message == "There is allready office with the same name");
+            Assert.IsTrue(exception.Message == "There is already office with the same name.");
         }
 
         [Test]
