@@ -54,9 +54,9 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
             Office existingOffice = _officeRepository.GetByName(officeDto.Name);
 
-            if (existingOffice != null)
+            if (existingOffice != null && existingOffice.Id != officeDto.Id)
             {
-                throw new ConflictException("There is allready office with the same name");
+                throw new ConflictException("There is already office with the same name.");
             }
 
             office.Name = officeDto.Name;
