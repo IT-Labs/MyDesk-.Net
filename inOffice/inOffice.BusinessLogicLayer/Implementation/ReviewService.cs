@@ -76,8 +76,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             {
                 Reviews = reviewDto.Reviews,
                 ReservationId = reviewDto.Reservation.Id,
-                ReviewOutput = GetAnalysedReview(reviewDto.Reviews),
-                Reservation = reservation
+                ReviewOutput = GetAnalysedReview(reviewDto.Reviews)
             };
 
             _reviewRepository.Insert(review);

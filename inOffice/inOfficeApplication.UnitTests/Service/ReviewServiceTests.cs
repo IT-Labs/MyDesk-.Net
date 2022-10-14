@@ -54,7 +54,7 @@ namespace inOfficeApplication.UnitTests.Service
             _reviewService.CreateReview(reviewDto);
 
             // Assert
-            _reviewRepository.Received(1).Insert(Arg.Is<Review>(x => x.Reviews == reviewDto.Reviews && x.ReviewOutput == "Neutral" && x.Reservation == reservation));
+            _reviewRepository.Received(1).Insert(Arg.Is<Review>(x => x.Reviews == reviewDto.Reviews && x.ReviewOutput == "Neutral" && x.ReservationId == reservation.Id));
         }
 
         [Test]
