@@ -1,6 +1,6 @@
 ﻿using inOfficeApplication.Data.Entities;
 
-namespace inOffice.Repository.Interface
+namespace inOfficeApplication.Data.Interfaces.Repository
 {
     public interface IOfficeRepository
     {

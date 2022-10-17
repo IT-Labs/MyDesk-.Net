@@ -13,7 +13,6 @@ namespace inOfficeApplication.UnitTests.Controller
         private AuthController _authController;
         private IEmployeeService _employeeService;
         private IAuthService _authService;
-        private IApplicationParmeters _applicationParmeters;
 
         [OneTimeSetUp]
         public void Setup()
@@ -37,7 +36,7 @@ namespace inOfficeApplication.UnitTests.Controller
             EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
-            _authService.GetToken(employeeDto).Returns(token);
+            _authService.GetToken(employeeDto, string.Empty).Returns(token);
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);

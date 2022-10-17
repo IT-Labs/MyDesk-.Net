@@ -1,9 +1,11 @@
 ﻿using inOffice.BusinessLogicLayer.Implementation;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.Repository.Interface;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Data.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NUnit.Framework;
@@ -16,6 +18,7 @@ namespace inOfficeApplication.UnitTests.Service
         private IApplicationParmeters _applicationParmeters;
         private IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
         private IEmployeeRepository _employeeRepository;
+        private IHttpContextAccessor _httpContextAccessor;
 
         private string issuer = "it labs";
         private string audience = "app";
@@ -27,12 +30,13 @@ namespace inOfficeApplication.UnitTests.Service
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _openIdConfigurationKeysFactory = Substitute.For<IOpenIdConfigurationKeysFactory>();
             _employeeRepository = Substitute.For<IEmployeeRepository>();
+            _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 
             _applicationParmeters.GetJwtIssuer().Returns(issuer);
             _applicationParmeters.GetJwtAudience().Returns(audience);
             _applicationParmeters.GetCustomBearerTokenSigningKey().Returns(signingKey);
 
-            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, () => _employeeRepository);
+            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, () => _employeeRepository, _httpContextAccessor);
         }
 
         [TestCase(false)]
@@ -53,7 +57,7 @@ namespace inOfficeApplication.UnitTests.Service
             _employeeRepository.GetByEmail("john.doe@it-labs.com").Returns(new Employee());
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
@@ -86,11 +90,11 @@ namespace inOfficeApplication.UnitTests.Service
             _employeeRepository.GetByEmail("john.doe@it-labs.com").Returns(new Employee());
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
-            Exception exception = Assert.Throws<Exception>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", AuthTypes.Custom));
+            NotFoundException exception = Assert.Throws<NotFoundException>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", AuthTypes.Custom));
             Assert.IsTrue(exception.Message == "Required endpoint doesn't exist.");
         }
 
@@ -109,7 +113,7 @@ namespace inOfficeApplication.UnitTests.Service
 
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
@@ -131,7 +135,7 @@ namespace inOfficeApplication.UnitTests.Service
             };
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);

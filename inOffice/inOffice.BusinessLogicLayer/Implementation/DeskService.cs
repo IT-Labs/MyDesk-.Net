@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.Repository.Interface;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
@@ -13,19 +13,16 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IOfficeRepository _officeRepository;
         private readonly IDeskRepository _deskRepository;
         private readonly ICategoriesRepository _categoriesRepository;
-        private readonly IReservationRepository _reservationRepository;
         private readonly IMapper _mapper;
 
         public DeskService(IOfficeRepository officeRepository, 
             IDeskRepository deskRepository, 
             ICategoriesRepository categoriesRepository,
-            IReservationRepository reservationRepository,
             IMapper mapper)
         {
             _officeRepository = officeRepository;
             _deskRepository = deskRepository;
             _categoriesRepository = categoriesRepository;
-            _reservationRepository = reservationRepository;
             _mapper = mapper;
         }
 

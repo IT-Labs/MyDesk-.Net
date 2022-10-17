@@ -1,8 +1,8 @@
-﻿using inOffice.Repository.Interface;
+﻿using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Entities;
 
-namespace inOffice.Repository.Implementation
+namespace inOffice.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using inOffice.BusinessLogicLayer.Implementation;
 using inOffice.BusinessLogicLayer.Interface;
-using inOffice.Repository.Interface;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;

@@ -1,8 +1,8 @@
-﻿using inOffice.Repository.Interface;
+﻿using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Entities;
 
-namespace inOffice.Repository.Implementation
+namespace inOffice.Repository
 {
     public class CategoriesRepository : ICategoriesRepository
     {
@@ -15,7 +15,7 @@ namespace inOffice.Repository.Implementation
 
         public Category Get(bool? doubleMonitor, bool? nearWindow, bool? singleMonitor, bool? unavailable)
         {
-            return _context.Categories.FirstOrDefault(x => x.DoubleMonitor == doubleMonitor && x.NearWindow == nearWindow && 
+            return _context.Categories.FirstOrDefault(x => x.DoubleMonitor == doubleMonitor && x.NearWindow == nearWindow &&
             x.SingleMonitor == singleMonitor && x.Unavailable == unavailable && x.IsDeleted == false);
         }
 
