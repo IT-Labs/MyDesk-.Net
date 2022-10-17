@@ -58,7 +58,7 @@ namespace inOfficeApplication.Controllers
             string decodedPassword = Encoding.UTF8.GetString(data);
 
             EmployeeDto employee = _employeeService.GetByEmailAndPassword(employeeDto.Email, decodedPassword);
-            string token = _authService.GetToken(employee);
+            string token = _authService.GetToken(employee, Request.HttpContext?.Items["tenant"]?.ToString());
             
             return Ok(token);
         }

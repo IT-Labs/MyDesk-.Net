@@ -2,7 +2,9 @@
 using inOffice.Repository.Interface;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Data.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,17 +18,20 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly IApplicationParmeters _applicationParmeters;
         private readonly IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
         private readonly Func<IEmployeeRepository> _employeeRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(IApplicationParmeters applicationParmeters,
             IOpenIdConfigurationKeysFactory openIdConfigurationKeysFactory,
-            Func<IEmployeeRepository> employeeRepository)
+            Func<IEmployeeRepository> employeeRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _applicationParmeters = applicationParmeters;
             _openIdConfigurationKeysFactory = openIdConfigurationKeysFactory;
             _employeeRepository = employeeRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetToken(EmployeeDto employee)
+        public string GetToken(EmployeeDto employee, string tenant)
         {
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
             {
@@ -39,6 +44,11 @@ namespace inOffice.BusinessLogicLayer.Implementation
             if (employee.IsAdmin == true)
             {
                 claimsIdentity.AddClaim(new Claim("roles", RoleTypes.ADMIN.ToString()));
+            }
+
+            if (!string.IsNullOrEmpty(tenant))
+            {
+                claimsIdentity.AddClaim(new Claim(_applicationParmeters.GetTenantClaimKey(), tenant));
             }
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
@@ -72,6 +82,21 @@ namespace inOffice.BusinessLogicLayer.Implementation
             else
             {
                 email = jwtSecurityToken.Claims.First(x => x.Type == "preferred_username").Value;
+            }
+
+            Claim? tenantClaim = jwtSecurityToken.Claims.SingleOrDefault(x => x.Type == _applicationParmeters.GetTenantClaimKey());
+            if (tenantClaim != null)
+            {
+                string tenantName = tenantClaim.Value;
+                if (!string.IsNullOrEmpty(tenantName))
+                {
+                    Dictionary<string, string> tenants = _applicationParmeters.GetTenants();
+
+                    if (tenants.ContainsKey(tenantName))
+                    {
+                        _httpContextAccessor.HttpContext.Items["tenant"] = tenants[tenantName];
+                    }
+                }
             }
 
             Employee employee = _employeeRepository().GetByEmail(email);
@@ -175,7 +200,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
             }
             else
             {
-                throw new Exception("Required endpoint doesn't exist.");
+                throw new NotFoundException("Required endpoint doesn't exist.");
             }
         }
         #endregion

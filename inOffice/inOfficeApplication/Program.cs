@@ -15,7 +15,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration["ConnectionString"], b => b.MigrationsAssembly("inOfficeApplication.Data")), ServiceLifetime.Transient);
+                    builder.Configuration["ConnectionString"], b => b.MigrationsAssembly("inOfficeApplication.Data")), contextLifetime: ServiceLifetime.Transient);
 
 
 builder.Services.AddCors();
@@ -45,6 +45,7 @@ builder.Services.AddSingleton<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpContextAccessor();
 
 // Configure mapper
 IMapper mapper = MapperConfigurations.CreateMapper();

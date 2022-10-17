@@ -8,5 +8,6 @@
         string GetSentimentEndpoint();
         string GetCustomBearerTokenSigningKey();
         string GetTenantClaimKey();
+        Dictionary<string, string> GetTenants();
     }
 }

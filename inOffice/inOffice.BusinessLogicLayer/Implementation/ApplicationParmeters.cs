@@ -1,5 +1,6 @@
 ﻿using inOffice.BusinessLogicLayer.Interface;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace inOffice.BusinessLogicLayer.Implementation
 {
@@ -39,6 +40,12 @@ namespace inOffice.BusinessLogicLayer.Implementation
         public string GetTenantClaimKey()
         {
             return _configuration["TenantClaimKey"];
+        }
+
+        public Dictionary<string, string> GetTenants()
+        {
+            string tenants = _configuration["Tenants"];
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(tenants);
         }
     }
 }

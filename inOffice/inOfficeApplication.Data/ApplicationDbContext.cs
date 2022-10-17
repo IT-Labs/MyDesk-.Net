@@ -1,15 +1,30 @@
 ﻿using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Entities.Configurations;
 using inOfficeApplication.Data.Entities.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace inOfficeApplication.Data
 {
     public partial class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
+            : base(GetOptions(options, httpContextAccessor))
         {
+        }
+
+        private static DbContextOptions<ApplicationDbContext> GetOptions(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
+        {
+            string tenant = httpContextAccessor?.HttpContext?.Items["tenant"]?.ToString();
+            if (!string.IsNullOrEmpty(tenant))
+            {
+                DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+                dbContextOptionsBuilder.UseSqlServer(tenant);
+
+                return dbContextOptionsBuilder.Options;
+            }
+
+            return options;
         }
 
         public virtual DbSet<Category> Categories { get; set; }
