@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
-using inOfficeApplication.Helpers;
 using Newtonsoft.Json;
 using System.Text;
+using inOfficeApplication.Data.Responses;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class ReviewService : IReviewService
     {

@@ -1,5 +1,5 @@
-﻿using inOffice.BusinessLogicLayer.Implementation;
-using inOffice.BusinessLogicLayer.Interface;
+﻿using inOffice.BusinessLogicLayer;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;

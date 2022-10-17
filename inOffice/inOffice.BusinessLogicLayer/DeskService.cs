@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
 using System.Transactions;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class DeskService : IDeskService
     {
@@ -15,8 +15,8 @@ namespace inOffice.BusinessLogicLayer.Implementation
         private readonly ICategoriesRepository _categoriesRepository;
         private readonly IMapper _mapper;
 
-        public DeskService(IOfficeRepository officeRepository, 
-            IDeskRepository deskRepository, 
+        public DeskService(IOfficeRepository officeRepository,
+            IDeskRepository deskRepository,
             ICategoriesRepository categoriesRepository,
             IMapper mapper)
         {

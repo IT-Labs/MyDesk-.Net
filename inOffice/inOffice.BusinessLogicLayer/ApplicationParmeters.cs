@@ -1,8 +1,8 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class ApplicationParmeters : IApplicationParmeters
     {
@@ -14,7 +14,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
 
         public string GetJwtIssuer()
         {
-            return _configuration["JwtIssuer"]; 
+            return _configuration["JwtIssuer"];
         }
 
         public string GetJwtAudience()

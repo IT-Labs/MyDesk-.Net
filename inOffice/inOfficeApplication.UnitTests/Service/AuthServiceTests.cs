@@ -1,5 +1,5 @@
-﻿using inOffice.BusinessLogicLayer.Implementation;
-using inOffice.BusinessLogicLayer.Interface;
+﻿using inOffice.BusinessLogicLayer;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;

@@ -1,4 +1,4 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Protocols;
@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class OpenIdConfigurationKeysFactory : IOpenIdConfigurationKeysFactory
     {

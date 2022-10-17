@@ -1,7 +1,7 @@
 ﻿using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 
-namespace inOffice.BusinessLogicLayer.Interface
+namespace inOfficeApplication.Data.Interfaces.BusinessLogic
 {
     public interface IAuthService
     {

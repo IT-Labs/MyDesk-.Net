@@ -1,4 +1,4 @@
-﻿namespace inOffice.BusinessLogicLayer.Requests
+﻿namespace inOfficeApplication.Data.Requests
 {
     public class EntitiesRequest
     {

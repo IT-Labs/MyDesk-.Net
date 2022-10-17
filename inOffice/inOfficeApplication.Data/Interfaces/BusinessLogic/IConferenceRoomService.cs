@@ -1,6 +1,6 @@
 ﻿using inOfficeApplication.Data.DTO;
 
-namespace inOffice.BusinessLogicLayer.Interface
+namespace inOfficeApplication.Data.Interfaces.BusinessLogic
 {
     public interface IConferenceRoomService
     {

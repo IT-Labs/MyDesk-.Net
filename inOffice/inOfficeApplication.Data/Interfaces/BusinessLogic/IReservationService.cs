@@ -1,7 +1,7 @@
-﻿using inOffice.BusinessLogicLayer.Requests;
-using inOfficeApplication.Data.DTO;
+﻿using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Requests;
 
-namespace inOffice.BusinessLogicLayer.Interface
+namespace inOfficeApplication.Data.Interfaces.BusinessLogic
 {
     public interface IReservationService
     {

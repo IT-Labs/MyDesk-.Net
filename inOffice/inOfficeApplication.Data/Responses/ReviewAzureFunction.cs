@@ -1,4 +1,4 @@
-﻿namespace inOfficeApplication.Helpers
+﻿namespace inOfficeApplication.Data.Responses
 {
     public class ReviewAzureFunction
     {

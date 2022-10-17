@@ -1,14 +1,14 @@
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data;
 using Microsoft.EntityFrameworkCore;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Implementation;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using inOfficeApplication.Middleware;
 using AutoMapper;
 using inOfficeApplication.Mapper;
 using inOffice.Repository;
+using inOffice.BusinessLogicLayer;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

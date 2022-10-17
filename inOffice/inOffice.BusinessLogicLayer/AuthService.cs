@@ -1,4 +1,4 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class AuthService : IAuthService
     {

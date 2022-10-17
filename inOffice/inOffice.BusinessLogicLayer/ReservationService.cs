@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Data.Requests;
 
-namespace inOffice.BusinessLogicLayer.Implementation
+namespace inOffice.BusinessLogicLayer
 {
     public class ReservationService : IReservationService
     {
@@ -51,7 +51,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, 
+            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, take: take, skip: skip);
 
             return _mapper.Map<List<ReservationDto>>(employeeReservations);
@@ -65,7 +65,7 @@ namespace inOffice.BusinessLogicLayer.Implementation
                 throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
             }
 
-            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, 
+            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, includeReviews: true, take: take, skip: skip);
 
             return _mapper.Map<List<ReservationDto>>(pastReservations);

@@ -1,7 +1,7 @@
 ﻿using inOfficeApplication.Data.Utils;
 using Microsoft.IdentityModel.Tokens;
 
-namespace inOffice.BusinessLogicLayer.Interface
+namespace inOfficeApplication.Data.Interfaces.BusinessLogic
 {
     public interface IOpenIdConfigurationKeysFactory
     {
