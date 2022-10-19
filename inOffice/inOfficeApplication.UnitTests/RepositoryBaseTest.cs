@@ -18,7 +18,7 @@ namespace inOfficeApplication.UnitTests
                 .UseInMemoryDatabase("testDB")
                 .Options;
 
-            _dbContext = new ApplicationDbContext(options);
+            _dbContext = new ApplicationDbContext(options, null);
             _dbContext.Database.EnsureCreated();
 
             SeedDbData();

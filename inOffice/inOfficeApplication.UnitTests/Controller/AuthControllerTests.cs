@@ -13,14 +13,19 @@ namespace inOfficeApplication.UnitTests.Controller
         private AuthController _authController;
         private IEmployeeService _employeeService;
         private IAuthService _authService;
+        private IApplicationParmeters _applicationParmeters;
+
+        private const string tenantName = "test tenant";
 
         [OneTimeSetUp]
         public void Setup()
         {
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
+            _applicationParmeters = Substitute.For<IApplicationParmeters>();
 
-            _authController = new AuthController(_employeeService, _authService);
+            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters);
+            _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(tenantName: tenantName) };
         }
 
         [Test]
@@ -33,10 +38,12 @@ namespace inOfficeApplication.UnitTests.Controller
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
             string encodedPassword = Convert.ToBase64String(plainTextBytes);
 
+            Dictionary<string, string> tenants = new Dictionary<string, string>() { { tenantName, "tenant connection string" } };
             EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
-            _authService.GetToken(employeeDto, string.Empty).Returns(token);
+            _authService.GetToken(employeeDto, tenantName).Returns(token);
+            _applicationParmeters.GetTenants().Returns(tenants);
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);
@@ -45,12 +52,13 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(result is OkObjectResult);
             OkObjectResult objectResult = (OkObjectResult)result;
             Assert.IsTrue(objectResult.Value.ToString() == token);
+            Assert.IsTrue(_authController.HttpContext.Items["tenant"] == tenants.First().Value);
         }
 
         [TestCase("", "pass")]
         [TestCase("email", "")]
         [Order(2)]
-        public void GetToken_BadRequest(string email, string password)
+        public void GetToken_Validation_BadRequest(string email, string password)
         {
             // Arrange
             EmployeeDto employeeDto = new EmployeeDto() { Email = email, Password = password };
@@ -62,11 +70,32 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(result is BadRequestResult);
         }
 
+        [Test]
+        [Order(3)]
+        public void GetToken_Tenant_BadRequest()
+        {
+            // Arrange
+            byte[] plainTextBytes = Encoding.UTF8.GetBytes("test password");
+            string encodedPassword = Convert.ToBase64String(plainTextBytes);
+
+            Dictionary<string, string> tenants = new Dictionary<string, string>() { { "new tenant", "tenant connection string" } };
+            EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
+            _applicationParmeters.GetTenants().Returns(tenants);
+
+            // Act
+            IActionResult result = _authController.GetToken(employeeDto);
+
+            // Assert
+            Assert.IsTrue(result is BadRequestObjectResult);
+            BadRequestObjectResult objectResult = (BadRequestObjectResult)result;
+            Assert.IsTrue(objectResult.Value.ToString() == $"Tenant {tenantName} does not exist.");
+        }
+
         [TestCase(true, true)]
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        [Order(3)]
+        [Order(4)]
         public void Authentication_Register_Success(bool hasPassword, bool useRegister)
         {
             // Arrange
@@ -86,8 +115,6 @@ namespace inOfficeApplication.UnitTests.Controller
             {
                 employeeDto.Password = encodedPassword;
             }
-
-            _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext() };
 
             // Act
             IActionResult result;
@@ -112,7 +139,7 @@ namespace inOfficeApplication.UnitTests.Controller
         [TestCase(null)]
         [TestCase(" ab ")]
         [TestCase(" test@test.com ")]
-        [Order(4)]
+        [Order(5)]
         public void Register_ValidationFailed(string email)
         {
             // Arrange
@@ -134,7 +161,7 @@ namespace inOfficeApplication.UnitTests.Controller
         }
 
         [Test]
-        [Order(5)]
+        [Order(6)]
         public void Register_EmployeeAlreadyExists()
         {
             // Arrange

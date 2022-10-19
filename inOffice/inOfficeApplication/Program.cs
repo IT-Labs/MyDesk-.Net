@@ -9,6 +9,7 @@ using AutoMapper;
 using inOfficeApplication.Mapper;
 using inOffice.Repository;
 using inOffice.BusinessLogicLayer;
+using inOfficeApplication.Data.Utils;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -30,18 +31,20 @@ builder.Services.AddTransient<IDeskRepository, DeskRepository>();
 builder.Services.AddTransient<IConferenceRoomRepository, ConferenceRoomRepository>();
 builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<IReviewRepository, ReviewRepository>();
-builder.Services.AddTransient<Func<IEmployeeRepository>>(provider => () => provider.GetService<IEmployeeRepository>());
+builder.Services.AddTransient<IMigrationRepository, MigrationRepository>();
+builder.Services.AddTransient<Func<DbContextOptions<ApplicationDbContext>, ApplicationDbContext>>(provider => (options) => ActivatorUtilities.CreateInstance<ApplicationDbContext>(provider, options));
 
-builder.Services.AddScoped<IOfficeService, OfficeService>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
-builder.Services.AddScoped<IDeskService, DeskService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IOfficeService, OfficeService>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReviewService, ReviewService>();
+builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
+builder.Services.AddTransient<IDeskService, DeskService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<Func<IEmployeeService>>(provider => () => provider.GetService<IEmployeeService>());
 
-builder.Services.AddScoped<IOpenIdConfigurationKeysFactory, OpenIdConfigurationKeysFactory>();
-builder.Services.AddSingleton<IApplicationParmeters, ApplicationParmeters>();
+builder.Services.AddTransient<IOpenIdConfigurationKeysFactory, OpenIdConfigurationKeysFactory>();
+builder.Services.AddTransient<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -86,16 +89,10 @@ builder.Services.AddSwaggerGen(option =>
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 {
-    using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-    {
-        using (ApplicationDbContext scope = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
-        {
-            scope?.Database.Migrate();
-        }
-    }
+    IMigrationRepository migrationRepository = serviceScope.ServiceProvider.GetService<IMigrationRepository>();
+    migrationRepository.ExecuteMigrations(DbType.SQL);
 }
 
 app.UseSwagger();

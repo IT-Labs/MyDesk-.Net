@@ -62,7 +62,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             });
 
             DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
-            defaultHttpContext.Request.Path = "/register";
+            defaultHttpContext.Request.Path = "/token";
 
             // Act
             await authorizationMiddleware.Invoke(defaultHttpContext, _authService);

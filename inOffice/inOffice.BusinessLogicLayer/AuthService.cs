@@ -1,5 +1,4 @@
 ﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
-using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
@@ -17,17 +16,17 @@ namespace inOffice.BusinessLogicLayer
     {
         private readonly IApplicationParmeters _applicationParmeters;
         private readonly IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
-        private readonly Func<IEmployeeRepository> _employeeRepository;
+        private readonly Func<IEmployeeService> _employeeService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(IApplicationParmeters applicationParmeters,
             IOpenIdConfigurationKeysFactory openIdConfigurationKeysFactory,
-            Func<IEmployeeRepository> employeeRepository,
+            Func<IEmployeeService> employeeService,
             IHttpContextAccessor httpContextAccessor)
         {
             _applicationParmeters = applicationParmeters;
             _openIdConfigurationKeysFactory = openIdConfigurationKeysFactory;
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -75,8 +74,15 @@ namespace inOffice.BusinessLogicLayer
             string email = string.Empty;
             JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)validatedToken;
 
+            EmployeeDto employee = null;
             if (authType == AuthTypes.Google)
             {
+                employee = _employeeService().GetByEmail(email);
+                if (employee == null)
+                {
+                    throw new SecurityTokenValidationException($"Employee with email {email} was not found in DB.");
+                }
+
                 email = jwtSecurityToken.Claims.First(x => x.Type == "email").Value;
             }
             else
@@ -97,12 +103,6 @@ namespace inOffice.BusinessLogicLayer
                         _httpContextAccessor.HttpContext.Items["tenant"] = tenants[tenantName];
                     }
                 }
-            }
-
-            Employee employee = _employeeRepository().GetByEmail(email);
-            if (employee == null)
-            {
-                throw new SecurityTokenValidationException($"Employee with email {email} was not found in DB.");
             }
 
             return HasRoles(url, httpMethod, jwtSecurityToken, employee, authType);
@@ -144,7 +144,7 @@ namespace inOffice.BusinessLogicLayer
             return parameters;
         }
 
-        private bool HasRoles(string url, string httpMethod, JwtSecurityToken jwtSecurityToken, Employee employee, AuthTypes authType)
+        private bool HasRoles(string url, string httpMethod, JwtSecurityToken jwtSecurityToken, EmployeeDto employee, AuthTypes authType)
         {
             RoleTypes requiredRole = GetRequiredRole(url, httpMethod);
 
