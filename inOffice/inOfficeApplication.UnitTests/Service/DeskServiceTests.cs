@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using inOffice.BusinessLogicLayer.Implementation;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.Repository.Interface;
+using inOffice.BusinessLogicLayer;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Exceptions;
@@ -16,7 +16,6 @@ namespace inOfficeApplication.UnitTests.Service
         private IOfficeRepository _officeRepository;
         private IDeskRepository _deskRepository;
         private ICategoriesRepository _categoriesRepository;
-        private IReservationRepository _reservationRepository;
         private IMapper _mapper;
 
         [OneTimeSetUp]
@@ -25,10 +24,9 @@ namespace inOfficeApplication.UnitTests.Service
             _officeRepository = Substitute.For<IOfficeRepository>();
             _deskRepository = Substitute.For<IDeskRepository>();
             _categoriesRepository = Substitute.For<ICategoriesRepository>();
-            _reservationRepository = Substitute.For<IReservationRepository>();
             _mapper = Substitute.For<IMapper>();
 
-            _deskService = new DeskService(_officeRepository, _deskRepository, _categoriesRepository, _reservationRepository, _mapper);
+            _deskService = new DeskService(_officeRepository, _deskRepository, _categoriesRepository, _mapper);
         }
 
         [TestCase(10, 0)]

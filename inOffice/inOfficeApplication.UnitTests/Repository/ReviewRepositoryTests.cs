@@ -1,5 +1,5 @@
-﻿using inOffice.Repository.Implementation;
-using inOffice.Repository.Interface;
+﻿using inOffice.Repository;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.Entities;
 using NUnit.Framework;
 

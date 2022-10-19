@@ -6,7 +6,7 @@ namespace inOfficeApplication.UnitTests
 {
     public class ControllerTestHelper
     {
-        public static DefaultHttpContext GetMockedHttpContext(int? take = null, int? skip = null)
+        public static DefaultHttpContext GetMockedHttpContext(int? take = null, int? skip = null, string tenantName = null)
         {
             DefaultHttpContext httpContext = new DefaultHttpContext();
 
@@ -20,6 +20,12 @@ namespace inOfficeApplication.UnitTests
 
                 IQueryCollection queryParams = new QueryCollection(dictionary);
                 httpContext.Request.Query = queryParams;
+            }
+
+            if (!string.IsNullOrEmpty(tenantName))
+            {
+                httpContext.Items["tenant"] = tenantName;
+                httpContext.Request.Headers["tenant"] = tenantName;
             }
 
             httpContext.Request.Headers[HeaderNames.Authorization] = GetToken();

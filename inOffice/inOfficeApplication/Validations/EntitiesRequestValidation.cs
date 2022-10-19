@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using inOffice.BusinessLogicLayer.Requests;
+using inOfficeApplication.Data.Requests;
 
 namespace inOfficeApplication.Validations
 {

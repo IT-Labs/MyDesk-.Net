@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Requests;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;

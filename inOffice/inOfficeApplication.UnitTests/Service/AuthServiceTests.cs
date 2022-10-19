@@ -1,9 +1,11 @@
-﻿using inOffice.BusinessLogicLayer.Implementation;
-using inOffice.BusinessLogicLayer.Interface;
-using inOffice.Repository.Interface;
+﻿using inOffice.BusinessLogicLayer;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
+using inOfficeApplication.Data.Interfaces.Repository;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Entities;
+using inOfficeApplication.Data.Exceptions;
 using inOfficeApplication.Data.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NUnit.Framework;
@@ -15,7 +17,8 @@ namespace inOfficeApplication.UnitTests.Service
         private IAuthService _authService;
         private IApplicationParmeters _applicationParmeters;
         private IOpenIdConfigurationKeysFactory _openIdConfigurationKeysFactory;
-        private IEmployeeRepository _employeeRepository;
+        private IEmployeeService _employeeService;
+        private IHttpContextAccessor _httpContextAccessor;
 
         private string issuer = "it labs";
         private string audience = "app";
@@ -26,13 +29,14 @@ namespace inOfficeApplication.UnitTests.Service
         {
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _openIdConfigurationKeysFactory = Substitute.For<IOpenIdConfigurationKeysFactory>();
-            _employeeRepository = Substitute.For<IEmployeeRepository>();
+            _employeeService = Substitute.For<IEmployeeService>();
+            _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 
             _applicationParmeters.GetJwtIssuer().Returns(issuer);
             _applicationParmeters.GetJwtAudience().Returns(audience);
             _applicationParmeters.GetCustomBearerTokenSigningKey().Returns(signingKey);
 
-            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, () => _employeeRepository);
+            _authService = new AuthService(_applicationParmeters, _openIdConfigurationKeysFactory, () => _employeeService, _httpContextAccessor);
         }
 
         [TestCase(false)]
@@ -50,10 +54,10 @@ namespace inOfficeApplication.UnitTests.Service
                 IsAdmin = isAdmin
             };
 
-            _employeeRepository.GetByEmail("john.doe@it-labs.com").Returns(new Employee());
+            _employeeService.GetByEmail("john.doe@it-labs.com").Returns(employeeDto);
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
@@ -83,14 +87,14 @@ namespace inOfficeApplication.UnitTests.Service
                 Email = "john.doe@it-labs.com"
             };
 
-            _employeeRepository.GetByEmail("john.doe@it-labs.com").Returns(new Employee());
+            _employeeService.GetByEmail("john.doe@it-labs.com").Returns(employeeDto);
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
-            Exception exception = Assert.Throws<Exception>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", AuthTypes.Custom));
+            NotFoundException exception = Assert.Throws<NotFoundException>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", AuthTypes.Custom));
             Assert.IsTrue(exception.Message == "Required endpoint doesn't exist.");
         }
 
@@ -109,7 +113,7 @@ namespace inOfficeApplication.UnitTests.Service
 
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, string.Empty);
 
             // Assert
             string jwtToken = token.Substring(7);
@@ -119,24 +123,33 @@ namespace inOfficeApplication.UnitTests.Service
 
         [Test]
         [Order(4)]
-        public void GetToken_ValidateToken_Custom_ThrowsSecurityTokenValidationException()
+        public void GetToken_ValidateToken_Custom_Tenant_Success()
         {
             // Arrange
+            string tenantClaimName = "tenant claim";
+            Dictionary<string, string> tenants = new Dictionary<string, string>() { { "tenant name", "tenant connection string" } };
+
             EmployeeDto employeeDto = new EmployeeDto()
             {
                 Id = 1,
                 FirstName = "John",
                 Surname = "Doe",
-                Email = "john.doe2@it-labs.com"
+                Email = "john.doe@it-labs.com"
             };
+            DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
+
+            _httpContextAccessor.HttpContext.Returns(defaultHttpContext);
+            _applicationParmeters.GetTenantClaimKey().Returns(tenantClaimName);
+            _applicationParmeters.GetTenants().Returns(tenants);
+            _employeeService.GetByEmail("john.doe@it-labs.com").Returns(employeeDto);
 
             // Act
-            string token = _authService.GetToken(employeeDto);
+            string token = _authService.GetToken(employeeDto, tenants.First().Key);
 
             // Assert
             string jwtToken = token.Substring(7);
-            SecurityTokenValidationException exception = Assert.Throws<SecurityTokenValidationException>(() => _authService.ValidateToken(jwtToken, "/employee/offices/12", "get", AuthTypes.Custom));
-            Assert.IsTrue(exception.Message == $"Employee with email {employeeDto.Email} was not found in DB.");
+            Assert.IsTrue(_authService.ValidateToken(jwtToken, "/employee/offices", "get", AuthTypes.Custom));
+            Assert.IsTrue(defaultHttpContext.Items["tenant"] == tenants.First().Value);
         }
     }
 }

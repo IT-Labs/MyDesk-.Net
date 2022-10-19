@@ -1,5 +1,5 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
-using inOffice.BusinessLogicLayer.Requests;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
+using inOfficeApplication.Data.Requests;
 using inOfficeApplication.Controllers;
 using inOfficeApplication.Data.DTO;
 using Microsoft.AspNetCore.Mvc;

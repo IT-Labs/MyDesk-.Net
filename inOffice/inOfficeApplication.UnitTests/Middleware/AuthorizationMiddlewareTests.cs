@@ -1,4 +1,4 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Middleware;
@@ -62,7 +62,7 @@ namespace inOfficeApplication.UnitTests.Middleware
             });
 
             DefaultHttpContext defaultHttpContext = new DefaultHttpContext();
-            defaultHttpContext.Request.Path = "/register";
+            defaultHttpContext.Request.Path = "/token";
 
             // Act
             await authorizationMiddleware.Invoke(defaultHttpContext, _authService);

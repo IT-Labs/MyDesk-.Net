@@ -1,5 +1,5 @@
 ﻿using FluentValidation.Results;
-using inOffice.BusinessLogicLayer.Interface;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
@@ -15,13 +15,17 @@ namespace inOfficeApplication.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
+        private readonly Func<IEmployeeService> _employeeService;
         private readonly IAuthService _authService;
+        private readonly IApplicationParmeters _applicationParmeters;
 
-        public AuthController(IEmployeeService employeeRepository, IAuthService authService)
+        public AuthController(Func<IEmployeeService> employeeRepository, 
+            IAuthService authService, 
+            IApplicationParmeters applicationParmeters)
         {
             _employeeService = employeeRepository;
             _authService = authService;
+            _applicationParmeters = applicationParmeters;
         }
 
         [HttpPost("authentication")]
@@ -57,8 +61,23 @@ namespace inOfficeApplication.Controllers
             byte[] data = Convert.FromBase64String(employeeDto.Password);
             string decodedPassword = Encoding.UTF8.GetString(data);
 
-            EmployeeDto employee = _employeeService.GetByEmailAndPassword(employeeDto.Email, decodedPassword);
-            string token = _authService.GetToken(employee);
+            string headerTenant = Request.Headers["tenant"];
+            if (!string.IsNullOrEmpty(headerTenant))
+            {
+                Dictionary<string, string> tenants = _applicationParmeters.GetTenants();
+
+                if (tenants.ContainsKey(headerTenant))
+                {
+                    Request.HttpContext.Items["tenant"] = tenants[headerTenant];
+                }
+                else
+                {
+                    return BadRequest($"Tenant {headerTenant} does not exist.");
+                }
+            }
+
+            EmployeeDto employee = _employeeService().GetByEmailAndPassword(employeeDto.Email, decodedPassword);
+            string token = _authService.GetToken(employee, headerTenant);
             
             return Ok(token);
         }
@@ -72,7 +91,7 @@ namespace inOfficeApplication.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            EmployeeDto employee = _employeeService.GetByEmail(employeeDto.Email);
+            EmployeeDto employee = _employeeService().GetByEmail(employeeDto.Email);
             if (employee != null)
             {
                 return Ok("User already exists, redirect depending on the role");
@@ -111,7 +130,7 @@ namespace inOfficeApplication.Controllers
                 Password = password,
                 IsAdmin = isAdmin
             };
-            _employeeService.Create(employee);
+            _employeeService().Create(employee);
 
             return Ok("User created, redirect depending on the role");
         }

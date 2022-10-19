@@ -1,4 +1,4 @@
-﻿using inOffice.BusinessLogicLayer.Interface;
+﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
