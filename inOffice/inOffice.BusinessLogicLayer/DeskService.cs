@@ -90,8 +90,10 @@ namespace inOffice.BusinessLogicLayer
                             Unavailable = deskToUpdate.Category.Unavailable
                         };
 
-                        category.Desks.Add(desk);
                         _categoriesRepository.Insert(category);
+
+                        desk.CategorieId = category.Id;
+                        _deskRepository.Update(desk);
                     }
                 }
 
