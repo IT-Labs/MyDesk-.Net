@@ -16,8 +16,6 @@ namespace inOfficeApplication.Data.Utils
             Tuple.Create("POST", "/employee/reserve"),
             Tuple.Create("POST", "/employee/reserve/coworker"),
             Tuple.Create("GET", "/employee/all"),
-            Tuple.Create("GET", "/employee/future-reservation"),
-            Tuple.Create("GET", "/employee/past-reservations"),
             Tuple.Create("GET", "/employee/review/{id}"),
             Tuple.Create("POST", "/employee/review"),
             Tuple.Create("DELETE", "/employee/reserve/{id}")
@@ -34,7 +32,11 @@ namespace inOfficeApplication.Data.Utils
             Tuple.Create("DELETE", "/admin/office/{id}"),
             Tuple.Create("PUT", "/admin/employee/{id}"),
             Tuple.Create("DELETE", "/admin/office-conferencerooms/{id}"),
-            Tuple.Create("DELETE", "/admin/office-desks/{id}")
+            Tuple.Create("DELETE", "/admin/office-desks/{id}"),
+            Tuple.Create("GET", "/employee/future-reservation"),
+            Tuple.Create("GET", "/employee/past-reservations"),
+            Tuple.Create("GET", "/employee/future-reservation/all"),
+            Tuple.Create("GET", "/employee/past-reservations/all")
         });
         public static readonly IList<Tuple<string, string>> EmployeeEndpoints = new ReadOnlyCollection<Tuple<string, string>>(new List<Tuple<string, string>>()
         {

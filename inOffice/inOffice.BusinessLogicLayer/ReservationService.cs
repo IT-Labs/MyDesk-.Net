@@ -43,38 +43,42 @@ namespace inOffice.BusinessLogicLayer
             _reservationRepository.SoftDelete(reservationToDelete);
         }
 
-        public List<ReservationDto> FutureReservations(string employeeEmail, int? take = null, int? skip = null)
+        public PaginationDto<ReservationDto> FutureReservations(string employeeEmail, int? take = null, int? skip = null)
         {
-            Employee employee = _employeeRepository.GetByEmail(employeeEmail);
-            if (employee == null)
+            Employee employee = null;
+            if (!string.IsNullOrEmpty(employeeEmail))
             {
-                throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+                employee = _employeeRepository.GetByEmail(employeeEmail);
+                if (employee == null)
+                {
+                    throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+                }
             }
 
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(employee?.Id, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, take: take, skip: skip);
 
-            return _mapper.Map<List<ReservationDto>>(employeeReservations);
+            return new PaginationDto<ReservationDto>()
+            {
+                Values = _mapper.Map<List<ReservationDto>>(result.Item2),
+                TotalCount = result.Item1.HasValue ? result.Item1.Value : result.Item2.Count()
+            };
         }
 
-        public List<ReservationDto> PastReservations(string employeeEmail, int? take = null, int? skip = null)
+        public PaginationDto<ReservationDto> PastReservations(string employeeEmail, int? take = null, int? skip = null)
         {
-            Employee employee = _employeeRepository.GetByEmail(employeeEmail);
-            if (employee == null)
+            Employee employee = null;
+            if (!string.IsNullOrEmpty(employeeEmail))
             {
-                throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+                employee = _employeeRepository.GetByEmail(employeeEmail);
+                if (employee == null)
+                {
+                    throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
+                }
             }
 
-            List<Reservation> pastReservations = _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(employee?.Id, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, includeReviews: true, take: take, skip: skip);
-
-            return _mapper.Map<List<ReservationDto>>(pastReservations);
-        }
-
-        public PaginationDto<ReservationDto> AllReservations(int? take = null, int? skip = null)
-        {
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip);
-            result.Item2.ForEach(x => x.Desk?.Reservations?.Clear());
 
             return new PaginationDto<ReservationDto>()
             {
