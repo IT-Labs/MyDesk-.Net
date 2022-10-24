@@ -9,7 +9,6 @@ namespace inOfficeApplication.Data.Utils
         {
             Tuple.Create("POST", "/authentication"),
             Tuple.Create("POST", "/register"),
-            Tuple.Create("GET", "/employee/reservations/all"),
             Tuple.Create("GET", "/employee/reviews/all"),
             Tuple.Create("GET", "/employee/offices"),
             Tuple.Create("GET", "/employee/office/image/{id}"),
