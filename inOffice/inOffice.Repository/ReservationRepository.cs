@@ -52,38 +52,6 @@ namespace inOffice.Repository
             return query.FirstOrDefault();
         }
 
-        public Tuple<int?, List<Reservation>> GetAll(bool? includeEmployee = null,
-            bool? includeDesk = null,
-            bool? includeOffice = null,
-            int? take = null,
-            int? skip = null)
-        {
-            int? totalCount = null;
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false);
-
-            if (includeEmployee == true)
-            {
-                query = query.Include(x => x.Employee);
-            }
-            if (includeDesk == true && includeOffice != true)
-            {
-                query = query.Include(x => x.Desk);
-            }
-            if (includeDesk == true && includeOffice == true)
-            {
-                query = query
-                    .Include(x => x.Desk)
-                    .ThenInclude(x => x.Office);
-            }
-            if (take.HasValue && skip.HasValue)
-            {
-                totalCount = query.Count();
-                query = query.Skip(skip.Value).Take(take.Value);
-            }
-
-            return Tuple.Create(totalCount, query.ToList());
-        }
-
         public List<Reservation> GetEmployeeReservations(int employeeId,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null)
@@ -103,14 +71,20 @@ namespace inOffice.Repository
             return query.ToList();
         }
 
-        public List<Reservation> GetEmployeeFutureReservations(int employeeId,
+        public Tuple<int?, List<Reservation>> GetFutureReservations(int? employeeId = null,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
             int? take = null,
             int? skip = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date);
+            int? totalCount = null;
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false && x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date);
+
+            if (employeeId.HasValue)
+            {
+                query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
 
             if (includeDesk == true && includeOffice != true)
             {
@@ -136,13 +110,14 @@ namespace inOffice.Repository
 
             if (take.HasValue && skip.HasValue)
             {
+                totalCount = query.Count();
                 query = query.Skip(skip.Value).Take(take.Value);
             }
 
-            return query.ToList();
+            return Tuple.Create(totalCount, query.ToList());
         }
 
-        public List<Reservation> GetEmployeePastReservations(int employeeId,
+        public Tuple<int?, List<Reservation>> GetPastReservations(int? employeeId = null,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
@@ -150,7 +125,13 @@ namespace inOffice.Repository
             int? take = null,
             int? skip = null)
         {
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.EmployeeId == employeeId && x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
+            int? totalCount = null;
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
+
+            if (employeeId.HasValue)
+            {
+                query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
 
             if (includeDesk == true && includeOffice != true)
             {
@@ -181,10 +162,11 @@ namespace inOffice.Repository
 
             if (take.HasValue && skip.HasValue)
             {
+                totalCount = query.Count();
                 query = query.Skip(skip.Value).Take(take.Value);
             }
 
-            return query.ToList();
+            return Tuple.Create(totalCount, query.ToList());
         }
 
         public List<Reservation> GetDeskReservations(int deskId, bool? includeEmployee = null)

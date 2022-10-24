@@ -23,35 +23,14 @@ namespace inOfficeApplication.UnitTests.Controller
         [TestCase(null, null)]
         [TestCase(10, 0)]
         [Order(1)]
-        public void ReservationsAll_Success(int? take, int? skip)
-        {
-            // Arrange
-            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
-
-            PaginationDto<ReservationDto> reservationDtos = new PaginationDto<ReservationDto>()
-            {
-                TotalCount = 2,
-                Values = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } }
-            };
-
-            _reservationService.AllReservations(take: take, skip: skip).Returns(reservationDtos);
-
-            // Act
-            IActionResult result = _reservationController.ReservationsAll();
-
-            // Assert
-            Assert.IsTrue(result is OkObjectResult);
-            OkObjectResult objectResult = (OkObjectResult)result;
-            Assert.IsTrue(objectResult.Value == reservationDtos);
-        }
-
-        [TestCase(null, null)]
-        [TestCase(10, 0)]
-        [Order(2)]
         public void EmployeeReservations_Success(int? take, int? skip)
         {
             // Arrange
-            List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
+            PaginationDto<ReservationDto> reservationDtos = new PaginationDto<ReservationDto>()
+            {
+                TotalCount = 1,
+                Values = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } }
+            };
 
             _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
             _reservationService.FutureReservations("test@it-labs.com", take: take, skip: skip).Returns(reservationDtos);
@@ -67,11 +46,15 @@ namespace inOfficeApplication.UnitTests.Controller
 
         [TestCase(null, null)]
         [TestCase(10, 0)]
-        [Order(3)]
+        [Order(2)]
         public void PastReservations_Success(int? take, int? skip)
         {
             // Arrange
-            List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
+            PaginationDto<ReservationDto> reservationDtos = new PaginationDto<ReservationDto>()
+            {
+                TotalCount = 1,
+                Values = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } }
+            };
 
             _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
             _reservationService.PastReservations("test@it-labs.com", take: take, skip: skip).Returns(reservationDtos);
@@ -85,8 +68,56 @@ namespace inOfficeApplication.UnitTests.Controller
             Assert.IsTrue(objectResult.Value == reservationDtos);
         }
 
-        [Test]
+        [TestCase(null, null)]
+        [TestCase(10, 0)]
+        [Order(3)]
+        public void GetAllFutureReservations_Success(int? take, int? skip)
+        {
+            // Arrange
+            PaginationDto<ReservationDto> reservationDtos = new PaginationDto<ReservationDto>()
+            {
+                TotalCount = 1,
+                Values = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } }
+            };
+
+            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
+            _reservationService.FutureReservations(string.Empty, take: take, skip: skip).Returns(reservationDtos);
+
+            // Act
+            IActionResult result = _reservationController.GetAllFutureReservations();
+
+            // Assert
+            Assert.IsTrue(result is OkObjectResult);
+            OkObjectResult objectResult = (OkObjectResult)result;
+            Assert.IsTrue(objectResult.Value == reservationDtos);
+        }
+
+        [TestCase(null, null)]
+        [TestCase(10, 0)]
         [Order(4)]
+        public void GetAllPastReservations_Success(int? take, int? skip)
+        {
+            // Arrange
+            PaginationDto<ReservationDto> reservationDtos = new PaginationDto<ReservationDto>()
+            {
+                TotalCount = 1,
+                Values = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } }
+            };
+
+            _reservationController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(take: take, skip: skip) };
+            _reservationService.PastReservations(string.Empty, take: take, skip: skip).Returns(reservationDtos);
+
+            // Act
+            IActionResult result = _reservationController.GetAllPastReservations();
+
+            // Assert
+            Assert.IsTrue(result is OkObjectResult);
+            OkObjectResult objectResult = (OkObjectResult)result;
+            Assert.IsTrue(objectResult.Value == reservationDtos);
+        }
+
+        [Test]
+        [Order(5)]
         public void CancelReservation_Success()
         {
             // Arrange
@@ -101,7 +132,7 @@ namespace inOfficeApplication.UnitTests.Controller
         }
 
         [Test]
-        [Order(5)]
+        [Order(6)]
         public void CoworkerReservation_Success()
         {
             // Arrange
@@ -125,7 +156,7 @@ namespace inOfficeApplication.UnitTests.Controller
         }
 
         [Test]
-        [Order(6)]
+        [Order(7)]
         public void CoworkerReservation_ValidationFailed()
         {
             // Arrange

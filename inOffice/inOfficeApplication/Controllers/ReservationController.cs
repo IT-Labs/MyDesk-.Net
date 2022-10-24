@@ -20,39 +20,51 @@ namespace inOfficeApplication.Controllers
             _reservationService = reservationService;
         }
 
-        [HttpGet("employee/reservations/all")]
+        [HttpGet("employee/future-reservation/all")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ReservationsAll()
+        public IActionResult GetAllFutureReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            PaginationDto<ReservationDto> reservations = _reservationService.AllReservations(take: take, skip: skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.FutureReservations(string.Empty, take: take, skip: skip);
+
+            return Ok(reservations);
+        }
+
+        [HttpGet("employee/past-reservations/all")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult GetAllPastReservations()
+        {
+            Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.PastReservations(string.Empty, take: take, skip: skip);
 
             return Ok(reservations);
         }
 
         [HttpGet("employee/future-reservation")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult EmployeeReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            List<ReservationDto> reservations = _reservationService.FutureReservations(GetEmployeeEmail(), take: take, skip: skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.FutureReservations(GetEmployeeEmail(), take: take, skip: skip);
             return Ok(reservations);
         }
 
         [HttpGet("employee/past-reservations")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReservationDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult PastReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
-            List<ReservationDto> reservations = _reservationService.PastReservations(GetEmployeeEmail(), take: take, skip: skip);
+            PaginationDto<ReservationDto> reservations = _reservationService.PastReservations(GetEmployeeEmail(), take: take, skip: skip);
             return Ok(reservations);
         }
 

@@ -67,14 +67,14 @@ namespace inOfficeApplication.UnitTests.Service
             Assert.IsTrue(exception.Message == $"Reservation with ID: {id} not found.");
         }
 
-        [TestCase(null, null)]
-        [TestCase(1, 1)]
+        [TestCase(null, null, null)]
+        [TestCase("test@it-labs.com", 1, 1)]
         [Order(3)]
-        public void EmployeeReservations_Success(int? take, int? skip)
+        public void FutureReservations_Success(string employeeEmail, int? take, int? skip)
         {
             // Arrange
-            Employee employee = new Employee() { Id = 11, Email = "test@it-labs.com" };
-            List<Reservation> reservations = new List<Reservation>()
+            int? totalCount = 1;
+            Tuple<int?, List<Reservation>> reservations = Tuple.Create(totalCount, new List<Reservation>()
             {
                 new Reservation()
                 {
@@ -86,19 +86,28 @@ namespace inOfficeApplication.UnitTests.Service
                     Id = 3,
                     StartDate = DateTime.Now.AddDays(-1)
                 }
-            };
+            });
+
+            if (!string.IsNullOrEmpty(employeeEmail))
+            {
+                Employee employee = new Employee() { Id = 11, Email = employeeEmail };
+                _employeeRepository.GetByEmail(employee.Email).Returns(employee);
+                _reservationRepository.GetFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
+            }
+            else
+            {
+                _reservationRepository.GetFutureReservations(null, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
+            }
 
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 2 } };
-
-            _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeeFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
             _mapper.Map<List<ReservationDto>>(Arg.Is<List<Reservation>>(x => x.Count == 2)).Returns(reservationDtos);
 
             // Act
-            List<ReservationDto> result = _reservationService.FutureReservations(employee.Email);
+            PaginationDto<ReservationDto> result = _reservationService.FutureReservations(employeeEmail, take: take, skip: skip);
 
             // Assert
-            Assert.IsTrue(result.Count == 1);
+            Assert.IsTrue(result.TotalCount == 1);
+            Assert.IsTrue(result.Values.Count == 1);
         }
 
         [Test]
@@ -113,14 +122,14 @@ namespace inOfficeApplication.UnitTests.Service
             Assert.IsTrue(exception.Message == $"Employee with email: {email} not found.");
         }
 
-        [TestCase(null, null)]
-        [TestCase(1, 1)]
+        [TestCase(null, null, null)]
+        [TestCase("test@it-labs.com", 1, 1)]
         [Order(5)]
-        public void PastReservations_Success(int? take, int? skip)
+        public void PastReservations_Success(string employeeEmail, int? take, int? skip)
         {
             // Arrange
-            Employee employee = new Employee() { Id = 4, Email = "test@it-labs.com" };
-            List<Reservation> reservations = new List<Reservation>()
+            int? totalCount = 1;
+            Tuple<int?, List<Reservation>> reservations = Tuple.Create(totalCount, new List<Reservation>()
             {
                 new Reservation()
                 {
@@ -134,19 +143,28 @@ namespace inOfficeApplication.UnitTests.Service
                     StartDate = DateTime.Now.AddDays(-2),
                     EndDate = DateTime.Now.AddDays(-1)
                 }
-            };
+            });
+
+            if (!string.IsNullOrEmpty(employeeEmail))
+            {
+                Employee employee = new Employee() { Id = 4, Email = employeeEmail };
+                _employeeRepository.GetByEmail(employee.Email).Returns(employee);
+                _reservationRepository.GetPastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
+            }
+            else
+            {
+                _reservationRepository.GetPastReservations(null, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
+            }
 
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 6 } };
-
-            _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-            _reservationRepository.GetEmployeePastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
             _mapper.Map<List<ReservationDto>>(Arg.Any<List<Reservation>>()).Returns(reservationDtos);
 
             // Act
-            List<ReservationDto> result = _reservationService.PastReservations(employee.Email);
+            PaginationDto<ReservationDto> result = _reservationService.PastReservations(employeeEmail, take: take, skip: skip);
 
             // Assert
-            Assert.IsTrue(result.Count == 1);
+            Assert.IsTrue(result.TotalCount == 1);
+            Assert.IsTrue(result.Values.Count == 1);
         }
 
         [Test]
@@ -161,50 +179,8 @@ namespace inOfficeApplication.UnitTests.Service
             Assert.IsTrue(exception.Message == $"Employee with email: {email} not found.");
         }
 
-        [TestCase(null, null)]
-        [TestCase(2, 0)]
-        [Order(7)]
-        public void AllReservations_Success(int? take, int? skip)
-        {
-            // Arrange
-            int? dbTotal = 3;
-            List<Reservation> partReservations = new List<Reservation>() { new Reservation() { Id = 1 }, new Reservation() { Id = 2 } };
-            List<Reservation> allReservations = new List<Reservation>() { new Reservation() { Id = 1 }, new Reservation() { Id = 2 }, new Reservation() { Id = 3 } };
-            List<ReservationDto> partReservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 } };
-            List<ReservationDto> allReservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 1 }, new ReservationDto() { Id = 2 }, new ReservationDto() { Id = 3 } };
-
-            Tuple<int?, List<Reservation>> tuple;
-            if (take.HasValue && skip.HasValue)
-            {
-                tuple = Tuple.Create(take, partReservations);
-            }
-            else
-            {
-                tuple = Tuple.Create(dbTotal, allReservations);
-            }
-
-            _reservationRepository.GetAll(includeEmployee: true, includeDesk: true, includeOffice: true, take: take, skip: skip).Returns(tuple);
-            _mapper.Map<List<ReservationDto>>(partReservations).Returns(partReservationDtos);
-            _mapper.Map<List<ReservationDto>>(allReservations).Returns(allReservationDtos);
-
-            // Act
-            PaginationDto<ReservationDto> result = _reservationService.AllReservations(take: take, skip: skip);
-
-            // Assert
-            if (take.HasValue && skip.HasValue)
-            {
-                Assert.IsTrue(result.TotalCount == take);
-                Assert.IsTrue(result.Values.Select(x => x.Id).All(x => partReservationDtos.Select(y => y.Id).Contains(x)));
-            }
-            else
-            {
-                Assert.IsTrue(result.TotalCount == dbTotal);
-                Assert.IsTrue(result.Values.Select(x => x.Id).All(x => allReservationDtos.Select(y => y.Id).Contains(x)));
-            }
-        }
-
         [Test]
-        [Order(8)]
+        [Order(7)]
         public void CoworkerReserve_Success()
         {
             // Arrange
@@ -249,7 +225,7 @@ namespace inOfficeApplication.UnitTests.Service
         }
 
         [Test]
-        [Order(9)]
+        [Order(8)]
         public void CoworkerReserve_WrongDeskId_ThrowsNotFoundException()
         {
             // Arrange
@@ -261,7 +237,7 @@ namespace inOfficeApplication.UnitTests.Service
         }
 
         [Test]
-        [Order(10)]
+        [Order(9)]
         public void CoworkerReserve_WrongEmployeeEmail_ThrowsNotFoundException()
         {
             // Arrange
@@ -274,7 +250,7 @@ namespace inOfficeApplication.UnitTests.Service
         }
 
         [Test]
-        [Order(11)]
+        [Order(10)]
         public void CoworkerReserve_ReservationTime_ThrowsConflictException()
         {
             // Arrange
@@ -303,7 +279,7 @@ namespace inOfficeApplication.UnitTests.Service
         }
 
         [Test]
-        [Order(12)]
+        [Order(11)]
         public void CoworkerReserve_DeskAlreadyReserved_ThrowsConflictException()
         {
             // Arrange
