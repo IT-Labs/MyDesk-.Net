@@ -131,17 +131,17 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
-        [TestCase(null, null, null, null, null)]
-        [TestCase(true, null, null, null, null)]
-        [TestCase(true, null, true, null, null)]
-        [TestCase(null, true, null, null, null)]
-        [TestCase(null, true, true, 1, 0)]
-        [TestCase(null, true, true, 2, 0)]
+        [TestCase(null, null, null, null, null, null)]
+        [TestCase(null, true, null, null, null, null)]
+        [TestCase(true, true, null, true, null, null)]
+        [TestCase(true, null, true, null, null, null)]
+        [TestCase(true, null, true, true, 1, 0)]
+        [TestCase(false, null, true, true, 2, 0)]
         [Order(4)]
-        public void GetEmployeeFutureReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, int? take, int? skip)
+        public void GetEmployeeFutureReservations_Success(bool? includeEmployee, bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, int? take, int? skip)
         {
             // Arrange + Act
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(2, includeDesk: includeDesk, 
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(2, includeEmployee: includeEmployee, includeDesk: includeDesk, 
                 includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, take: take, skip: skip);
 
             // Assert
@@ -160,6 +160,11 @@ namespace inOfficeApplication.UnitTests.Repository
 
             foreach (Reservation reservation in result.Item2)
             {
+                if (includeEmployee == true)
+                {
+                    Assert.NotNull(reservation.Employee);
+                }
+
                 if (includeDesk == true && reservation.DeskId.HasValue)
                 {
                     Assert.NotNull(reservation.Desk);
@@ -196,17 +201,17 @@ namespace inOfficeApplication.UnitTests.Repository
             }
         }
 
-        [TestCase(null, null, null, null, null, null)]
-        [TestCase(true, null, null, null, null, null)]
-        [TestCase(true, null, true, null, null, null)]
-        [TestCase(null, true, null, null, null, null)]
-        [TestCase(null, true, true, null, null, null)]
-        [TestCase(null, true, true, true, 1, 0)]
+        [TestCase(null, null, null, null, null, null, null)]
+        [TestCase(null, true, null, null, null, null, null)]
+        [TestCase(true, true, null, true, null, null, null)]
+        [TestCase(true, null, true, null, null, null, null)]
+        [TestCase(true, null, true, true, null, null, null)]
+        [TestCase(false, null, true, true, true, 1, 0)]
         [Order(5)]
-        public void GetEmployeePastReservations_Success(bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews, int? take, int? skip)
+        public void GetEmployeePastReservations_Success(bool? includeEmployee, bool? includeDesk, bool? includeConferenceRoom, bool? includeOffice, bool? includeReviews, int? take, int? skip)
         {
             // Arrange + Act
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(2, includeDesk: includeDesk,
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(2, includeEmployee: includeEmployee, includeDesk: includeDesk,
                 includeConferenceRoom: includeConferenceRoom, includeOffice: includeOffice, includeReviews: includeReviews, take: take, skip: skip);
 
             // Assert
@@ -225,6 +230,11 @@ namespace inOfficeApplication.UnitTests.Repository
 
             foreach (Reservation reservation in result.Item2)
             {
+                if (includeEmployee == true)
+                {
+                    Assert.NotNull(reservation.Employee);
+                }
+
                 if (includeReviews == true)
                 {
                     Assert.IsTrue(reservation.Reviews.Count == 1);
