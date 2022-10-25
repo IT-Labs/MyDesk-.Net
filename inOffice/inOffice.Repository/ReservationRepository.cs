@@ -72,6 +72,7 @@ namespace inOffice.Repository
         }
 
         public Tuple<int?, List<Reservation>> GetFutureReservations(int? employeeId = null,
+            bool? includeEmployee = null,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
@@ -84,6 +85,11 @@ namespace inOffice.Repository
             if (employeeId.HasValue)
             {
                 query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
+
+            if (includeEmployee == true)
+            {
+                query = query.Include(x => x.Employee);
             }
 
             if (includeDesk == true && includeOffice != true)
@@ -118,6 +124,7 @@ namespace inOffice.Repository
         }
 
         public Tuple<int?, List<Reservation>> GetPastReservations(int? employeeId = null,
+            bool? includeEmployee = null,
             bool? includeDesk = null,
             bool? includeConferenceRoom = null,
             bool? includeOffice = null,
@@ -131,6 +138,11 @@ namespace inOffice.Repository
             if (employeeId.HasValue)
             {
                 query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
+
+            if (includeEmployee == true)
+            {
+                query = query.Include(x => x.Employee);
             }
 
             if (includeDesk == true && includeOffice != true)

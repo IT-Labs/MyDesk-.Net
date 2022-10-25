@@ -55,7 +55,7 @@ namespace inOffice.BusinessLogicLayer
                 }
             }
 
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(employee?.Id, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, take: take, skip: skip);
 
             return new PaginationDto<ReservationDto>()
@@ -77,7 +77,7 @@ namespace inOffice.BusinessLogicLayer
                 }
             }
 
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(employee?.Id, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, includeReviews: true, take: take, skip: skip);
 
             return new PaginationDto<ReservationDto>()

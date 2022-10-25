@@ -92,11 +92,11 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Employee employee = new Employee() { Id = 11, Email = employeeEmail };
                 _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-                _reservationRepository.GetFutureReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
+                _reservationRepository.GetFutureReservations(employee.Id, includeEmployee: true,  includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
             }
             else
             {
-                _reservationRepository.GetFutureReservations(null, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
+                _reservationRepository.GetFutureReservations(null, includeEmployee: true, includeDesk: true, includeConferenceRoom: true, includeOffice: true, take: take, skip: skip).Returns(reservations);
             }
 
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 2 } };
@@ -149,11 +149,11 @@ namespace inOfficeApplication.UnitTests.Service
             {
                 Employee employee = new Employee() { Id = 4, Email = employeeEmail };
                 _employeeRepository.GetByEmail(employee.Email).Returns(employee);
-                _reservationRepository.GetPastReservations(employee.Id, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
+                _reservationRepository.GetPastReservations(employee.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
             }
             else
             {
-                _reservationRepository.GetPastReservations(null, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
+                _reservationRepository.GetPastReservations(null, includeEmployee: true, includeDesk: true, includeConferenceRoom: true, includeOffice: true, includeReviews: true, take: take, skip: skip).Returns(reservations);
             }
 
             List<ReservationDto> reservationDtos = new List<ReservationDto>() { new ReservationDto() { Id = 6 } };
