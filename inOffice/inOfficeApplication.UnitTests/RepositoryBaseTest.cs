@@ -21,6 +21,8 @@ namespace inOfficeApplication.UnitTests
             _dbContext = new ApplicationDbContext(options, null);
             _dbContext.Database.EnsureCreated();
 
+            
+
             SeedDbData();
         }
 
@@ -92,6 +94,17 @@ namespace inOfficeApplication.UnitTests
         {
             return new List<Employee>()
             {
+                new Employee()
+                {
+                    Id = 1,
+                    FirstName = "Admin",
+                    LastName = "Employee",
+                    Email = "admin@it-labs.com",
+                    Password = BCrypt.Net.BCrypt.HashPassword("Something"),
+                    JobTitle = "admin",
+                    IsAdmin = true,
+                    IsDeleted = false
+                },
                 new Employee()
                 {
                     Id = 2,

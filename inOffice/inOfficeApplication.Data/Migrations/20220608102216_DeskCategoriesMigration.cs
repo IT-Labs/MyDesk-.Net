@@ -54,20 +54,6 @@ namespace inOfficeApplication.Data.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$VJYnT7RraGX22NQq8QGhKexacpmBokvQ2LY4JnzBAD2FJoC7q1Yp6");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$fb9wKLniDjfRQY2GWWsBeOOqCyn.yeAP7NhoiI4D5KayF391czMS6");
-
             migrationBuilder.CreateIndex(
                 name: "IX_DeskCategories_CategoryId",
                 table: "DeskCategories",
@@ -90,20 +76,6 @@ namespace inOfficeApplication.Data.Migrations
             migrationBuilder.DropColumn(
                 name: "CategorieId",
                 table: "Desks");
-
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$gR9BmBM4Egj.OCQK3xU.iOF5SuYrG7xQPY0Pf/WEFjkVvU8Uplur2");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$SpHiYycg6TPqsEYp8takzewxiXrRrM56a/I9NZWdkcg1BvNvEbruK");
         }
     }
 }

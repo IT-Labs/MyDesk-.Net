@@ -10,6 +10,7 @@ using inOfficeApplication.Mapper;
 using inOffice.Repository;
 using inOffice.BusinessLogicLayer;
 using inOfficeApplication.Data.Utils;
+using inOfficeApplication.Data.Entities.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +94,9 @@ using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScop
 {
     IMigrationRepository migrationRepository = serviceScope.ServiceProvider.GetService<IMigrationRepository>();
     migrationRepository.ExecuteMigrations(DbType.SQL);
+
+    var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    DbInitializer.Initialize(context, app.Configuration["AdminEmail"], app.Configuration["AdminPassword"]);
 }
 
 app.UseSwagger();

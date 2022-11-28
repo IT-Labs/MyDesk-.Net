@@ -24,20 +24,6 @@ namespace inOfficeApplication.Data.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$rYujnzLxeudGRY7bOqMRaewrcvzJOxk13U3ZaTaEw7tQARQNOTQpm");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$905PCW6R/YCUhLO7iT2CIeukMZA0QJQt6Ur55UcQPxLxoGoum2yu2");
-
             migrationBuilder.CreateIndex(
                 name: "IX_ConferenceRooms_ReservationId",
                 table: "ConferenceRooms",
@@ -72,20 +58,6 @@ namespace inOfficeApplication.Data.Migrations
                 oldClrType: typeof(int),
                 oldType: "int",
                 oldNullable: true);
-
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$sk6hPno222fBITblqzURhuu92w.BpIDFgcG6Zjx4u.Ak6tRFC19m2");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$vyXLEo.Rk3ETcZfn2zVVluQCVJEPqFjt6wX622Wgg7WRNQjHBSkRK");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConferenceRooms_ReservationId",

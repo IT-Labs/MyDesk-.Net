@@ -112,20 +112,6 @@ namespace inOfficeApplication.Data.Migrations
                 table: "ConferenceRoomModes",
                 column: "Id");
 
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$5UhL1eBw3qzxpO5bwrYx4e.DFhXdyl7/i1yaXOPD/IY9G1HZSqP1m");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$esLRp7lvteptwuQC6NRCw.lGa60QwjgzQN4D6majsWFcmNtFNagdG");
-
             migrationBuilder.CreateIndex(
                 name: "IX_DeskModes_DeskId",
                 table: "DeskModes",
@@ -212,20 +198,6 @@ namespace inOfficeApplication.Data.Migrations
                 name: "PK_ConferenceRoomModes",
                 table: "ConferenceRoomModes",
                 columns: new[] { "ConferenceRoomId", "ModeId" });
-
-            migrationBuilder.UpdateData(
-                table: "Admins",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "Password",
-                value: "$2a$11$.wPZU45XwT68GfaUcSfY6euymKTyTiesitdH8xVG3WGZV56rb6ZoC");
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$WGfOjQvLqp3rhBlerZS3duvq2/MSqUJaZWW45Xic4mnbylUVZIBLS");
         }
     }
 }

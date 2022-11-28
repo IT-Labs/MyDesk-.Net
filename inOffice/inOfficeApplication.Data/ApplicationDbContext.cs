@@ -1,6 +1,5 @@
 ﻿using inOfficeApplication.Data.Entities;
 using inOfficeApplication.Data.Entities.Configurations;
-using inOfficeApplication.Data.Entities.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,8 +43,6 @@ namespace inOfficeApplication.Data
             modelBuilder.ApplyConfiguration(new OfficeConfiguration());
             modelBuilder.ApplyConfiguration(new ReservationConfiguration());
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
-
-            modelBuilder.SeedAdminEmployee();
 
             OnModelCreatingPartial(modelBuilder);
         }

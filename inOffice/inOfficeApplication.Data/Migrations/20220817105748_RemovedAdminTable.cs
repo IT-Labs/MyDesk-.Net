@@ -17,13 +17,6 @@ namespace inOfficeApplication.Data.Migrations
                 type: "bit",
                 nullable: false,
                 defaultValue: true);
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$Nhp5LeLiLWYm5xXKQW1RuOA7xVL90vxwmSLHLhIzRdP8FM9C20TH2");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -53,13 +46,6 @@ namespace inOfficeApplication.Data.Migrations
                 table: "Admins",
                 columns: new[] { "Id", "Email", "FirstName", "IsDeleted", "LastName", "Password" },
                 values: new object[] { 2, "admin@inoffice.com", "Nekoj Admin", false, "Prezime Admin", "$2a$11$GbYZXsuaza80dC4zNp7T5u6OHgCslHgWPrj/0W8ANhxOvWNNFNTC2" });
-
-            migrationBuilder.UpdateData(
-                table: "Employees",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$BBZYzOYelQJQgDyifH1DkuyuVmUFCZtuLjNLXNPJda6a/hLMVav0m");
         }
     }
 }

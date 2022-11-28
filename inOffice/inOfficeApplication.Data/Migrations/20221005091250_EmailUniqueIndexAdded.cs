@@ -16,13 +16,6 @@ namespace inOfficeApplication.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.UpdateData(
-                table: "Employee",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$R642mS1rxrHHSFeebfi1RuwE5ya8GYObaEqZTnMKmrKhdtdQqr9oi");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_Email",
                 table: "Employee",
@@ -43,13 +36,6 @@ namespace inOfficeApplication.Data.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)");
-
-            migrationBuilder.UpdateData(
-                table: "Employee",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$MdQnkO8H0NLYcQYd4ePAHO3pO15ioq3HJlP895a5aqpQr5UtuXhui");
         }
     }
 }

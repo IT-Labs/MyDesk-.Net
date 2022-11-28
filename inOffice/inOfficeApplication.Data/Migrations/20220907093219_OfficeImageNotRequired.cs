@@ -15,13 +15,6 @@ namespace inOfficeApplication.Data.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
-
-            migrationBuilder.UpdateData(
-                table: "Employee",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$cIqMEmkIaW/xe7w3ORbbj.tWNWcKHOVXpGGz7ryksaAHVelzfG5sW");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -35,13 +28,6 @@ namespace inOfficeApplication.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)",
                 oldNullable: true);
-
-            migrationBuilder.UpdateData(
-                table: "Employee",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "Password",
-                value: "$2a$11$wdjhCrEA60JEqot3lW4yguYBIgmyZ/IWpnS6VUgjDOlK2VORFpddi");
         }
     }
 }
