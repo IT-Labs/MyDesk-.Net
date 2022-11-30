@@ -59,7 +59,7 @@ stages:
     displayName: 'Deploy to the dev environment'
     pool:
       vmImage: ubuntu-latest
-    environment: 'ITLabs-Internship-Development'
+    environment: 'development'
     variables:
     - group: mydesk-be-dev
     strategy:
@@ -95,7 +95,7 @@ stages:
     displayName: 'Deploy to the prod environment'
     pool:
       vmImage: ubuntu-latest
-    environment: 'ITLabs-Internship-Production'
+    environment: 'production'
     variables:
     - group: mydesk-be-production
     strategy:
