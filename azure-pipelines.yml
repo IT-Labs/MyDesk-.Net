@@ -40,6 +40,7 @@ stages:
     
     - task: DotNetCoreCLI@2
       displayName: 'Publish the project - $(buildConfiguration)'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
       inputs:
         command: 'publish'
         projects: './inOffice/inOfficeApplication/inOfficeApplication.csproj'
@@ -48,6 +49,7 @@ stages:
         zipAfterPublish: true
 
     - publish: '$(Build.ArtifactStagingDirectory)'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
       artifact: drop
 
 - stage: 'Dev'
@@ -81,10 +83,12 @@ stages:
                 -CustomBearerTokenSigningKey "$(CustomBearerTokenSigningKey)" 
                 -JwtAudience "$(JwtAudience)" 
                 -JwtIssuer "$(JwtIssuer)" 
-                -MetadataAddress "$(MetadataAddress)" 
-                -SentimentEndpoint "$(SentimentEndpoint)" 
-                -TenantClaimKey "$(TenantClaimKey)" 
+                -MetadataAddress "$(MetadataAddress)"
+                -SentimentEndpoint "$(SentimentEndpoint)"
+                -TenantClaimKey "$(TenantClaimKey)"
                 -Tenants "$(Tenants)"
+                -AdminEmail "$(AdminEmail)" 
+                -AdminPassword "$(AdminPassword)"
 
 - stage: 'Production'
   displayName: 'Deploy to the prod environment'
@@ -121,3 +125,5 @@ stages:
                 -SentimentEndpoint "$(SentimentEndpoint)" 
                 -TenantClaimKey "$(TenantClaimKey)" 
                 -Tenants "$(Tenants)"
+                -AdminEmail "$(AdminEmail)" 
+                -AdminPassword "$(AdminPassword)"
