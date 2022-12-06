@@ -12,8 +12,8 @@ using inOfficeApplication.Data;
 namespace inOfficeApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220912104012_DateTimeToDate")]
-    partial class DateTimeToDate
+    [Migration("20221129084630_AddIsMSAccountFieldIntoEmployee")]
+    partial class AddIsMSAccountFieldIntoEmployee
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -142,7 +142,7 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -160,6 +160,9 @@ namespace inOfficeApplication.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
+                    b.Property<bool?>("IsMSAccount")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -172,6 +175,9 @@ namespace inOfficeApplication.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Email" }, "IX_Employee_Email")
+                        .IsUnique();
 
                     b.ToTable("Employee", (string)null);
                 });

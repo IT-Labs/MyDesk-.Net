@@ -174,19 +174,6 @@ namespace inOfficeApplication.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Employee", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@it-labs.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            IsDeleted = false,
-                            JobTitle = "admin",
-                            LastName = "Employee",
-                            Password = "$2a$11$cIqMEmkIaW/xe7w3ORbbj.tWNWcKHOVXpGGz7ryksaAHVelzfG5sW"
-                        });
                 });
 
             modelBuilder.Entity("inOfficeApplication.Data.Entities.Office", b =>

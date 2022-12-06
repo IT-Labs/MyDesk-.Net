@@ -18,14 +18,17 @@ namespace inOfficeApplication.Controllers
         private readonly Func<IEmployeeService> _employeeService;
         private readonly IAuthService _authService;
         private readonly IApplicationParmeters _applicationParmeters;
+        private readonly IConfiguration _configuration;
 
         public AuthController(Func<IEmployeeService> employeeRepository, 
             IAuthService authService, 
-            IApplicationParmeters applicationParmeters)
+            IApplicationParmeters applicationParmeters,
+            IConfiguration configuration)
         {
             _employeeService = employeeRepository;
             _authService = authService;
             _applicationParmeters = applicationParmeters;
+            _configuration = configuration;
         }
 
         [HttpPost("authentication")]
@@ -34,7 +37,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Authentication([FromBody] EmployeeDto employeeDto)
         {
-            return CreateEmployee(employeeDto);
+            return CreateEmployee(employeeDto, true);
         }
 
         [HttpPost("register")]
@@ -43,7 +46,7 @@ namespace inOfficeApplication.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Register([FromBody] EmployeeDto employeeDto)
         {
-            return CreateEmployee(employeeDto);
+            return CreateEmployee(employeeDto, false);
         }
 
         [HttpPost("token")]
@@ -82,7 +85,7 @@ namespace inOfficeApplication.Controllers
             return Ok(token);
         }
 
-        private IActionResult CreateEmployee(EmployeeDto employeeDto)
+        private IActionResult CreateEmployee(EmployeeDto employeeDto, bool isSSOAccount = false)
         {
             EmployeeDtoValidation validationRules = new EmployeeDtoValidation();
             ValidationResult validationResult = validationRules.Validate(employeeDto);
@@ -91,19 +94,24 @@ namespace inOfficeApplication.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            EmployeeDto employee = _employeeService().GetByEmail(employeeDto.Email);
+            var employee = _employeeService().GetByEmail(employeeDto.Email);
             if (employee != null)
             {
                 return Ok("User already exists, redirect depending on the role");
             }
 
-            string password;
-            bool isAdmin = false;
-
-            // MS SSO
-            if (string.IsNullOrEmpty(employeeDto.Password))
+            if (!isSSOAccount && string.IsNullOrEmpty(employeeDto.Password))
             {
-                password = BCrypt.Net.BCrypt.HashPassword("Passvord!23");
+                return BadRequest("Password is not provided");
+            }
+
+            string password;
+            bool isAdmin = false; 
+
+            // SSO
+            if (string.IsNullOrEmpty(employeeDto.Password) && isSSOAccount)
+            {
+                password = BCrypt.Net.BCrypt.HashPassword(_configuration["AdminPassword"] ?? "");
 
                 // Check if user is marked as admin
                 string authHeader = Request.Headers[HeaderNames.Authorization];
@@ -128,7 +136,8 @@ namespace inOfficeApplication.Controllers
                 Email = employeeDto.Email,
                 JobTitle = employeeDto.JobTitle,
                 Password = password,
-                IsAdmin = isAdmin
+                IsAdmin = isAdmin,
+                IsSSOAccount = isSSOAccount
             };
             _employeeService().Create(employee);
 

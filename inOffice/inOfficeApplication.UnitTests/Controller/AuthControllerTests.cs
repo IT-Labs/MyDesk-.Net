@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace inOfficeApplication.UnitTests.Controller
 {
@@ -14,6 +15,7 @@ namespace inOfficeApplication.UnitTests.Controller
         private IEmployeeService _employeeService;
         private IAuthService _authService;
         private IApplicationParmeters _applicationParmeters;
+        private IConfiguration _configuration;
 
         private const string tenantName = "test tenant";
 
@@ -23,8 +25,9 @@ namespace inOfficeApplication.UnitTests.Controller
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
+            _configuration = Substitute.For<IConfiguration>();
 
-            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters);
+            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters, _configuration);
             _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(tenantName: tenantName) };
         }
 
@@ -129,6 +132,13 @@ namespace inOfficeApplication.UnitTests.Controller
             }
 
             // Assert
+            if (!hasPassword && useRegister)
+            {
+                Assert.IsTrue(result is BadRequestObjectResult);
+                Assert.IsTrue((result as BadRequestObjectResult).Value.ToString() == "Password is not provided");
+                return;
+            }
+
             Assert.IsTrue(result is OkObjectResult);
             OkObjectResult objectResult = (OkObjectResult)result;
             Assert.IsTrue(objectResult.Value.ToString() == "User created, redirect depending on the role");
@@ -165,7 +175,7 @@ namespace inOfficeApplication.UnitTests.Controller
         public void Register_EmployeeAlreadyExists()
         {
             // Arrange
-            EmployeeDto employeeDto = new EmployeeDto() { Email = "test@it-labs.com" };
+            EmployeeDto employeeDto = new EmployeeDto() { Email = "test@it-labs.com", Password = "" };
             _employeeService.GetByEmail(employeeDto.Email).Returns(employeeDto);
 
             // Act

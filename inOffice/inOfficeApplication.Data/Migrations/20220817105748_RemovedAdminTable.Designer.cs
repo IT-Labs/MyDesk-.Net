@@ -241,17 +241,6 @@ namespace inOfficeApplication.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "user@inoffice.com",
-                            FirstName = "Nekoj Employee",
-                            IsDeleted = false,
-                            LastName = "Prezime Employee",
-                            Password = "$2a$11$Nhp5LeLiLWYm5xXKQW1RuOA7xVL90vxwmSLHLhIzRdP8FM9C20TH2"
-                        });
                 });
 
             modelBuilder.Entity("inOfficeApplication.Data.Models.Mode", b =>

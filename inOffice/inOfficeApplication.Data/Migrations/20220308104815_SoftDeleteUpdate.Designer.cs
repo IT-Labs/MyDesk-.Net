@@ -55,16 +55,6 @@ namespace inOfficeApplication.Data.Migrations
 
                     b.ToTable("Admins");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 2,
-                            Email = "admin@inoffice.com",
-                            FirstName = "Nekoj Admin",
-                            IsDeleted = false,
-                            LastName = "Prezime Admin",
-                            Password = "$2a$11$5UhL1eBw3qzxpO5bwrYx4e.DFhXdyl7/i1yaXOPD/IY9G1HZSqP1m"
-                        });
                 });
 
             modelBuilder.Entity("inOfficeApplication.Data.Models.ConferenceRoom", b =>
@@ -213,17 +203,6 @@ namespace inOfficeApplication.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "user@inoffice.com",
-                            FirstName = "Nekoj Employee",
-                            IsDeleted = false,
-                            LastName = "Prezime Employee",
-                            Password = "$2a$11$esLRp7lvteptwuQC6NRCw.lGa60QwjgzQN4D6majsWFcmNtFNagdG"
-                        });
                 });
 
             modelBuilder.Entity("inOfficeApplication.Data.Models.Mode", b =>

@@ -515,11 +515,6 @@ namespace inOfficeApplication.Data.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "Employees",
-                columns: new[] { "Id", "Email", "FirstName", "IsAdmin", "IsDeleted", "JobTitle", "LastName", "Password" },
-                values: new object[] { 1, "user@inoffice.com", "Nekoj Employee", null, false, null, "Prezime Employee", "$2a$11$Nhp5LeLiLWYm5xXKQW1RuOA7xVL90vxwmSLHLhIzRdP8FM9C20TH2" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ConferenceRoomModes_ConferenceRoomId",
                 table: "ConferenceRoomModes",

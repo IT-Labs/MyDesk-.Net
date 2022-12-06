@@ -158,6 +158,9 @@ namespace inOfficeApplication.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
+                    b.Property<bool?>("IsMSAccount")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -175,19 +178,6 @@ namespace inOfficeApplication.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Employee", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@it-labs.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            IsDeleted = false,
-                            JobTitle = "admin",
-                            LastName = "Employee",
-                            Password = "$2a$11$R642mS1rxrHHSFeebfi1RuwE5ya8GYObaEqZTnMKmrKhdtdQqr9oi"
-                        });
                 });
 
             modelBuilder.Entity("inOfficeApplication.Data.Entities.Office", b =>

@@ -9,5 +9,6 @@
         public string? FirstName { get; set; }
         public string? Surname { get; set; }
         public bool? IsAdmin { get; set; }
+        public bool? IsSSOAccount { get; set; }
     }
 }

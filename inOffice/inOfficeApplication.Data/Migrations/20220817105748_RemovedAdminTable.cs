@@ -41,11 +41,6 @@ namespace inOfficeApplication.Data.Migrations
                 {
                     table.PrimaryKey("PK_Admins", x => x.Id);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Admins",
-                columns: new[] { "Id", "Email", "FirstName", "IsDeleted", "LastName", "Password" },
-                values: new object[] { 2, "admin@inoffice.com", "Nekoj Admin", false, "Prezime Admin", "$2a$11$GbYZXsuaza80dC4zNp7T5u6OHgCslHgWPrj/0W8ANhxOvWNNFNTC2" });
         }
     }
 }
