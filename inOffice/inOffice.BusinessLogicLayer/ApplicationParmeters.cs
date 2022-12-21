@@ -16,29 +16,24 @@ namespace inOffice.BusinessLogicLayer
             _cache = cache;
         }
 
-        public string GetJwtIssuer()
+        public string GetAdminEmail()
         {
-            return GetConfigurationProperty("GetJwtIssuer cache key", "JwtIssuer");
+            return GetConfigurationProperty("GetAdminEmail cache key", "AdminEmail");
         }
 
-        public string GetJwtAudience()
+        public string GetAdminPassword()
         {
-            return GetConfigurationProperty("GetJwtAudience cache key", "JwtAudience");
+            return GetConfigurationProperty("GetAdminPassword cache key", "AdminPassword");
         }
 
-        public string GetMetadataAddress()
+        public string GetConnectionString()
         {
-            return GetConfigurationProperty("GetMetadataAddress cache key", "MetadataAddress");
+            return GetConfigurationProperty("GetConnectionString cache key", "ConnectionString");
         }
 
         public string GetSentimentEndpoint()
         {
             return GetConfigurationProperty("GetSentimentEndpoint cache key", "SentimentEndpoint");
-        }
-
-        public string GetCustomBearerTokenSigningKey()
-        {
-            return GetConfigurationProperty("GetCustomBearerTokenSigningKey cache key", "CustomBearerTokenSigningKey");
         }
 
         public string GetTenantClaimKey()
@@ -70,7 +65,43 @@ namespace inOffice.BusinessLogicLayer
 
                 _cache.Set(tenantsCacheKey, tenantsData, GetCacheOptions());
                 return tenantsData;
-            }  
+            }
+        }
+
+        public string GetCustomBearerTokenSigningKey(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:Local:CustomBearerTokenSigningKey" : "Authentication_Local_CustomBearerTokenSigningKey";
+            return GetConfigurationProperty("GetCustomBearerTokenSigningKey cache key", configurationKey);
+        }
+
+        public string GetAzureAdIssuer(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:AzureAd:Issuer" : "Authentication_AzureAd_Issuer";
+            return GetConfigurationProperty("GetAzureAdIssuer cache key", configurationKey);
+        }
+
+        public string GetAzureAdAudience(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:AzureAd:Audience" : "Authentication_AzureAd_Audience";
+            return GetConfigurationProperty("GetAzureAdAudience cache key", configurationKey);
+        }
+
+        public string GetAzureAdMetadataAddress(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:AzureAd:MetadataAddress" : "Authentication_AzureAd_MetadataAddress";
+            return GetConfigurationProperty("GetAzureAdMetadataAddress cache key", configurationKey);
+        }
+
+        public string GetGoogleIssuer(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:Google:Issuer" : "Authentication_Google_Issuer";
+            return GetConfigurationProperty("GetGoogleIssuer cache key", configurationKey);
+        }
+
+        public string GetGoogleClientId(bool isDevelopment)
+        {
+            var configurationKey = isDevelopment ? "Authentication:Google:ClientId" : "Authentication_Google_ClientId";
+            return GetConfigurationProperty("GetGoogleClientId cache key", configurationKey);
         }
 
         private string GetConfigurationProperty(string cacheKey, string configurationKey)

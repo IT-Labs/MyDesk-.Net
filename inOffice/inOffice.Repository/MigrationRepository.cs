@@ -9,13 +9,10 @@ namespace inOffice.Repository
 {
     public class MigrationRepository : IMigrationRepository
     {
-        private readonly IConfiguration _configuration;
         private readonly IApplicationParmeters _applicationParmeters;
 
-        public MigrationRepository(IConfiguration configuration, 
-            IApplicationParmeters applicationParmeters)
+        public MigrationRepository(IApplicationParmeters applicationParmeters)
         {
-            _configuration = configuration;
             _applicationParmeters = applicationParmeters;
         }
 
@@ -23,7 +20,7 @@ namespace inOffice.Repository
         {
             List<ApplicationDbContext> applicationDbContexts = new List<ApplicationDbContext>();
 
-            DbContextOptionsBuilder<ApplicationDbContext> defaultDbContextOptionsBuilder = GetDbOptions(dbType, _configuration["ConnectionString"]);
+            DbContextOptionsBuilder<ApplicationDbContext> defaultDbContextOptionsBuilder = GetDbOptions(dbType, _applicationParmeters.GetConnectionString());
             ApplicationDbContext defaultDbContext = new ApplicationDbContext(defaultDbContextOptionsBuilder.Options, null);
             if (defaultDbContext.Database.IsRelational())
             {

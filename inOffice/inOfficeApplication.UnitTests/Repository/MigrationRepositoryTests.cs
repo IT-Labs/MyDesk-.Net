@@ -1,4 +1,5 @@
-﻿using inOffice.Repository;
+﻿using inOffice.BusinessLogicLayer;
+using inOffice.Repository;
 using inOfficeApplication.Data;
 using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Interfaces.Repository;
@@ -10,22 +11,20 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
+using System.Configuration;
 
 namespace inOfficeApplication.UnitTests.Repository
 {
     public class MigrationRepositoryTests
     {
-        private IConfiguration _configuration;
         private IApplicationParmeters _applicationParmeters;
         private IMigrationRepository _migrationRepository;
 
         [SetUp]
         public void Setup()
         {
-            _configuration = Substitute.For<IConfiguration>();
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
-
-            _migrationRepository = new MigrationRepository(_configuration, _applicationParmeters);
+            _migrationRepository = new MigrationRepository(_applicationParmeters);
         }
 
         [Test]
@@ -35,7 +34,7 @@ namespace inOfficeApplication.UnitTests.Repository
             string defaultConnectionString = "default tenant";
             Dictionary<string, string> tenants = new Dictionary<string, string>() { { "tenant name", "other tenant" } };
 
-            _configuration["ConnectionString"].Returns(defaultConnectionString);
+            _applicationParmeters.GetConnectionString().Returns(defaultConnectionString);
             _applicationParmeters.GetTenants().Returns(tenants);
 
             // Act

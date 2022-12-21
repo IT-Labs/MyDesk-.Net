@@ -1,29 +1,29 @@
-﻿using FluentValidation.Results;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
+using FluentValidation.Results;
 using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.Requests;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
     public class ReservationController : ControllerBase
     {
         private readonly IReservationService _reservationService;
+        private readonly string[] identityClaims = new string[] { "preferred_username", "email" };
+
         public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
         }
 
         [HttpGet("employee/future-reservation/all")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllFutureReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -33,9 +33,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/past-reservations/all")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllPastReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -45,10 +42,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/future-reservation")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult EmployeeReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -57,10 +50,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/past-reservations")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReservationDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult PastReservations()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -69,12 +58,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("employee/reserve/coworker")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Conflict)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult CoworkerReservation([FromBody] ReservationRequest reservationRequest)
         {
             ReservationRequestValidation validationRules = new ReservationRequestValidation();
@@ -89,10 +72,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpDelete("employee/reserve/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult CancelReservation(int id)
         {
             _reservationService.CancelReservation(id);
@@ -104,7 +83,7 @@ namespace inOfficeApplication.Controllers
             string authHeader = Request.Headers[HeaderNames.Authorization];
             string jwt = authHeader.Substring(7);
             JwtPayload jwtSecurityTokenDecoded = new JwtSecurityToken(jwt).Payload;
-            return jwtSecurityTokenDecoded.Claims.First(x => x.Type == "preferred_username").Value;
+            return jwtSecurityTokenDecoded.Claims.First(x => identityClaims.Contains(x.Type)).Value;
         }
     }
 }

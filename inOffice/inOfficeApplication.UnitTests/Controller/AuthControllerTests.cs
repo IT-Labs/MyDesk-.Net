@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 namespace inOfficeApplication.UnitTests.Controller
 {
@@ -15,7 +16,6 @@ namespace inOfficeApplication.UnitTests.Controller
         private IEmployeeService _employeeService;
         private IAuthService _authService;
         private IApplicationParmeters _applicationParmeters;
-        private IConfiguration _configuration;
 
         private const string tenantName = "test tenant";
 
@@ -25,9 +25,8 @@ namespace inOfficeApplication.UnitTests.Controller
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
             _applicationParmeters = Substitute.For<IApplicationParmeters>();
-            _configuration = Substitute.For<IConfiguration>();
 
-            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters, _configuration);
+            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters);
             _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(tenantName: tenantName) };
         }
 

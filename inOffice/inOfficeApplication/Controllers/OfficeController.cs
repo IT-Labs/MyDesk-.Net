@@ -1,14 +1,17 @@
-﻿using FluentValidation.Results;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using FluentValidation.Results;
 using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
+
     public class OfficeController : ControllerBase
     {
         private readonly IOfficeService _officeService;
@@ -18,9 +21,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/offices")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllOfficesForEmployee()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -30,9 +30,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("admin/offices")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<OfficeDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult GetAllOffices()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -42,10 +40,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office/image/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ImageUrlForEmployee(int id)
         {
             OfficeDto office = _officeService.GetDetailsForOffice(id);
@@ -53,10 +47,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("admin/office/image/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult ImageUrl(int id)
         {
             OfficeDto officeDto = _officeService.GetDetailsForOffice(id);
@@ -64,11 +55,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("admin/office")]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Conflict)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult AddNewOffice([FromBody] OfficeDto officeDto)
         {
             OfficeDtoValidation validationRules = new OfficeDtoValidation();
@@ -84,11 +71,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPut("admin/office/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Edit(int id, [FromBody] OfficeDto officeDto)
         {
             OfficeDtoValidation validationRules = new OfficeDtoValidation();
@@ -105,10 +88,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpDelete("admin/office/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Delete(int id)
         {
             _officeService.DeleteOffice(id);

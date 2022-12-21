@@ -6,7 +6,6 @@ using inOfficeApplication.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -18,42 +17,29 @@ namespace inOfficeApplication.Controllers
         private readonly Func<IEmployeeService> _employeeService;
         private readonly IAuthService _authService;
         private readonly IApplicationParmeters _applicationParmeters;
-        private readonly IConfiguration _configuration;
 
         public AuthController(Func<IEmployeeService> employeeRepository, 
             IAuthService authService, 
-            IApplicationParmeters applicationParmeters,
-            IConfiguration configuration)
+            IApplicationParmeters applicationParmeters)
         {
             _employeeService = employeeRepository;
             _authService = authService;
             _applicationParmeters = applicationParmeters;
-            _configuration = configuration;
         }
 
         [HttpPost("authentication")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Authentication([FromBody] EmployeeDto employeeDto)
         {
             return CreateEmployee(employeeDto, true);
         }
 
         [HttpPost("register")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Register([FromBody] EmployeeDto employeeDto)
         {
             return CreateEmployee(employeeDto, false);
         }
 
         [HttpPost("token")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetToken([FromBody] EmployeeDto employeeDto)
         {
             if (string.IsNullOrEmpty(employeeDto.Email) || string.IsNullOrEmpty(employeeDto.Password))
@@ -111,7 +97,7 @@ namespace inOfficeApplication.Controllers
             // SSO
             if (string.IsNullOrEmpty(employeeDto.Password) && isSSOAccount)
             {
-                password = BCrypt.Net.BCrypt.HashPassword(_configuration["AdminPassword"] ?? "");
+                password = BCrypt.Net.BCrypt.HashPassword(_applicationParmeters.GetAdminPassword());
 
                 // Check if user is marked as admin
                 string authHeader = Request.Headers[HeaderNames.Authorization];

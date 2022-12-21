@@ -1,14 +1,17 @@
-﻿using FluentValidation.Results;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using FluentValidation.Results;
 using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
+
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
@@ -18,10 +21,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/review/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ReviewDto))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ShowReview(int id)
         {
             ReviewDto review = _reviewService.ShowReview(id);
@@ -29,9 +28,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("entity/reviews/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ReviewDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult AllEntitiesForDesk(int id)
         {
             List<ReviewDto> reviews = _reviewService.GetReviewsForDesk(id);
@@ -39,9 +35,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/reviews/all")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PaginationDto<ReviewDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ReviewsAll()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -51,10 +44,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("employee/review")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult CreateReview([FromBody] ReviewDto reviewDto)
         {
             ReviewDtoValidation validationRules = new ReviewDtoValidation();

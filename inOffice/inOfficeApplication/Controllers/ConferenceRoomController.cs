@@ -1,12 +1,14 @@
-﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Utils;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
     public class ConferenceRoomController : ControllerBase
     {
         private readonly IConferenceRoomService _conferenceRoomService;
@@ -16,9 +18,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office-conferencerooms/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ConferenceRoomDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllConferenceRoomsForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -28,9 +27,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("admin/office-conferencerooms/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<ConferenceRoomDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult GetAllConferenceRooms(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -40,10 +37,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpDelete("admin/office-conferencerooms/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Delete(int id)
         {
             _conferenceRoomService.Delete(id);

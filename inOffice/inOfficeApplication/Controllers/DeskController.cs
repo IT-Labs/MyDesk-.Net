@@ -1,15 +1,17 @@
-﻿using FluentValidation.Results;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using FluentValidation.Results;
 using inOfficeApplication.Data.Interfaces.BusinessLogic;
 using inOfficeApplication.Data.DTO;
 using inOfficeApplication.Data.Requests;
 using inOfficeApplication.Data.Utils;
 using inOfficeApplication.Validations;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
     public class DeskController : ControllerBase
     {
         private readonly IDeskService _deskService;
@@ -19,9 +21,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/office-desks/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<DeskDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetAllDesksForEmployee(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -31,9 +30,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("admin/office-desks/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<DeskDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult GetAllDesks(int id)
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -43,11 +40,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPost("admin/office-desks/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Create(int id, [FromBody] EntitiesRequest entitiesRequest)
         {
             EntitiesRequestValidation validationRules = new EntitiesRequestValidation();
@@ -62,10 +55,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpPut("admin/office-desks")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Update([FromBody] List<DeskDto> desks)
         {
             DeskDtosValidation validationRules = new DeskDtosValidation();
@@ -80,11 +70,7 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpDelete("admin/office-desks/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Delete(int id)
         {
             _deskService.Delete(id);

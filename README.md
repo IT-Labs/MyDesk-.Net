@@ -23,18 +23,24 @@ This is .NET web API project that uses Entity Framework 6 to communicate with Az
 * Open the solution in Visual Studio 2022
 * In **appsettings.json** file add following properties:
   - **ConnectionString:** Connection string for your database
-  - **JwtIssuer:** String that defines valid issuer of the token. If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
-  - **JwtAudience:** String that defines valid audience of the token. If application is deployed on Azure, it should be GUID from **Application (client) ID** from Azure
-  - **MetadataAddress (optional):** If application is deployed on Azure, it should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
+  - **AdminEmail:** Email address for the initial admin account created during application startup
+  - **AdminPassword:** Password for the initial admin account created during application startup
   - **SentimentEndpoint (optional):** URL of the external API that will determine sentiment of the reservation's review
-  - **CustomBearerTokenSigningKey:** Random string that will be used for signing and validating of self-issued JWT tokens
   - **TenantClaimKey:** Name of custom property in JWT token that will contain name of user's tenant
   - **Tenants:** Serialized dictionary that contains list of all added tenants in format (**key:** tenant name, **value:** connection string to tenant's database)
+  - **Authentication:Local:CustomBearerTokenSigningKey:** Random string that will be used for signing and validating of self-issued JWT tokens
+  - **Authentication:AzureAd:Issuer:** String that defines valid issuer of the Azure AD token. It should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0
+  - **Authentication:AzureAd:Audience:** String that defines valid audience of the Azure AD token. It should be GUID from **Application (client) ID** from Azure
+  - **Authentication:AzureAd:MetadataAddress:** It should be in format https://login.microsoftonline.com/{your_Azure_tenant_ID}/v2.0/.well-known/openid-configuration
+  - **Authentication:Google:Issuer:** String that defines valid issuer of the Google token. It should have the following value: https://accounts.google.com
+  - **Authentication:Google:ClientId:** Client Id from the google application
+
 * Run application locally
 
 ## Setting up the application on Azure
 
 In order to setup API on Azure, App Service should be created on Azure portal. When creating the App Service, if **Code** publish type is selected, then connection to Git should be defined and pipelines should be used to enable CI/CD. On the other hand, if **Docker Container** publish type is selected, **inoffice/api** image from **Docker Hub** can be used. In either case, after creating App Service, application parameters described [above](#steps-for-running-the-application-locally) should be added to **Application settings** on **Configuration** menu option.
+Note that all nested JSON settings will be modified during deployment to Azure (i.e. Authentication:AzureAd:Issuer will be replaced witj Authentication_AzureAd_Issuer) since Linux app service does not support ':' character in the app setting name (https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#app-settings)
 
 ## Setting up multitenancy
 

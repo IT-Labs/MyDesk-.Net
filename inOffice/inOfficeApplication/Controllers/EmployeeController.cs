@@ -1,12 +1,14 @@
-﻿using inOfficeApplication.Data.Interfaces.BusinessLogic;
-using inOfficeApplication.Data.DTO;
-using inOfficeApplication.Data.Utils;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+
+using inOfficeApplication.Data.DTO;
+using inOfficeApplication.Data.Interfaces.BusinessLogic;
+using inOfficeApplication.Data.Utils;
 
 namespace inOfficeApplication.Controllers
 {
     [ApiController]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
@@ -16,9 +18,6 @@ namespace inOfficeApplication.Controllers
         }
 
         [HttpGet("employee/all")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<EmployeeDto>))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult AllEmployees()
         {
             Utilities.GetPaginationParameters(Request, out int? take, out int? skip);
@@ -26,12 +25,8 @@ namespace inOfficeApplication.Controllers
 
             return Ok(result);
         }
-
         [HttpPut("admin/employee/{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult SetAsAdmin(int id)
         {
             _employeeService.SetEmployeeAsAdmin(id);
