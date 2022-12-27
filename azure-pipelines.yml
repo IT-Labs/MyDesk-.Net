@@ -23,27 +23,27 @@ stages:
       displayName: 'Restore project dependencies'
       inputs:
         command: 'restore'
-        projects: './inOffice/inOfficeApplication/inOfficeApplication.csproj'
+        projects: './MyDesk/MyDesk.Application/MyDesk.Application.csproj'
 
     - task: DotNetCoreCLI@2
       displayName: 'Build the project - $(buildConfiguration)'
       inputs:
         command: 'build'
         arguments: '--no-restore --configuration $(buildConfiguration)'
-        projects: './inOffice/inOfficeApplication/inOfficeApplication.csproj'
+        projects: './MyDesk/MyDesk.Application/MyDesk.Application.csproj'
 
     - task: DotNetCoreCLI@2
       displayName: 'Run tests'
       inputs:
         command: 'test'
-        projects: './inOffice/inOfficeApplication.UnitTests/inOfficeApplication.UnitTests.csproj'
+        projects: './MyDesk/MyDesk.UnitTests/MyDesk.UnitTests.csproj'
     
     - task: DotNetCoreCLI@2
       displayName: 'Publish the project - $(buildConfiguration)'
       condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
       inputs:
         command: 'publish'
-        projects: './inOffice/inOfficeApplication/inOfficeApplication.csproj'
+        projects: './MyDesk/MyDesk.Application/MyDesk.Application.csproj'
         publishWebProjects: false
         arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
         zipAfterPublish: true
