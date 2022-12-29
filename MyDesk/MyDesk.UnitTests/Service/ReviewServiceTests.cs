@@ -8,6 +8,7 @@ using MyDesk.Data.Exceptions;
 using NSubstitute;
 using NUnit.Framework;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace MyDesk.UnitTests.Service
 {
@@ -16,22 +17,29 @@ namespace MyDesk.UnitTests.Service
         private IReviewService _reviewService;
         private IReviewRepository _reviewRepository;
         private IReservationRepository _reservationRepository;
-        private IApplicationParmeters _applicationParmeters;
         private IMapper _mapper;
         private IHttpClientFactory _clientFactory;
+        private IConfiguration _config;
 
         [OneTimeSetUp]
         public void Setup()
         {
+            var inMemorySettings = new Dictionary<string, string> {
+                  {"SentimentEndpoint", "http://test.com"}
+            };
+
+            _config = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
             _reviewRepository = Substitute.For<IReviewRepository>();
             _reservationRepository = Substitute.For<IReservationRepository>();
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _mapper = Substitute.For<IMapper>();
             _clientFactory = Substitute.For<IHttpClientFactory>();
 
             _clientFactory.CreateClient().Returns(new ReviewMockedHttpClient());
 
-            _reviewService = new ReviewService(_reviewRepository, _reservationRepository, _applicationParmeters, _mapper, _clientFactory);
+            _reviewService = new ReviewService(_reviewRepository, _reservationRepository, _config, _mapper, _clientFactory);
         }
 
         [Test]
@@ -39,15 +47,14 @@ namespace MyDesk.UnitTests.Service
         public void CreateReview_Success()
         {
             // Arrange
-            ReviewDto reviewDto = new ReviewDto()
+            ReviewDto reviewDto = new()
             {
                 Reviews = "Bad review",
                 Reservation = new ReservationDto() { Id = 1 }
             };
 
-            Reservation reservation = new Reservation() { Id = 1 };
+            Reservation reservation = new() { Id = 1 };
 
-            _applicationParmeters.GetSentimentEndpoint().Returns("http://test.com");
             _reservationRepository.Get(reviewDto.Reservation.Id).Returns(reservation);
 
             // Act

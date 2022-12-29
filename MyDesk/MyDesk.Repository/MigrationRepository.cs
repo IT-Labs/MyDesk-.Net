@@ -4,34 +4,48 @@ using MyDesk.Data.Interfaces.Repository;
 using MyDesk.Data.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace MyDesk.Repository
 {
     public class MigrationRepository : IMigrationRepository
     {
-        private readonly IApplicationParmeters _applicationParmeters;
+        private readonly IConfiguration _config;
 
-        public MigrationRepository(IApplicationParmeters applicationParmeters)
+        public MigrationRepository(IConfiguration config)
         {
-            _applicationParmeters = applicationParmeters;
+            _config = config;
         }
 
         public List<ApplicationDbContext> ExecuteMigrations(DbType dbType)
         {
-            List<ApplicationDbContext> applicationDbContexts = new List<ApplicationDbContext>();
+            List<ApplicationDbContext> applicationDbContexts = new ();
 
-            DbContextOptionsBuilder<ApplicationDbContext> defaultDbContextOptionsBuilder = GetDbOptions(dbType, _applicationParmeters.GetConnectionString());
-            ApplicationDbContext defaultDbContext = new ApplicationDbContext(defaultDbContextOptionsBuilder.Options, null);
+            DbContextOptionsBuilder<ApplicationDbContext> defaultDbContextOptionsBuilder = GetDbOptions(dbType, _config["ConnectionString"]);
+            ApplicationDbContext defaultDbContext = new (defaultDbContextOptionsBuilder.Options, null);
             if (defaultDbContext.Database.IsRelational())
             {
                 defaultDbContext.Database.Migrate();
             }
             applicationDbContexts.Add(defaultDbContext);
 
-            foreach (KeyValuePair<string, string> tenantData in _applicationParmeters.GetTenants())
+            // Migrate each Tenant Db
+            Dictionary<string, string> tenantsData;
+            string tenants = _config["Tenants"];
+
+            if (!string.IsNullOrEmpty(tenants))
+            {
+                tenantsData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tenants);
+            }
+            else
+            {
+                tenantsData = new Dictionary<string, string>();
+            }
+
+            foreach (KeyValuePair<string, string> tenantData in tenantsData)
             {
                 DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = GetDbOptions(dbType, tenantData.Value);
-                ApplicationDbContext dbContext = new ApplicationDbContext(dbContextOptionsBuilder.Options, null);
+                ApplicationDbContext dbContext = new (dbContextOptionsBuilder.Options, null);
                 if (dbContext.Database.IsRelational())
                 {
                     dbContext.Database.Migrate();

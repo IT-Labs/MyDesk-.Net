@@ -14,14 +14,19 @@ namespace MyDesk.Data
 
         private static DbContextOptions<ApplicationDbContext> GetOptions(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
         {
-            string tenant = httpContextAccessor?.HttpContext?.Items["tenant"]?.ToString();
-            if (!string.IsNullOrEmpty(tenant))
-            {
-                DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-                dbContextOptionsBuilder.UseSqlServer(tenant);
 
-                return dbContextOptionsBuilder.Options;
-            }
+            // TODO: This code should be reviwed, as we cannot pass connection string on HEADER.
+            // There should be a mapping between Tenant name and Connection String
+            // The Authorization Middleware that was previosly used was addressing this issue, but it was removed.
+
+            //string tenant = httpContextAccessor?.HttpContext?.Items["tenant"]?.ToString();
+            //if (!string.IsNullOrEmpty(tenant))
+            //{
+            //    DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            //    dbContextOptionsBuilder.UseSqlServer(tenant);
+
+            //    return dbContextOptionsBuilder.Options;
+            //}
 
             return options;
         }

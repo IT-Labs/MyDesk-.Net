@@ -7,6 +7,7 @@ using MyDesk.Data.Exceptions;
 using Newtonsoft.Json;
 using System.Text;
 using MyDesk.Data.Responses;
+using Microsoft.Extensions.Configuration;
 
 namespace MyDesk.BusinessLogicLayer
 {
@@ -14,19 +15,19 @@ namespace MyDesk.BusinessLogicLayer
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IReservationRepository _reservationRepository;
-        private readonly IApplicationParmeters _applicationParmeters;
+        private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
 
         public ReviewService(IReviewRepository reviewRepository,
             IReservationRepository reservationRepository,
-            IApplicationParmeters applicationParmeters,
+            IConfiguration config,
             IMapper mapper,
             IHttpClientFactory clientFactory)
         {
             _reviewRepository = reviewRepository;
             _reservationRepository = reservationRepository;
-            _applicationParmeters = applicationParmeters;
+            _config = config;
             _mapper = mapper;
             _httpClient = clientFactory.CreateClient();
         }
@@ -66,17 +67,17 @@ namespace MyDesk.BusinessLogicLayer
 
         public void CreateReview(ReviewDto reviewDto)
         {
-            Reservation reservation = _reservationRepository.Get(reviewDto.Reservation.Id);
+            Reservation reservation = _reservationRepository.Get(reviewDto?.Reservation?.Id??0);
             if (reservation == null)
             {
-                throw new NotFoundException($"Reservation with ID: {reviewDto.Reservation.Id} not found");
+                throw new NotFoundException($"Reservation with ID: {reviewDto?.Reservation?.Id ?? 0} not found");
             }
 
             Review review = new Review()
             {
-                Reviews = reviewDto.Reviews,
-                ReservationId = reviewDto.Reservation.Id,
-                ReviewOutput = GetAnalysedReview(reviewDto.Reviews)
+                Reviews = reviewDto?.Reviews,
+                ReservationId = reviewDto?.Reservation?.Id??0,
+                ReviewOutput = GetAnalysedReview(reviewDto?.Reviews??string.Empty)
             };
 
             _reviewRepository.Insert(review);
@@ -85,14 +86,14 @@ namespace MyDesk.BusinessLogicLayer
         private string GetAnalysedReview(string textReview)
         {
             string review = string.Empty;
-            string sentimentEndpoint = _applicationParmeters.GetSentimentEndpoint();
+            string sentimentEndpoint = _config["SentimentEndpoint"];
 
             if (!string.IsNullOrEmpty(sentimentEndpoint))
             {
-                Dictionary<string, string> dictionaryData = new Dictionary<string, string>() { { "text", textReview } };
+                Dictionary<string, string> dictionaryData = new () { { "text", textReview } };
                 string data = JsonConvert.SerializeObject(dictionaryData);
 
-                HttpRequestMessage request = new HttpRequestMessage()
+                HttpRequestMessage request = new ()
                 {
                     Method = HttpMethod.Post,
                     RequestUri = new Uri(sentimentEndpoint),
@@ -103,9 +104,9 @@ namespace MyDesk.BusinessLogicLayer
                 if (response.IsSuccessStatusCode)
                 {
                     string stringResponse = response.Content.ReadAsStringAsync().Result;
-                    ReviewAzureFunction result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
+                    ReviewAzureFunction? result = JsonConvert.DeserializeObject<ReviewAzureFunction>(stringResponse);
 
-                    review = result.Sentiment;
+                    review = result?.Sentiment??string.Empty;
                 }
             }
 

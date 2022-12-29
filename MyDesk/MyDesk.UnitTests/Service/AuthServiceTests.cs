@@ -15,7 +15,6 @@ namespace MyDesk.UnitTests.Service
     public class AuthServiceTests
     {
         private IAuthService _authService;
-        private IApplicationParmeters _applicationParmeters;
         private IWebHostEnvironment _webHostEnvironment;
 
         private string signingKey;
@@ -27,21 +26,16 @@ namespace MyDesk.UnitTests.Service
         {
             var config = new ConfigurationBuilder()
                .AddJsonFile("appsettings.json", true)
-                .AddEnvironmentVariables()
-                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
-                .Build();
+               .Build();
 
-
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
             _webHostEnvironment = Substitute.For<IWebHostEnvironment>();
 
             adminEmail = config.GetValue<string>("AdminEmail");
             adminPassword = config.GetValue<string>("AdminPassword");
             signingKey = config.GetValue<string>("Authentication:Local:CustomBearerTokenSigningKey");
 
-            _applicationParmeters.GetCustomBearerTokenSigningKey(false).Returns(signingKey);
 
-            _authService = new AuthService(_applicationParmeters, _webHostEnvironment);
+            _authService = new AuthService(config);
 
         }
 

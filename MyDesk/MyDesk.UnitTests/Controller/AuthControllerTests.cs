@@ -15,18 +15,22 @@ namespace MyDesk.UnitTests.Controller
         private AuthController _authController;
         private IEmployeeService _employeeService;
         private IAuthService _authService;
-        private IApplicationParmeters _applicationParmeters;
+        private IConfiguration _config;
 
-        private const string tenantName = "test tenant";
+        private const string tenantName = "";
 
         [OneTimeSetUp]
         public void Setup()
         {
             _employeeService = Substitute.For<IEmployeeService>();
             _authService = Substitute.For<IAuthService>();
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
 
-            _authController = new AuthController(() => _employeeService, _authService, _applicationParmeters);
+            // Read configurations
+            _config = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json",true)
+               .Build();
+
+            _authController = new AuthController(() => _employeeService, _authService, _config);
             _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(tenantName: tenantName) };
         }
 
@@ -40,12 +44,14 @@ namespace MyDesk.UnitTests.Controller
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
             string encodedPassword = Convert.ToBase64String(plainTextBytes);
 
-            Dictionary<string, string> tenants = new Dictionary<string, string>() { { tenantName, "tenant connection string" } };
-            EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
+            EmployeeDto employeeDto = new ()
+            {
+                Email = "test",
+                Password = encodedPassword 
+            };
 
             _employeeService.GetByEmailAndPassword(employeeDto.Email, password).Returns(employeeDto);
             _authService.GetToken(employeeDto, tenantName).Returns(token);
-            _applicationParmeters.GetTenants().Returns(tenants);
 
             // Act
             IActionResult result = _authController.GetToken(employeeDto);
@@ -54,7 +60,6 @@ namespace MyDesk.UnitTests.Controller
             Assert.IsTrue(result is OkObjectResult);
             OkObjectResult objectResult = (OkObjectResult)result;
             Assert.IsTrue(objectResult.Value.ToString() == token);
-            Assert.IsTrue(_authController.HttpContext.Items["tenant"] == tenants.First().Value);
         }
 
         [TestCase("", "pass")]
@@ -70,27 +75,6 @@ namespace MyDesk.UnitTests.Controller
 
             // Assert
             Assert.IsTrue(result is BadRequestResult);
-        }
-
-        [Test]
-        [Order(3)]
-        public void GetToken_Tenant_BadRequest()
-        {
-            // Arrange
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes("test password");
-            string encodedPassword = Convert.ToBase64String(plainTextBytes);
-
-            Dictionary<string, string> tenants = new Dictionary<string, string>() { { "new tenant", "tenant connection string" } };
-            EmployeeDto employeeDto = new EmployeeDto() { Email = "test", Password = encodedPassword };
-            _applicationParmeters.GetTenants().Returns(tenants);
-
-            // Act
-            IActionResult result = _authController.GetToken(employeeDto);
-
-            // Assert
-            Assert.IsTrue(result is BadRequestObjectResult);
-            BadRequestObjectResult objectResult = (BadRequestObjectResult)result;
-            Assert.IsTrue(objectResult.Value.ToString() == $"Tenant {tenantName} does not exist.");
         }
 
         [TestCase(true, true)]

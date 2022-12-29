@@ -14,14 +14,12 @@ using MyDesk.Data;
 using MyDesk.Application.Middleware;
 using MyDesk.Data.Interfaces.BusinessLogic;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Caching.Memory;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-IApplicationParmeters applicationParmeters = new ApplicationParmeters(builder.Configuration, new MemoryCache(new MemoryCacheOptions()));
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(applicationParmeters.GetConnectionString(), b => b.MigrationsAssembly("MyDesk.Data")), contextLifetime: ServiceLifetime.Transient);
+                options.UseSqlServer(builder.Configuration.GetValue<string>("ConnectionString"), b => b.MigrationsAssembly("MyDesk.Data")), contextLifetime: ServiceLifetime.Transient);
 
 builder.Services.AddCors();
 
@@ -46,8 +44,6 @@ builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
 builder.Services.AddTransient<IDeskService, DeskService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<Func<IEmployeeService>>(provider => () => provider.GetService<IEmployeeService>());
-
-builder.Services.AddTransient<IApplicationParmeters, ApplicationParmeters>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -97,7 +93,7 @@ builder.Services
         x.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(applicationParmeters.GetCustomBearerTokenSigningKey(builder.Environment.IsDevelopment()))),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Authentication:Local:CustomBearerTokenSigningKey"))),
             ValidateIssuer = false,
             ValidateAudience = false
         };
@@ -105,25 +101,25 @@ builder.Services
     .AddJwtBearer("AzureAd", x =>
     {
         x.RequireHttpsMetadata = true;
-        x.MetadataAddress = applicationParmeters.GetAzureAdMetadataAddress(builder.Environment.IsDevelopment());
+        x.MetadataAddress = builder.Configuration.GetValue<string>("Authentication:AzureAd:MetadataAddress");
         x.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             ValidateAudience = true,
-            ValidAudience = applicationParmeters.GetAzureAdAudience(builder.Environment.IsDevelopment()),
+            ValidAudience = builder.Configuration.GetValue<string>("Authentication:AzureAd:Audience"),
             ValidateIssuer = true,
-            ValidIssuer = applicationParmeters.GetAzureAdIssuer(builder.Environment.IsDevelopment()),
+            ValidIssuer = builder.Configuration.GetValue<string>("Authentication:AzureAd:Issuer"),
         };
     })
     .AddJwtBearer("Google", options =>
     {
-        options.Authority = applicationParmeters.GetGoogleIssuer(builder.Environment.IsDevelopment());
+        options.Authority = builder.Configuration.GetValue<string>("Authentication:Google:Issuer");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = applicationParmeters.GetGoogleIssuer(builder.Environment.IsDevelopment()),
+            ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Google:Issuer"),
             ValidateAudience = true,
-            ValidAudience = applicationParmeters.GetGoogleClientId(builder.Environment.IsDevelopment()),
+            ValidAudience =  builder.Configuration.GetValue<string>("Authentication:Google:ClientId"),
             ValidateLifetime = false
         };
     });
@@ -138,15 +134,14 @@ builder.Services.AddAuthorization(options =>
 
 WebApplication app = builder.Build();
 
-applicationParmeters = app.Services.GetRequiredService<IApplicationParmeters>();
-
 using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 {
-    IMigrationRepository migrationRepository = serviceScope.ServiceProvider.GetService<IMigrationRepository>();
-    migrationRepository.ExecuteMigrations(DbType.SQL);
+    var migrationRepository = serviceScope.ServiceProvider.GetService<IMigrationRepository>();
+    if (migrationRepository!=null)
+        migrationRepository.ExecuteMigrations(DbType.SQL);
 
     var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    DbInitializer.Initialize(context, applicationParmeters.GetAdminEmail(), applicationParmeters.GetAdminPassword());
+    DbInitializer.Initialize(context, builder.Configuration.GetValue<string>("AdminEmail"), builder.Configuration.GetValue<string>("AdminPassword"));
 }
 
 app.UseSwagger();

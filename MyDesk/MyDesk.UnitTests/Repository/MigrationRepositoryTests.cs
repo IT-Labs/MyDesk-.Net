@@ -17,26 +17,27 @@ namespace MyDesk.UnitTests.Repository
 {
     public class MigrationRepositoryTests
     {
-        private IApplicationParmeters _applicationParmeters;
+        private IConfiguration _config;
         private IMigrationRepository _migrationRepository;
 
         [SetUp]
         public void Setup()
         {
-            _applicationParmeters = Substitute.For<IApplicationParmeters>();
-            _migrationRepository = new MigrationRepository(_applicationParmeters);
+            var inMemorySettings = new Dictionary<string, string> {
+                  {"ConnectionString", "default tenant"},
+                  {"Tenants:tenant name", "other tenant" }
+            };
+
+            _config = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            _migrationRepository = new MigrationRepository(_config);
         }
 
         [Test]
         public void ExecuteMigrations_Success()
         {
-            // Arrange
-            string defaultConnectionString = "default tenant";
-            Dictionary<string, string> tenants = new Dictionary<string, string>() { { "tenant name", "other tenant" } };
-
-            _applicationParmeters.GetConnectionString().Returns(defaultConnectionString);
-            _applicationParmeters.GetTenants().Returns(tenants);
-
             // Act
             List<ApplicationDbContext> applicationDbContexts = _migrationRepository.ExecuteMigrations(DbType.InMemory);
 
@@ -45,7 +46,7 @@ namespace MyDesk.UnitTests.Repository
             {
                 applicationDbContext.Database.EnsureCreated();
                 applicationDbContext.Database.CanConnect();
-                Assert.IsTrue(applicationDbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory");
+                Assert.That(applicationDbContext.Database.ProviderName, Is.EqualTo("Microsoft.EntityFrameworkCore.InMemory"));
             }
         }
     }

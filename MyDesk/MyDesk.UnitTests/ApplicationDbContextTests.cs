@@ -31,13 +31,11 @@ namespace MyDesk.UnitTests
         {
             // Arrange
             string defaultConnectionString = "connection string";
-            string tenantConnectionString = "tenant connection string";
 
             DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             dbContextOptionsBuilder.UseSqlServer(defaultConnectionString);
 
-            DefaultHttpContext httpContext = new DefaultHttpContext();
-            httpContext.Items["tenant"] = tenantConnectionString;
+            DefaultHttpContext httpContext = new ();
 
             IHttpContextAccessor httpContextAccessor = Substitute.For<IHttpContextAccessor>();
             httpContextAccessor.HttpContext.Returns(httpContext);
@@ -46,7 +44,7 @@ namespace MyDesk.UnitTests
             ApplicationDbContext applicationDbContext = new ApplicationDbContext(dbContextOptionsBuilder.Options, httpContextAccessor);
 
             // Assert
-            Assert.IsTrue(applicationDbContext.Database.GetConnectionString() == tenantConnectionString);
+            Assert.That(applicationDbContext.Database.GetConnectionString(), Is.EqualTo(defaultConnectionString));
         }
     }
 }
