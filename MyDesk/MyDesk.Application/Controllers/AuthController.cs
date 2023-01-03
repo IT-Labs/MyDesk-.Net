@@ -51,6 +51,11 @@ namespace MyDesk.Application.Controllers
             string decodedPassword = Encoding.UTF8.GetString(data);
 
             EmployeeDto employee = _employeeService().GetByEmailAndPassword(employeeDto.Email, decodedPassword);
+            if (employee.IsSSOAccount == true)
+            {
+                return BadRequest($"Employee with email address {employeeDto.Email} does not exist.");
+            }
+            
             string token = _authService.GetToken(employee,String.Empty);
             
             return Ok(token);
