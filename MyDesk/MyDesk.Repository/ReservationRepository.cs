@@ -80,7 +80,7 @@ namespace MyDesk.Repository
             int? skip = null)
         {
             int? totalCount = null;
-            IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false && x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date);
+            IQueryable<Reservation> query = _context.Reservations.Where(x => x.IsDeleted == false && x.StartDate >= DateTime.Now.Date);
 
             if (employeeId.HasValue)
             {
