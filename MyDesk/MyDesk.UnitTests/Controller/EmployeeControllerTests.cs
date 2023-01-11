@@ -41,17 +41,24 @@ namespace MyDesk.UnitTests.Controller
 
         [Test]
         [Order(2)]
-        public void SetAsAdmin_Success()
+        public void Update_Success()
         {
             // Arrange
-            int id = 7;
+            int id = 1;
+            var employeeDto = new EmployeeDto
+            {
+                Email = "test@it-labs.com",
+                Id = id,
+                Password = "test",
+                FirstName = "test",
+                Surname = "test"
+            };
 
             // Act
-            IActionResult result = _employeeController.SetAsAdmin(id);
+            IActionResult result = _employeeController.UpdateEmployee(id, employeeDto);
 
             // Assert
             Assert.IsTrue(result is OkResult);
-            _employeeService.Received(1).SetEmployeeAsAdmin(id);
         }
     }
 }

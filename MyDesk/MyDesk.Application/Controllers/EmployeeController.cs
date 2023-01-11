@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using MyDesk.Application.Validations;
 using MyDesk.Data.DTO;
 using MyDesk.Data.Interfaces.BusinessLogic;
 using MyDesk.Data.Utils;
+using FluentValidation.Results;
 
 namespace MyDesk.Application.Controllers
 {
@@ -27,9 +28,18 @@ namespace MyDesk.Application.Controllers
         }
         [HttpPut("admin/employee/{id}")]
         [Authorize(Roles = "ADMIN")]
-        public IActionResult SetAsAdmin(int id)
+        public IActionResult UpdateEmployee(int id, EmployeeDto EmployeeDto)
         {
-            _employeeService.SetEmployeeAsAdmin(id);
+            var validationRules = new EmployeeDtoValidation();
+            ValidationResult validationResult = validationRules.Validate(EmployeeDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
+            EmployeeDto.Id = id;
+            _employeeService.UpdateEmployee(EmployeeDto);
+
             return Ok();
         }
     }

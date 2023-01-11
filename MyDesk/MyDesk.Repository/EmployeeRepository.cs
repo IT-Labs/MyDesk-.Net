@@ -13,12 +13,12 @@ namespace MyDesk.Repository
             _context = context;
         }
 
-        public Employee Get(int id)
+        public Employee? Get(int id)
         {
             return _context.Employees.FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
         }
 
-        public Employee GetByEmail(string email)
+        public Employee? GetByEmail(string email)
         {
             return _context.Employees.FirstOrDefault(a => a.Email == email && a.IsDeleted == false);
         }
