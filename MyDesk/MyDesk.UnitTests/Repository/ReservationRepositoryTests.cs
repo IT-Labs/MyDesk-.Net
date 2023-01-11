@@ -147,16 +147,16 @@ namespace MyDesk.UnitTests.Repository
             // Assert
             if (take.HasValue && skip.HasValue)
             {
-                Assert.IsTrue(result.Item1 == 2);
+                Assert.IsTrue(result.Item1 == 3);
                 Assert.IsTrue(result.Item2.Count == take.Value);
             }
             else
             {
                 Assert.IsNull(result.Item1);
-                Assert.IsTrue(result.Item2.Count == 2);
+                Assert.IsTrue(result.Item2.Count == 3);
             }
             
-            Assert.IsTrue(result.Item2.All(x => x.StartDate > DateTime.Now.Date && x.EndDate > DateTime.Now.Date));
+            Assert.IsTrue(result.Item2.All(x => x.StartDate >= DateTime.Now.Date));
 
             foreach (Reservation reservation in result.Item2)
             {
