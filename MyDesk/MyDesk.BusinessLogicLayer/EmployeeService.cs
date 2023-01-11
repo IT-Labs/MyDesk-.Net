@@ -94,12 +94,18 @@ namespace MyDesk.BusinessLogicLayer
                 throw new ConflictException("There is already and employee with same email.");
             }
 
-            employee.JobTitle = employeeDto.JobTitle;
-            employee.Email = employeeDto.Email;
-            employee.FirstName = employeeDto.FirstName;
-            employee.LastName = employeeDto.Surname;
-            employee.IsAdmin = employeeDto.IsAdmin;
-            employee.IsSSOAccount = employeeDto.IsSSOAccount;
+            if (employeeDto.JobTitle != null )
+                employee.JobTitle = employeeDto.JobTitle;
+            if (employeeDto.Email != null)
+                employee.Email = employeeDto.Email;
+            if (employeeDto.FirstName != null )
+                employee.FirstName = employeeDto.FirstName;
+            if (employeeDto.Surname != null)
+                employee.LastName = employeeDto.Surname;
+            if (employeeDto.IsAdmin != null )
+                employee.IsAdmin = employeeDto.IsAdmin;
+            if (employeeDto.IsSSOAccount != null)
+                employee.IsSSOAccount = employeeDto.IsSSOAccount;
 
             _employeeRepository.Update(employee);
         }

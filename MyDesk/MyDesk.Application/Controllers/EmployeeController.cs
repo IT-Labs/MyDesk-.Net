@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyDesk.Application.Validations;
 using MyDesk.Data.DTO;
 using MyDesk.Data.Interfaces.BusinessLogic;
 using MyDesk.Data.Utils;
-using FluentValidation.Results;
 
 namespace MyDesk.Application.Controllers
 {
@@ -30,11 +28,9 @@ namespace MyDesk.Application.Controllers
         [Authorize(Roles = "ADMIN")]
         public IActionResult UpdateEmployee(int id, EmployeeDto EmployeeDto)
         {
-            var validationRules = new EmployeeDtoValidation();
-            ValidationResult validationResult = validationRules.Validate(EmployeeDto);
-            if (!validationResult.IsValid)
+            if (id != EmployeeDto.Id && EmployeeDto.Id != null)
             {
-                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                return BadRequest("Id doesn't match");
             }
 
             EmployeeDto.Id = id;
