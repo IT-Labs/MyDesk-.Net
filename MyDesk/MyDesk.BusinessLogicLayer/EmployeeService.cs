@@ -26,7 +26,7 @@ namespace MyDesk.BusinessLogicLayer
 
         public void SetEmployeeAsAdmin(int id)
         {
-            Employee employee = _employeeRepository.Get(id);
+            var employee = _employeeRepository.Get(id);
 
             if (employee == null)
             {
@@ -45,15 +45,15 @@ namespace MyDesk.BusinessLogicLayer
             return result.DistinctBy(x => x.Email).ToList();
         }
 
-        public EmployeeDto GetByEmail(string email)
+        public EmployeeDto? GetByEmail(string email)
         {
-            Employee employee = _employeeRepository.GetByEmail(email);
+            var employee = _employeeRepository.GetByEmail(email);
             return employee == null ? null : _mapper.Map<EmployeeDto>(employee);
         }
 
         public EmployeeDto GetByEmailAndPassword(string email, string password)
         {
-            Employee employee = _employeeRepository.GetByEmail(email);
+            var employee = _employeeRepository.GetByEmail(email);
 
             if (employee == null || !BCrypt.Net.BCrypt.Verify(password, employee.Password))
             {
@@ -62,5 +62,53 @@ namespace MyDesk.BusinessLogicLayer
 
             return _mapper.Map<EmployeeDto>(employee);
         }
+        public void UpdateEmployee(EmployeeDto employeeDto)
+        {
+            if (employeeDto.Id == null)
+            {
+                throw new NotFoundException($"Employee Id is not provided");
+            }
+
+            var employee = _employeeRepository.Get(employeeDto.Id.Value);
+
+            if (employee == null)
+            {
+                throw new NotFoundException($"Employee with ID: {employeeDto.Id} not found.");
+            }
+
+            if (employeeDto.Email != null && employeeDto.Email != employee.Email && (employee.IsSSOAccount ?? false))
+            {
+                throw new NotFoundException($"Cannot change email for a SSO Account.");
+            }
+
+            if (employeeDto.IsSSOAccount != null && employeeDto.IsSSOAccount != employee.IsSSOAccount)
+            {
+                throw new NotFoundException($"Cannot reconfigure IsSSOAccount flag.");
+            }
+
+            if (employeeDto.Email != null)
+            {
+                var existingEmployeee = _employeeRepository.GetByEmail(employeeDto.Email ?? String.Empty);
+
+                if (existingEmployeee != null && existingEmployeee.Id != employeeDto?.Id)
+                {
+                    throw new ConflictException("There is already and employee with same email.");
+                }
+            }
+
+            if (employeeDto.JobTitle != null)
+                employee.JobTitle = employeeDto.JobTitle;
+            if (employeeDto.Email != null)
+                employee.Email = employeeDto.Email;
+            if (employeeDto.FirstName != null)
+                employee.FirstName = employeeDto.FirstName;
+            if (employeeDto.Surname != null)
+                employee.LastName = employeeDto.Surname;
+            if (employeeDto.IsAdmin != null)
+                employee.IsAdmin = employeeDto.IsAdmin;
+
+            _employeeRepository.Update(employee);
+        }
+
     }
 }

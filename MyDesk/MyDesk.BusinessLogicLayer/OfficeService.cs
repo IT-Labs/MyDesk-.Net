@@ -27,6 +27,11 @@ namespace MyDesk.BusinessLogicLayer
 
         public void CreateNewOffice(OfficeDto officeDto)
         {
+            if (string.IsNullOrEmpty(officeDto?.Name))
+            {
+                throw new ConflictException("Office name cannot be empty");
+            }
+
             Office existingOffice = _officeRepository.GetByName(officeDto.Name);
 
             if (existingOffice != null)
@@ -34,7 +39,7 @@ namespace MyDesk.BusinessLogicLayer
                 throw new ConflictException("There is allready office with the same name");
             }
 
-            Office office = new Office()
+            var office = new Office()
             {
                 Name = officeDto.Name,
                 OfficeImage = officeDto.OfficeImage
@@ -45,6 +50,11 @@ namespace MyDesk.BusinessLogicLayer
 
         public void UpdateOffice(OfficeDto officeDto)
         {
+            if (officeDto?.Id == null)
+            {
+                throw new NotFoundException($"Office Id is not provided");
+            }
+
             Office office = _officeRepository.Get(officeDto.Id.Value);
 
             if (office == null)
@@ -52,15 +62,15 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Office with ID: {officeDto.Id} not found.");
             }
 
-            Office existingOffice = _officeRepository.GetByName(officeDto.Name);
+            Office existingOffice = _officeRepository.GetByName(officeDto?.Name ?? String.Empty);
 
-            if (existingOffice != null && existingOffice.Id != officeDto.Id)
+            if (existingOffice != null && existingOffice.Id != officeDto?.Id)
             {
                 throw new ConflictException("There is already office with the same name.");
             }
 
-            office.Name = officeDto.Name;
-            office.OfficeImage = officeDto.OfficeImage;
+            office.Name = officeDto?.Name;
+            office.OfficeImage = officeDto?.OfficeImage;
 
             _officeRepository.Update(office);
         }
@@ -116,7 +126,7 @@ namespace MyDesk.BusinessLogicLayer
             return officeDto;
         }
 
-        private void MarkAsSoftDeleted(ICollection<Reservation> reservations)
+        private static void MarkAsSoftDeleted(ICollection<Reservation> reservations)
         {
             foreach (Reservation reservation in reservations)
             {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using MyDesk.Data.DTO;
 using MyDesk.Data.Interfaces.BusinessLogic;
 using MyDesk.Data.Utils;
@@ -27,9 +26,16 @@ namespace MyDesk.Application.Controllers
         }
         [HttpPut("admin/employee/{id}")]
         [Authorize(Roles = "ADMIN")]
-        public IActionResult SetAsAdmin(int id)
+        public IActionResult UpdateEmployee(int id, EmployeeDto EmployeeDto)
         {
-            _employeeService.SetEmployeeAsAdmin(id);
+            if (EmployeeDto.Id != null && EmployeeDto.Id != id)
+            {
+                return BadRequest("Id doesn't match");
+            }
+
+            EmployeeDto.Id = id;
+            _employeeService.UpdateEmployee(EmployeeDto);
+
             return Ok();
         }
     }
