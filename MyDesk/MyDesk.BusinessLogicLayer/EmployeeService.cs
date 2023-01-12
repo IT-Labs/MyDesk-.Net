@@ -64,10 +64,9 @@ namespace MyDesk.BusinessLogicLayer
         }
         public void UpdateEmployee(EmployeeDto employeeDto)
         {
-
             if (employeeDto.Id == null)
             {
-                throw new NotFoundException($"Cannot update null Employee");
+                throw new NotFoundException($"Employee Id is not provided");
             }
 
             var employee = _employeeRepository.Get(employeeDto.Id.Value);
@@ -77,35 +76,36 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Employee with ID: {employeeDto.Id} not found.");
             }
 
-            if (employeeDto.Email != employee.Email && (employee.IsSSOAccount??false))
+            if (employeeDto.Email != null && employeeDto.Email != employee.Email && (employee.IsSSOAccount ?? false))
             {
                 throw new NotFoundException($"Cannot change email for a SSO Account.");
             }
 
-            if ( employeeDto.IsSSOAccount != employee.IsSSOAccount)
+            if (employeeDto.IsSSOAccount != null && employeeDto.IsSSOAccount != employee.IsSSOAccount)
             {
                 throw new NotFoundException($"Cannot reconfigure IsSSOAccount flag.");
             }
 
-            var existingEmployeee = _employeeRepository.GetByEmail(employeeDto.Email ?? String.Empty);
-
-            if (existingEmployeee != null && existingEmployeee.Id != employeeDto?.Id)
+            if (employeeDto.Email != null)
             {
-                throw new ConflictException("There is already and employee with same email.");
+                var existingEmployeee = _employeeRepository.GetByEmail(employeeDto.Email ?? String.Empty);
+
+                if (existingEmployeee != null && existingEmployeee.Id != employeeDto?.Id)
+                {
+                    throw new ConflictException("There is already and employee with same email.");
+                }
             }
 
-            if (employeeDto.JobTitle != null )
+            if (employeeDto.JobTitle != null)
                 employee.JobTitle = employeeDto.JobTitle;
             if (employeeDto.Email != null)
                 employee.Email = employeeDto.Email;
-            if (employeeDto.FirstName != null )
+            if (employeeDto.FirstName != null)
                 employee.FirstName = employeeDto.FirstName;
             if (employeeDto.Surname != null)
                 employee.LastName = employeeDto.Surname;
-            if (employeeDto.IsAdmin != null )
+            if (employeeDto.IsAdmin != null)
                 employee.IsAdmin = employeeDto.IsAdmin;
-            if (employeeDto.IsSSOAccount != null)
-                employee.IsSSOAccount = employeeDto.IsSSOAccount;
 
             _employeeRepository.Update(employee);
         }

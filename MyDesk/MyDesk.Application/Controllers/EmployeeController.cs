@@ -28,7 +28,7 @@ namespace MyDesk.Application.Controllers
         [Authorize(Roles = "ADMIN")]
         public IActionResult UpdateEmployee(int id, EmployeeDto EmployeeDto)
         {
-            if (id != EmployeeDto.Id && EmployeeDto.Id != null)
+            if (EmployeeDto.Id != null && EmployeeDto.Id != id)
             {
                 return BadRequest("Id doesn't match");
             }

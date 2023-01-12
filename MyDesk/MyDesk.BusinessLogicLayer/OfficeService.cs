@@ -50,10 +50,9 @@ namespace MyDesk.BusinessLogicLayer
 
         public void UpdateOffice(OfficeDto officeDto)
         {
-
             if (officeDto?.Id == null)
             {
-                throw new NotFoundException($"Cannot update null office");
+                throw new NotFoundException($"Office Id is not provided");
             }
 
             Office office = _officeRepository.Get(officeDto.Id.Value);
@@ -63,7 +62,7 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Office with ID: {officeDto.Id} not found.");
             }
 
-            Office existingOffice = _officeRepository.GetByName(officeDto?.Name??String.Empty);
+            Office existingOffice = _officeRepository.GetByName(officeDto?.Name ?? String.Empty);
 
             if (existingOffice != null && existingOffice.Id != officeDto?.Id)
             {
