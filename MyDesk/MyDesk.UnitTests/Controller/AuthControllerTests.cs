@@ -148,7 +148,7 @@ namespace MyDesk.UnitTests.Controller
             Assert.IsTrue(objectResult.Value is IEnumerable<string>);
             IEnumerable<string> values = (IEnumerable<string>)objectResult.Value;
             Assert.IsTrue(values.Any(x => x == "Employee must have an email address.") ||
-                values.Any(x => x == "Email length should be between 3 and 254.") || values.Any(x => x == "Invalid email adress."));
+                values.Any(x => x == "Email length should be between 3 and 254.") || values.Any(x => x == "Invalid email address."));
             _employeeService.DidNotReceive().GetByEmail(Arg.Any<string>());
             _employeeService.DidNotReceive().Create(Arg.Any<EmployeeDto>());
         }
@@ -165,8 +165,9 @@ namespace MyDesk.UnitTests.Controller
             IActionResult result = _authController.Register(employeeDto);
 
             // Assert
-            Assert.IsTrue(result is OkObjectResult);
-            OkObjectResult objectResult = (OkObjectResult)result;
+            Assert.IsTrue(result is BadRequestObjectResult);
+            BadRequestObjectResult objectResult = (BadRequestObjectResult)result;
+            Assert.NotNull(objectResult.Value);
             Assert.IsTrue(objectResult.Value.ToString() == "User already exists, redirect depending on the role");
             _employeeService.DidNotReceive().Create(Arg.Any<EmployeeDto>());
         }
