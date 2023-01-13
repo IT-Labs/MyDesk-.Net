@@ -20,7 +20,7 @@ namespace MyDesk.Application.Validations
 
                     if (!email.Contains("@it-labs.com") && !email.Contains("@gmail.com"))
                     {
-                        context.AddFailure("Invalid email adress.");
+                        context.AddFailure("Invalid email address.");
                     }
                 });
             });

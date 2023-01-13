@@ -73,7 +73,7 @@ namespace MyDesk.Application.Controllers
             var employee = _employeeService().GetByEmail(employeeDto?.Email??String.Empty);
             if (employee != null)
             {
-                return Ok("User already exists, redirect depending on the role");
+                return BadRequest("User already exists, redirect depending on the role");
             }
 
             if (!isSSOAccount && string.IsNullOrEmpty(employeeDto?.Password??String.Empty))
