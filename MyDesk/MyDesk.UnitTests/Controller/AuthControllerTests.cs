@@ -168,7 +168,7 @@ namespace MyDesk.UnitTests.Controller
             Assert.IsTrue(result is BadRequestObjectResult);
             BadRequestObjectResult objectResult = (BadRequestObjectResult)result;
             Assert.NotNull(objectResult.Value);
-            Assert.IsTrue(objectResult.Value.ToString() == "User already exists, redirect depending on the role");
+            Assert.IsTrue(objectResult.Value.ToString() == $"User with email address {employeeDto.Email} already exists");
             _employeeService.DidNotReceive().Create(Arg.Any<EmployeeDto>());
         }
 

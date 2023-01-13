@@ -30,6 +30,11 @@ namespace MyDesk.Application.Controllers
         [HttpPost("authentication")]
         public IActionResult Authentication([FromBody] EmployeeDto employeeDto)
         {
+            if (_employeeService().GetByEmail(employeeDto?.Email ?? String.Empty) != null)
+            {
+                return Ok("User already exists, redirect depending on the role");
+            }
+
             return CreateEmployee(employeeDto, true);
         }
 
@@ -70,10 +75,9 @@ namespace MyDesk.Application.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var employee = _employeeService().GetByEmail(employeeDto?.Email??String.Empty);
-            if (employee != null)
+            if (_employeeService().GetByEmail(employeeDto?.Email ?? String.Empty) != null)
             {
-                return BadRequest("User already exists, redirect depending on the role");
+                return BadRequest($"User with email address {employeeDto?.Email} already exists");
             }
 
             if (!isSSOAccount && string.IsNullOrEmpty(employeeDto?.Password??String.Empty))
@@ -105,7 +109,7 @@ namespace MyDesk.Application.Controllers
                 password = BCrypt.Net.BCrypt.HashPassword(decodedPassword);
             }
 
-            employee = new EmployeeDto
+            var employee = new EmployeeDto
             {
                 FirstName = employeeDto?.FirstName,
                 Surname = employeeDto?.Surname,
