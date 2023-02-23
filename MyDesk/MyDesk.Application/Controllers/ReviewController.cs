@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using FluentValidation.Results;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Utils;
 using MyDesk.Application.Validations;
-
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
+using MyDesk.BusinessLogicLayer.Utils;
 
 namespace MyDesk.Application.Controllers
 {

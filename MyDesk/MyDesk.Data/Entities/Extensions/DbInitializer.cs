@@ -1,4 +1,6 @@
-﻿namespace MyDesk.Data.Entities.Extensions
+﻿using MyDesk.Core.Entities;
+
+namespace MyDesk.Data.Entities.Extensions
 {
     public static class DbInitializer
     {

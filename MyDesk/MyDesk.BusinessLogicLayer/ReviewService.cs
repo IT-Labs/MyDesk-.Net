@@ -1,48 +1,55 @@
 ﻿using AutoMapper;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
 using Newtonsoft.Json;
 using System.Text;
-using MyDesk.Data.Responses;
+using MyDesk.Core.Responses;
 using Microsoft.Extensions.Configuration;
+using MyDesk.Core.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyDesk.BusinessLogicLayer
 {
     public class ReviewService : IReviewService
     {
-        private readonly IReviewRepository _reviewRepository;
-        private readonly IReservationRepository _reservationRepository;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
+        private readonly IContext _context;
 
-        public ReviewService(IReviewRepository reviewRepository,
-            IReservationRepository reservationRepository,
-            IConfiguration config,
+        public ReviewService(IConfiguration config,
             IMapper mapper,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory,
+            IContext context)
         {
-            _reviewRepository = reviewRepository;
-            _reservationRepository = reservationRepository;
             _config = config;
             _mapper = mapper;
             _httpClient = clientFactory.CreateClient();
+            _context = context;
         }
 
         public List<ReviewDto> GetReviewsForDesk(int id)
         {
-            List<Reservation> deskReservations = _reservationRepository.GetPastDeskReservations(id, includeReview: true);
-            List<Review> reviews = deskReservations.SelectMany(x => x.Reviews).ToList();
+            var deskReservations = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.DeskId == id && x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date)
+                .Include(x => x.Reviews.Where(y => y.IsDeleted == false));
+
+            var reviews = deskReservations
+                .SelectMany(x => x.Reviews)
+                .ToList();
 
             return _mapper.Map<List<ReviewDto>>(reviews);
         }
 
         public ReviewDto ShowReview(int id)
         {
-            Review review = _reviewRepository.Get(id);
+            var review = _context
+                .AsQueryable<Review>()
+                .FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+
             if (review == null)
             {
                 throw new NotFoundException($"Review with ID: {id} not found.");
@@ -53,13 +60,25 @@ namespace MyDesk.BusinessLogicLayer
 
         public List<ReviewDto> AllReviews(int? take = null, int? skip = null)
         {
-            List<Review> reviews = _reviewRepository.GetAll(take: take, skip: skip);
+            var query = _context
+                .AsQueryable<Review>()
+                .Where(x => x.IsDeleted == false);
 
-            foreach (Review review in reviews)
+            var reviews = (take.HasValue && skip.HasValue) ?
+                query.Skip(skip.Value).Take(take.Value).ToList() :
+                query.ToList();
+
+            foreach (var review in reviews)
             {
                 // EF will handle references
                 // We used foreach instead of SQL join in order to prevent inefficient queries
-                review.Reservation = _reservationRepository.Get(review.ReservationId, includeDesk: true, includeonferenceRoom: true, includeOffice: true);
+                review.Reservation = _context
+                    .AsQueryable<Reservation>()
+                    .Include(x => x.Desk)
+                        .ThenInclude(x => x.Office)
+                    .Include(x => x.ConferenceRoom)
+                        .ThenInclude(x => x.Office)
+                    .FirstOrDefault(x => x.Id == review.ReservationId && x.IsDeleted == false); 
             }
 
             return _mapper.Map<List<ReviewDto>>(reviews);
@@ -67,7 +86,10 @@ namespace MyDesk.BusinessLogicLayer
 
         public void CreateReview(ReviewDto reviewDto)
         {
-            Reservation reservation = _reservationRepository.Get(reviewDto?.Reservation?.Id??0);
+            var reservation = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.Id == reviewDto.Reservation.Id && x.IsDeleted == false);
+
             if (reservation == null)
             {
                 throw new NotFoundException($"Reservation with ID: {reviewDto?.Reservation?.Id ?? 0} not found");
@@ -80,7 +102,7 @@ namespace MyDesk.BusinessLogicLayer
                 ReviewOutput = GetAnalysedReview(reviewDto?.Reviews??string.Empty)
             };
 
-            _reviewRepository.Insert(review);
+            _context.Insert(review);
         }
 
         private string GetAnalysedReview(string textReview)

@@ -1,0 +1,73 @@
+﻿using MyDesk.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using MyDesk.Core.Utils;
+
+namespace MyDesk.BusinessLogicLayer
+{
+    public class MigrationService
+    {
+        private readonly IConfiguration _config;
+
+        public MigrationService(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public List<ApplicationDbContext> ExecuteMigrations(DbType dbType)
+        {
+            List<ApplicationDbContext> applicationDbContexts = new ();
+
+            DbContextOptionsBuilder<ApplicationDbContext> defaultDbContextOptionsBuilder = GetDbOptions(dbType, _config["ConnectionString"]);
+            ApplicationDbContext defaultDbContext = new (defaultDbContextOptionsBuilder.Options, null);
+            if (defaultDbContext.Database.IsRelational())
+            {
+                defaultDbContext.Database.Migrate();
+            }
+            applicationDbContexts.Add(defaultDbContext);
+
+            // Migrate each Tenant Db
+            Dictionary<string, string> tenantsData;
+            var tenants = _config["Tenants"];
+
+            if (!string.IsNullOrEmpty(tenants))
+            {
+                tenantsData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tenants);
+            }
+            else
+            {
+                tenantsData = new Dictionary<string, string>();
+            }
+
+            foreach (KeyValuePair<string, string> tenantData in tenantsData)
+            {
+                DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = GetDbOptions(dbType, tenantData.Value);
+                ApplicationDbContext dbContext = new (dbContextOptionsBuilder.Options, null);
+                if (dbContext.Database.IsRelational())
+                {
+                    dbContext.Database.Migrate();
+                }
+                applicationDbContexts.Add(dbContext);
+            }
+
+            return applicationDbContexts;
+        }
+
+        private DbContextOptionsBuilder<ApplicationDbContext> GetDbOptions(DbType dbType, string connectionString)
+        {
+            DbContextOptionsBuilder<ApplicationDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+
+            if (dbType == DbType.SQL)
+            {
+                dbContextOptionsBuilder.UseSqlServer(connectionString);
+            }
+            else
+            {
+                dbContextOptionsBuilder.UseInMemoryDatabase(connectionString);
+            }
+
+            return dbContextOptionsBuilder;
+        }
+    }
+}

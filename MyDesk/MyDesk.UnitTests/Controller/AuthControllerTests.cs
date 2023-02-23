@@ -1,12 +1,12 @@
 ﻿using MyDesk.Data.Interfaces.BusinessLogic;
 using MyDesk.Application.Controllers;
-using MyDesk.Data.DTO;
+using MyDesk.Core.DTO;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
+using MyDesk.Core.Interfaces.BusinessLogic;
 
 namespace MyDesk.UnitTests.Controller
 {
@@ -30,7 +30,7 @@ namespace MyDesk.UnitTests.Controller
                .AddJsonFile("appsettings.json",true)
                .Build();
 
-            _authController = new AuthController(() => _employeeService, _authService, _config);
+            _authController = new AuthController(_employeeService, _authService, _config);
             _authController.ControllerContext = new ControllerContext() { HttpContext = ControllerTestHelper.GetMockedHttpContext(tenantName: tenantName) };
         }
 

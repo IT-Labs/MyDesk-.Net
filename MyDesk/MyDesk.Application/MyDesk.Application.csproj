@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyDesk.BusinessLogicLayer\MyDesk.BusinessLogicLayer.csproj" />
+    <ProjectReference Include="..\MyDesk.Data\MyDesk.Data.csproj" />
   </ItemGroup>
 
 </Project>

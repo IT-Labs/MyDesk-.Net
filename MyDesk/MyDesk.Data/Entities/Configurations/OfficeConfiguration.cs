@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MyDesk.Core.Entities;
 
 namespace MyDesk.Data.Entities.Configurations
 {

@@ -1,5 +1,5 @@
-﻿using MyDesk.Data.DTO;
-using MyDesk.Data.Exceptions;
+﻿using MyDesk.Core.DTO;
+using MyDesk.Core.Exceptions;
 using MyDesk.Application.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;

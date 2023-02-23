@@ -1,6 +1,6 @@
-﻿using MyDesk.Data.Interfaces.BusinessLogic;
+﻿using MyDesk.Core.Interfaces.BusinessLogic;
 using MyDesk.Application.Controllers;
-using MyDesk.Data.DTO;
+using MyDesk.Core.DTO;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;

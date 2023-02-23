@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyDesk.Data.DTO;
+using MyDesk.BusinessLogicLayer.Utils;
+using MyDesk.Core.DTO;
 using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Utils;
 
 namespace MyDesk.Application.Controllers
 {
@@ -24,6 +24,7 @@ namespace MyDesk.Application.Controllers
 
             return Ok(result);
         }
+
         [HttpPut("admin/employee/{id}")]
         [Authorize(Roles = "ADMIN")]
         public IActionResult UpdateEmployee(int id, EmployeeDto EmployeeDto)

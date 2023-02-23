@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
 
 namespace MyDesk.Application.Mapper
 {
@@ -29,7 +29,7 @@ namespace MyDesk.Application.Mapper
                     .ForMember(x => x.Reservations, opt => opt.MapFrom(y => y.Reservations))
                     .ForMember(x => x.Office, opt => opt.MapFrom(y => y.Office));
 
-                config.CreateMap<Category, CategoryDto>()
+                config.CreateMap<MyDesk.Core.Entities.Category, CategoryDto>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
                     .ForMember(x => x.DoubleMonitor, opt => opt.MapFrom(y => y.DoubleMonitor))
                     .ForMember(x => x.NearWindow, opt => opt.MapFrom(y => y.NearWindow))

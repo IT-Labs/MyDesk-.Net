@@ -1,11 +1,11 @@
-﻿using MyDesk.Data.Entities;
+﻿using MyDesk.Core.Entities;
 using MyDesk.Data.Entities.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace MyDesk.Data
 {
-    public partial class ApplicationDbContext : DbContext
+    public partial class ApplicationDbContext : BaseDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
             : base(GetOptions(options, httpContextAccessor))

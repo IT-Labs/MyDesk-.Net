@@ -1,9 +1,9 @@
-﻿using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Application.Controllers;
-using MyDesk.Data.DTO;
+﻿using MyDesk.Application.Controllers;
+using MyDesk.Core.DTO;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
+using MyDesk.Core.Interfaces.BusinessLogic;
 
 namespace MyDesk.UnitTests.Controller
 {

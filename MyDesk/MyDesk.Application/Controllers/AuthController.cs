@@ -1,28 +1,29 @@
 ﻿using FluentValidation.Results;
 using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Utils;
+using MyDesk.Core.DTO;
 using MyDesk.Application.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.Utils;
 
 namespace MyDesk.Application.Controllers
 {
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly Func<IEmployeeService> _employeeService;
+        private readonly IEmployeeService _employeeService;
         private readonly IAuthService _authService;
         private readonly IConfiguration _config;
 
-        public AuthController(Func<IEmployeeService> employeeRepository, 
+        public AuthController(IEmployeeService employeeService, 
             IAuthService authService, 
             IConfiguration config)
         {
-            _employeeService = employeeRepository;
+            _employeeService = employeeService;
             _authService = authService;
             _config = config;
         }
@@ -30,7 +31,7 @@ namespace MyDesk.Application.Controllers
         [HttpPost("authentication")]
         public IActionResult Authentication([FromBody] EmployeeDto employeeDto)
         {
-            if (_employeeService().GetByEmail(employeeDto?.Email ?? String.Empty) != null)
+            if (_employeeService.GetByEmail(employeeDto?.Email ?? String.Empty) != null)
             {
                 return Ok("User already exists, redirect depending on the role");
             }
@@ -55,7 +56,7 @@ namespace MyDesk.Application.Controllers
             byte[] data = Convert.FromBase64String(employeeDto.Password);
             string decodedPassword = Encoding.UTF8.GetString(data);
 
-            EmployeeDto employee = _employeeService().GetByEmailAndPassword(employeeDto.Email, decodedPassword);
+            EmployeeDto employee = _employeeService.GetByEmailAndPassword(employeeDto.Email, decodedPassword);
             if (employee.IsSSOAccount == true)
             {
                 return BadRequest($"Employee with email address {employeeDto.Email} does not exist.");
@@ -75,7 +76,7 @@ namespace MyDesk.Application.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            if (_employeeService().GetByEmail(employeeDto?.Email ?? String.Empty) != null)
+            if (_employeeService.GetByEmail(employeeDto?.Email ?? String.Empty) != null)
             {
                 return BadRequest($"User with email address {employeeDto?.Email} already exists");
             }
@@ -119,7 +120,7 @@ namespace MyDesk.Application.Controllers
                 IsAdmin = isAdmin,
                 IsSSOAccount = isSSOAccount
             };
-            _employeeService().Create(employee);
+            _employeeService.Create(employee);
 
             return Ok("User created, redirect depending on the role");
         }

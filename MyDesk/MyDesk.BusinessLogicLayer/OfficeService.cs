@@ -1,28 +1,22 @@
 ﻿using AutoMapper;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
+using MyDesk.Core.Database;
+using Microsoft.EntityFrameworkCore;
+using MyDesk.Core.Interfaces.BusinessLogic;
 
 namespace MyDesk.BusinessLogicLayer
 {
     public class OfficeService : IOfficeService
     {
-        private readonly IOfficeRepository _officeRepository;
-        private readonly IDeskRepository _deskRepository;
-        private readonly IConferenceRoomRepository _conferenceRoomRepository;
         private readonly IMapper _mapper;
+        private readonly IContext _context;
 
-        public OfficeService(IOfficeRepository officeRepository,
-            IDeskRepository deskRepository,
-            IConferenceRoomRepository conferenceRoomRepository,
-            IMapper mapper)
+        public OfficeService(IMapper mapper, IContext context)
         {
-            _officeRepository = officeRepository;
-            _deskRepository = deskRepository;
-            _conferenceRoomRepository = conferenceRoomRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         public void CreateNewOffice(OfficeDto officeDto)
@@ -32,8 +26,7 @@ namespace MyDesk.BusinessLogicLayer
                 throw new ConflictException("Office name cannot be empty");
             }
 
-            Office existingOffice = _officeRepository.GetByName(officeDto.Name);
-
+            var existingOffice = GetOfficeByName(officeDto.Name);
             if (existingOffice != null)
             {
                 throw new ConflictException("There is allready office with the same name");
@@ -45,7 +38,7 @@ namespace MyDesk.BusinessLogicLayer
                 OfficeImage = officeDto.OfficeImage
             };
 
-            _officeRepository.Insert(office);
+            _context.Insert(office);
         }
 
         public void UpdateOffice(OfficeDto officeDto)
@@ -55,15 +48,19 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Office Id is not provided");
             }
 
-            Office office = _officeRepository.Get(officeDto.Id.Value);
+            if (officeDto?.Name == null)
+            {
+                throw new NotFoundException($"Office Id is not provided");
+            }
+
+            var office = GetOfficeById(officeDto.Id.Value);
 
             if (office == null)
             {
                 throw new NotFoundException($"Office with ID: {officeDto.Id} not found.");
             }
 
-            Office existingOffice = _officeRepository.GetByName(officeDto?.Name ?? String.Empty);
-
+            var existingOffice = GetOfficeByName(officeDto.Name);
             if (existingOffice != null && existingOffice.Id != officeDto?.Id)
             {
                 throw new ConflictException("There is already office with the same name.");
@@ -72,12 +69,17 @@ namespace MyDesk.BusinessLogicLayer
             office.Name = officeDto?.Name;
             office.OfficeImage = officeDto?.OfficeImage;
 
-            _officeRepository.Update(office);
+            _context.Modify(office);
         }
 
         public void DeleteOffice(int id)
         {
-            Office office = _officeRepository.Get(id, includeDesks: true, includeConferenceRooms: true);
+            var office1 = _context
+                .AsQueryable<Office>();
+            var office = office1
+                .Include(x => x.Desks.Where(y => y.IsDeleted == false))
+                .Include(x => x.ConferenceRooms.Where(y => y.IsDeleted == false))
+                .FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
 
             if (office == null)
             {
@@ -86,56 +88,96 @@ namespace MyDesk.BusinessLogicLayer
 
             for (int i = 0; i < office.Desks.Count; i++)
             {
-                Desk desk = office.Desks.ElementAt(i);
-                desk = _deskRepository.Get(desk.Id, includeReservations: true, includeReviews: true);
-                desk.IsDeleted = true;
+                var officeDesk = office.Desks.ElementAt(i);
+                var desk = _context
+                    .AsQueryable<Desk>()
+                    .Where(x => x.Id == officeDesk.Id && x.IsDeleted == false)
+                    .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
+                        .ThenInclude(x => x.Reviews.Where(y => y.IsDeleted == false))
+                    .FirstOrDefault();
 
-                MarkAsSoftDeleted(desk.Reservations);
+                if (desk != null)
+                {
+                    desk.IsDeleted = true;
+                    MarkAsSoftDeleted(desk.Reservations);
+                }
             }
 
             for (int i = 0; i < office.ConferenceRooms.Count; i++)
             {
-                ConferenceRoom conferenceRoom = office.ConferenceRooms.ElementAt(i);
-                conferenceRoom = _conferenceRoomRepository.Get(conferenceRoom.Id, includeReservations: true, includeReviews: true);
-                conferenceRoom.IsDeleted = true;
+                var officeConferenceRoom = office.ConferenceRooms.ElementAt(i);
+                var conferenceRoom = _context
+                    .AsQueryable<ConferenceRoom>()
+                    .Where(x => x.Id == officeConferenceRoom.Id && x.IsDeleted == false)
+                    .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
+                        .ThenInclude(x => x.Reviews.Where(y => y.IsDeleted == false))
+                    .FirstOrDefault();
 
-                MarkAsSoftDeleted(conferenceRoom.Reservations);
+                if (conferenceRoom != null)
+                {
+                    conferenceRoom.IsDeleted = true;
+                    MarkAsSoftDeleted(conferenceRoom.Reservations);
+                }
             }
 
-            _officeRepository.SoftDelete(office);
+            office.IsDeleted = true;
+            _context.Modify(office);
         }
 
         public List<OfficeDto> GetAllOffices(int? take = null, int? skip = null)
         {
-            List<Office> offices = _officeRepository.GetAll(take: take, skip: skip);
-            List<OfficeDto> officeDtos = _mapper.Map<List<OfficeDto>>(offices);
+           var query = _context
+                .AsQueryable<Office>()
+                .Where(x => x.IsDeleted == false);
 
+            var offices = (take.HasValue && skip.HasValue) ?
+                query.Skip(skip.Value).Take(take.Value).ToList() :
+                query.ToList();
+
+            var officeDtos = _mapper.Map<List<OfficeDto>>(offices);
             return officeDtos;
         }
 
         public OfficeDto GetDetailsForOffice(int id)
         {
-            Office office = _officeRepository.Get(id);
+            var office = GetOfficeById(id);
             if (office == null)
             {
                 throw new NotFoundException($"Office with ID: {id} not found.");
             }
 
-            OfficeDto officeDto = _mapper.Map<OfficeDto>(office);
-
+            var officeDto = _mapper.Map<OfficeDto>(office);
             return officeDto;
         }
 
         private static void MarkAsSoftDeleted(ICollection<Reservation> reservations)
         {
-            foreach (Reservation reservation in reservations)
+            foreach (var reservation in reservations)
             {
                 reservation.IsDeleted = true;
-                foreach (Review review in reservation.Reviews)
+                foreach (var review in reservation.Reviews)
                 {
                     review.IsDeleted = true;
                 }
             }
+        }
+
+        private Office? GetOfficeById(int id)
+        {
+            var office = _context
+                .AsQueryable<Office>()
+                .FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+
+            return office;
+        }
+
+        private Office? GetOfficeByName(string name)
+        {
+            var office = _context
+                .AsQueryable<Office>()
+                .FirstOrDefault(x => x.Name == name && x.IsDeleted == false);
+
+            return office;
         }
     }
 }

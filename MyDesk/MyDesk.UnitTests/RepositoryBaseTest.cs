@@ -1,8 +1,9 @@
-﻿using MyDesk.Data;
-using MyDesk.Data.Entities;
+﻿using MyDesk.Core;
+using MyDesk.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NUnit.Framework;
+using MyDesk.Data;
 
 namespace MyDesk.UnitTests
 {

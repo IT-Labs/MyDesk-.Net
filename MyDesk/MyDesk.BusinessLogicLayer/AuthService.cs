@@ -1,13 +1,12 @@
-﻿using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Utils;
+﻿
+using MyDesk.Core.DTO;
+using MyDesk.Core.Utils;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using MyDesk.Core.Interfaces.BusinessLogic;
 
 namespace MyDesk.BusinessLogicLayer
 {
@@ -30,7 +29,7 @@ namespace MyDesk.BusinessLogicLayer
                 new Claim("roles", RoleTypes.EMPLOYEE.ToString())
             });
 
-            if (employee?.IsAdmin??false)
+            if (employee?.IsAdmin ?? false)
             {
                 claimsIdentity.AddClaim(new Claim("roles", RoleTypes.ADMIN.ToString()));
             }

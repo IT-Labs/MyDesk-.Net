@@ -1,35 +1,34 @@
 ﻿using AutoMapper;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
-using MyDesk.Data.Utils;
-using MyDesk.Data.Requests;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
+using MyDesk.Core.Requests;
+using MyDesk.Core.Database;
+using Microsoft.EntityFrameworkCore;
+using MyDesk.BusinessLogicLayer.Utils;
 
 namespace MyDesk.BusinessLogicLayer
 {
     public class ReservationService : IReservationService
     {
-        private readonly IReservationRepository _reservationRepository;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IDeskRepository _deskRepository;
         private readonly IMapper _mapper;
+        private readonly IContext _context;
 
-        public ReservationService(IReservationRepository reservationRepository,
-            IEmployeeRepository employeeRepository,
-            IDeskRepository deskRepository,
-            IMapper mapper)
+        public ReservationService(IMapper mapper,
+            IContext context)
         {
-            _reservationRepository = reservationRepository;
-            _employeeRepository = employeeRepository;
-            _deskRepository = deskRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         public void CancelReservation(int id)
         {
-            Reservation reservationToDelete = _reservationRepository.Get(id, includeReviews: true);
+            var reservationToDelete = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.Id == id && x.IsDeleted == false)
+                .Include(x => x.Reviews.Where(y => y.IsDeleted == false))
+                .FirstOrDefault();
             if (reservationToDelete == null)
             {
                 throw new NotFoundException($"Reservation with ID: {id} not found.");
@@ -40,22 +39,23 @@ namespace MyDesk.BusinessLogicLayer
                 review.IsDeleted = true;
             }
 
-            _reservationRepository.SoftDelete(reservationToDelete);
+            reservationToDelete.IsDeleted= true;
+            _context.Modify(reservationToDelete);
         }
 
         public PaginationDto<ReservationDto> FutureReservations(string employeeEmail, int? take = null, int? skip = null)
         {
-            Employee employee = null;
+            Employee? employee = null;
             if (!string.IsNullOrEmpty(employeeEmail))
             {
-                employee = _employeeRepository.GetByEmail(employeeEmail);
+                employee = GetEmployeeByEmail(employeeEmail);
                 if (employee == null)
                 {
                     throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
                 }
             }
 
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetFutureReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = GetFutureReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, take: take, skip: skip);
 
             return new PaginationDto<ReservationDto>()
@@ -67,17 +67,17 @@ namespace MyDesk.BusinessLogicLayer
 
         public PaginationDto<ReservationDto> PastReservations(string employeeEmail, int? take = null, int? skip = null)
         {
-            Employee employee = null;
+            Employee? employee = null;
             if (!string.IsNullOrEmpty(employeeEmail))
             {
-                employee = _employeeRepository.GetByEmail(employeeEmail);
+                employee = GetEmployeeByEmail(employeeEmail);
                 if (employee == null)
                 {
                     throw new NotFoundException($"Employee with email: {employeeEmail} not found.");
                 }
             }
 
-            Tuple<int?, List<Reservation>> result = _reservationRepository.GetPastReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
+            Tuple<int?, List<Reservation>> result = GetPastReservations(employee?.Id, includeEmployee: true, includeDesk: true, includeConferenceRoom: true,
                 includeOffice: true, includeReviews: true, take: take, skip: skip);
 
             return new PaginationDto<ReservationDto>()
@@ -89,21 +89,25 @@ namespace MyDesk.BusinessLogicLayer
 
         public void CoworkerReserve(ReservationRequest request)
         {
-            Desk desk = _deskRepository.Get(request.DeskId);
+            var desk = _context
+                .AsQueryable<Desk>()
+                .FirstOrDefault(x => x.Id == request.DeskId && x.IsDeleted == false);
             if (desk == null)
             {
                 throw new NotFoundException($"Desk with ID: {request.DeskId} not found.");
             }
 
-            Employee employee = _employeeRepository.GetByEmail(request.EmployeeEmail);
+            var employee = GetEmployeeByEmail(request.EmployeeEmail);
             if (employee == null)
             {
                 throw new NotFoundException($"Employee with email: {request.EmployeeEmail} not found.");
             }
 
-            List<Reservation> deskReservations = _reservationRepository.GetDeskReservations(request.DeskId);
+            var deskReservations = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.DeskId == request.DeskId && x.IsDeleted == false && (x.StartDate >= DateTime.Now.Date || x.EndDate >= DateTime.Now.Date));
 
-            Reservation newReservation = new Reservation()
+            var newReservation = new Reservation
             {
                 StartDate = DateTime.ParseExact(request.StartDate, "dd-MM-yyyy", null),
                 EndDate = DateTime.ParseExact(request.EndDate, "dd-MM-yyyy", null),
@@ -122,7 +126,12 @@ namespace MyDesk.BusinessLogicLayer
             }
 
             // Check if there are existing reservations for that employee in that time-frame for current office
-            List<Reservation> employeeReservations = _reservationRepository.GetEmployeeReservations(employee.Id, includeDesk: true, includeConferenceRoom: true);
+            var employeeReservations = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.EmployeeId == employee.Id && x.IsDeleted == false && (x.StartDate >= DateTime.Now.Date || x.EndDate >= DateTime.Now.Date))
+                .Include(x => x.Desk)
+                .Include(x => x.ConferenceRoom);
+
             foreach (Reservation reservation in employeeReservations)
             {
                 if (desk.OfficeId == GetOfficeId(reservation) && (reservation.StartDate.IsInRange(newReservation.StartDate, newReservation.EndDate) || reservation.EndDate.IsInRange(newReservation.StartDate, newReservation.EndDate) ||
@@ -132,7 +141,7 @@ namespace MyDesk.BusinessLogicLayer
                 }
             }
 
-            _reservationRepository.Insert(newReservation);
+            _context.Insert(newReservation);
         }
 
         private int GetOfficeId(Reservation reservation)
@@ -146,5 +155,127 @@ namespace MyDesk.BusinessLogicLayer
                 return reservation.ConferenceRoom.OfficeId;
             }
         }
+
+        private Employee? GetEmployeeByEmail(string employeeEmail)
+        {
+            return _context
+                .AsQueryable<Employee>()
+                .FirstOrDefault(x => x.Email.ToLower() == employeeEmail.ToLower() && x.IsDeleted == false);
+        }
+
+        public Tuple<int?, List<Reservation>> GetFutureReservations(int? employeeId = null,
+            bool? includeEmployee = null,
+            bool? includeDesk = null,
+            bool? includeConferenceRoom = null,
+            bool? includeOffice = null,
+            int? take = null,
+            int? skip = null)
+        {
+            int? totalCount = null;
+            var query = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.IsDeleted == false && x.StartDate >= DateTime.Now.Date);
+
+            if (employeeId.HasValue)
+            {
+                query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
+
+            if (includeEmployee == true)
+            {
+                query = query.Include(x => x.Employee);
+            }
+
+            if (includeDesk == true && includeOffice != true)
+            {
+                query = query.Include(x => x.Desk);
+            }
+            else if (includeDesk == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.Desk)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (includeConferenceRoom == true && includeOffice != true)
+            {
+                query = query.Include(x => x.ConferenceRoom);
+            }
+            else if (includeConferenceRoom == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.ConferenceRoom)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (take.HasValue && skip.HasValue)
+            {
+                totalCount = query.Count();
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return Tuple.Create(totalCount, query.ToList());
+        }
+
+        public Tuple<int?, List<Reservation>> GetPastReservations(int? employeeId = null,
+            bool? includeEmployee = null,
+            bool? includeDesk = null,
+            bool? includeConferenceRoom = null,
+            bool? includeOffice = null,
+            bool? includeReviews = null,
+            int? take = null,
+            int? skip = null)
+        {
+            int? totalCount = null;
+            var query = _context
+                .AsQueryable<Reservation>()
+                .Where(x => x.IsDeleted == false && x.StartDate < DateTime.Now.Date && x.EndDate < DateTime.Now.Date);
+
+            if (employeeId.HasValue)
+            {
+                query = query.Where(x => x.EmployeeId == employeeId.Value);
+            }
+
+            if (includeEmployee == true)
+            {
+                query = query.Include(x => x.Employee);
+            }
+
+            if (includeDesk == true && includeOffice != true)
+            {
+                query = query.Include(x => x.Desk);
+            }
+            else if (includeDesk == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.Desk)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (includeConferenceRoom == true && includeOffice != true)
+            {
+                query = query.Include(x => x.ConferenceRoom);
+            }
+            else if (includeConferenceRoom == true && includeOffice == true)
+            {
+                query = query
+                    .Include(x => x.ConferenceRoom)
+                    .ThenInclude(x => x.Office);
+            }
+
+            if (includeReviews == true)
+            {
+                query = query.Include(x => x.Reviews.Where(y => y.IsDeleted == false));
+            }
+
+            if (take.HasValue && skip.HasValue)
+            {
+                totalCount = query.Count();
+                query = query.Skip(skip.Value).Take(take.Value);
+            }
+
+            return Tuple.Create(totalCount, query.ToList());
+        }
+
     }
 }

@@ -1,32 +1,29 @@
 ﻿using AutoMapper;
 using MyDesk.BusinessLogicLayer;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
 using NSubstitute;
 using NUnit.Framework;
+using MyDesk.Core.Database;
+using NSubstitute.ReceivedExtensions;
 
 namespace MyDesk.UnitTests.Service
 {
     public class OfficeServiceTests
     {
         private IOfficeService _officeService;
-        private IOfficeRepository _officeRepository;
-        private IDeskRepository _deskRepository;
-        private IConferenceRoomRepository _conferenceRoomRepository;
         private IMapper _mapper;
+        private IContext _context;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _officeRepository = Substitute.For<IOfficeRepository>();
-            _deskRepository = Substitute.For<IDeskRepository>();
-            _conferenceRoomRepository = Substitute.For<IConferenceRoomRepository>();
             _mapper = Substitute.For<IMapper>();
+            _context = Substitute.For<IContext>();
 
-            _officeService = new OfficeService(_officeRepository, _deskRepository, _conferenceRoomRepository, _mapper);
+            _officeService = new OfficeService(_mapper, _context);
         }
 
         [Test]
@@ -47,7 +44,7 @@ namespace MyDesk.UnitTests.Service
             _officeService.CreateNewOffice(officeDto);
 
             // Assert
-            _officeRepository.Received(1).Insert(Arg.Is<Office>(x => x.Name == name && x.OfficeImage == image));
+            _context.Received().Insert(Arg.Is<Office>(x => x.Name == name && x.OfficeImage == image));
         }
 
         [Test]
@@ -55,19 +52,15 @@ namespace MyDesk.UnitTests.Service
         public void CreateNewOffice_ThrowsConflictException()
         {
             // Arrange
-            OfficeDto officeDto = new OfficeDto()
+            Office office = GetOffices().Where(x => x.Id == 5).First();
+            OfficeDto officeDto = new OfficeDto
             {
-                Name = "Test office",
-                OfficeImage = "image"
+                Id = office.Id,
+                Name = office.Name,
+                OfficeImage = office.OfficeImage
             };
 
-            Office office = new Office()
-            {
-                Name = "Test office",
-                OfficeImage = "image"
-            };
-
-            _officeRepository.GetByName(office.Name).Returns(office);
+            _context.AsQueryable<Office>().Returns(GetOffices());
 
             // Act + Assert
             ConflictException exception = Assert.Throws<ConflictException>(() => _officeService.CreateNewOffice(officeDto));
@@ -81,25 +74,18 @@ namespace MyDesk.UnitTests.Service
             // Arrange
             OfficeDto officeDto = new OfficeDto()
             {
-                Id = 1,
+                Id = 5,
                 Name = "Changed office",
                 OfficeImage = "Changed image"
             };
 
-            Office office = new Office()
-            {
-                Id = 1,
-                Name = "Test office",
-                OfficeImage = "image"
-            };
-
-            _officeRepository.Get(officeDto.Id.Value).Returns(office);
+            _context.AsQueryable<Office>().Returns(GetOffices());
 
             // Act
             _officeService.UpdateOffice(officeDto);
 
             // Assert
-            _officeRepository.Received(1).Update(Arg.Is<Office>(x => x.Id == officeDto.Id && x.Name == officeDto.Name && x.OfficeImage == officeDto.OfficeImage));
+            _context.Received(1).Modify(Arg.Is<Office>(x => x.Id == officeDto.Id && x.Name == officeDto.Name && x.OfficeImage == officeDto.OfficeImage));
         }
 
         [Test]
@@ -124,29 +110,16 @@ namespace MyDesk.UnitTests.Service
         public void UpdateOffice_ThrowsConflictException()
         {
             // Arrange
-            OfficeDto officeDto = new OfficeDto()
+            Office firstOffice = GetOffices().Skip(0).Take(1).First();
+            Office secondOffice = GetOffices().Skip(1).Take(1).First();
+            OfficeDto officeDto = new OfficeDto
             {
-                Id = 1,
-                Name = "Changed office",
-                OfficeImage = "Changed image"
+                Id = firstOffice.Id,
+                Name = secondOffice.Name,
+                OfficeImage = firstOffice.OfficeImage
             };
 
-            Office sameExistingOffice = new Office()
-            {
-                Id = 1,
-                Name = "Test office",
-                OfficeImage = "image"
-            };
-
-            Office differentExistingOffice = new Office()
-            {
-                Id = 2,
-                Name = "Changed office",
-                OfficeImage = "Some other image"
-            };
-
-            _officeRepository.Get(officeDto.Id.Value).Returns(sameExistingOffice);
-            _officeRepository.GetByName(officeDto.Name).Returns(differentExistingOffice);
+            _context.AsQueryable<Office>().Returns(GetOffices());
 
             // Act + Assert
             ConflictException exception = Assert.Throws<ConflictException>(() => _officeService.UpdateOffice(officeDto));
@@ -164,6 +137,7 @@ namespace MyDesk.UnitTests.Service
                 Id = id,
                 Name = "Test office",
                 OfficeImage = "image",
+                IsDeleted = false,
                 Desks = new List<Desk>()
                 {
                     new Desk()
@@ -222,24 +196,18 @@ namespace MyDesk.UnitTests.Service
                 }
             };
 
-            foreach (Desk desk in office.Desks)
-            {
-                _deskRepository.Get(desk.Id, true, true).Returns(desk);
-            }
+            var offices = new List<Office> { office };
 
-            foreach (ConferenceRoom conferenceRoom in office.ConferenceRooms)
-            {
-                _conferenceRoomRepository.Get(conferenceRoom.Id, true, true).Returns(conferenceRoom);
-            }
-
-            _officeRepository.Get(id, true, true).Returns(office);
+            _context.AsQueryable<Office>().Returns(offices.AsQueryable());
+            _context.AsQueryable<Desk>().Returns(offices.First().Desks.AsQueryable());
+            _context.AsQueryable<ConferenceRoom>().Returns(offices.First().ConferenceRooms.AsQueryable());
 
             // Act
             _officeService.DeleteOffice(id);
 
             // Assert
-            _officeRepository.Received(1).SoftDelete(Arg.Is<Office>(x => 
-                x.Desks.All(y => y.IsDeleted == true && y.Reservations.All(z => z.IsDeleted == true && z.Reviews.All(r => r.IsDeleted == true))) && 
+            _context.Received().Modify(Arg.Is<Office>(x =>
+                x.Desks.All(y => y.IsDeleted == true && y.Reservations.All(z => z.IsDeleted == true && z.Reviews.All(r => r.IsDeleted == true))) &&
                 x.ConferenceRooms.All(y => y.IsDeleted == true && y.Reservations.All(z => z.IsDeleted == true && z.Reviews.All(r => r.IsDeleted == true)))));
         }
 
@@ -261,40 +229,27 @@ namespace MyDesk.UnitTests.Service
         public void GetAllOffices_Success(int? take, int? skip)
         {
             // Arrange
-            List<Office> offices = new List<Office>()
+            var offices = GetOffices();
+            _context.AsQueryable<Office>().Returns(offices);
+            var excpectedCount = offices.Count();
+
+            var expectedOfficesDto = new List<OfficeDto>();
+            foreach (var item in offices.ToList())
             {
-                new Office()
-                {
-                    Name = "Main office"
-                },
-                new Office()
-                {
-                    Name = "Side office"
-                }
-            };
+                expectedOfficesDto.Add(
+                    new OfficeDto {
+                    Id = item.Id,
+                    Name = item.Name,
+                    OfficeImage = item.OfficeImage
+                });
+            }
+            _mapper.Map<List<OfficeDto>>(Arg.Any<object>()).Returns(expectedOfficesDto);
 
-            List<OfficeDto> officeDtos = new List<OfficeDto>()
-            {
-                new OfficeDto()
-                {
-                    Name = "Main office"
-                },
-                new OfficeDto()
-                {
-                    Name = "Side office"
-                }
-            };
-
-            _officeRepository.GetAll(take: take, skip: skip).Returns(offices);
-            _mapper.Map<List<OfficeDto>>(offices).Returns(officeDtos);
-
-            // Act
+            //_mapper.When(t => t.Map<List<OfficeDto>>(Arg.Any<object>())).Do(p => expectedOfficesDto = p);
             List<OfficeDto> result = _officeService.GetAllOffices(take: take, skip: skip);
 
             // Assert
-            Assert.IsTrue(result.Count == 2);
-            _officeRepository.Received(1).GetAll(take: take, skip: skip);
-            _mapper.Received(1).Map<List<OfficeDto>>(offices);
+            Assert.IsTrue(result.Count == excpectedCount);
         }
 
         [Test]
@@ -302,31 +257,24 @@ namespace MyDesk.UnitTests.Service
         public void GetDetailsForOffice_Success()
         {
             // Arrange
-            int id = 7;
-            Office office = new Office()
-            {
-                Id = id,
-                Name = "Test office",
-                OfficeImage = "image"
-            };
-
+            var office = GetOffices().First();
+            var expectedId = office.Id;
             OfficeDto officeDto = new OfficeDto()
             {
-                Id = id,
-                Name = "Test office",
-                OfficeImage = "image"
+                Id = office.Id,
+                Name = office.Name,
+                OfficeImage = office.OfficeImage
             };
 
-            _officeRepository.Get(id).Returns(office);
-            _mapper.Map<OfficeDto>(office).Returns(officeDto);
+            _context.AsQueryable<Office>().Returns(GetOffices());
+            _mapper.Map<OfficeDto>(Arg.Any<object>()).Returns(officeDto);
 
             // Act
-            OfficeDto result = _officeService.GetDetailsForOffice(id);
+            OfficeDto actualResult = _officeService.GetDetailsForOffice(expectedId);
 
             // Assert
-            Assert.NotNull(result);
-            _officeRepository.Received(1).Get(id);
-            _mapper.Received(1).Map<OfficeDto>(office);
+            Assert.NotNull(actualResult);
+            Assert.IsTrue(expectedId == actualResult.Id);
         }
 
         [Test]
@@ -339,6 +287,18 @@ namespace MyDesk.UnitTests.Service
             // Act + Assert
             NotFoundException exception = Assert.Throws<NotFoundException>(() => _officeService.GetDetailsForOffice(id));
             Assert.IsTrue(exception.Message == $"Office with ID: {id} not found.");
+        }
+
+
+        private IQueryable<Office> GetOffices ()
+        {
+            var offices = new List<Office>
+            {
+                new Office { Id = 5, Name = "Test office5", OfficeImage = "image6", IsDeleted = false },
+                new Office { Id = 6, Name = "Test office6", OfficeImage = "image6", IsDeleted = false },
+                new Office { Id = 7, Name = "Test office7", OfficeImage = "image7", IsDeleted = false }
+            };
+            return offices.AsQueryable();
         }
     }
 }

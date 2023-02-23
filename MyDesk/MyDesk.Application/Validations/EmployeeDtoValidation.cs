@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using MyDesk.Data.DTO;
+using MyDesk.Core.DTO;
 
 namespace MyDesk.Application.Validations
 {

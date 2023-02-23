@@ -5,15 +5,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using System.Text;
 using MyDesk.Application.Mapper;
-using MyDesk.Repository;
 using MyDesk.BusinessLogicLayer;
-using MyDesk.Data.Utils;
 using MyDesk.Data.Entities.Extensions;
-using MyDesk.Data.Interfaces.Repository;
 using MyDesk.Data;
 using MyDesk.Application.Middleware;
 using MyDesk.Data.Interfaces.BusinessLogic;
 using Microsoft.AspNetCore.Authorization;
+using MyDesk.Core.Database;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.Utils;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -26,15 +26,9 @@ builder.Services.AddCors();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-builder.Services.AddTransient<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddTransient<IReservationRepository, ReservationRepository>();
-builder.Services.AddTransient<IOfficeRepository, OfficeRepository>();
-builder.Services.AddTransient<IDeskRepository, DeskRepository>();
-builder.Services.AddTransient<IConferenceRoomRepository, ConferenceRoomRepository>();
-builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
-builder.Services.AddTransient<IReviewRepository, ReviewRepository>();
-builder.Services.AddTransient<IMigrationRepository, MigrationRepository>();
+builder.Services.AddScoped<MigrationService>();
 builder.Services.AddTransient<Func<DbContextOptions<ApplicationDbContext>, ApplicationDbContext>>(provider => (options) => ActivatorUtilities.CreateInstance<ApplicationDbContext>(provider, options));
+builder.Services.AddScoped<IContext, ApplicationDbContext>();
 
 builder.Services.AddTransient<IOfficeService, OfficeService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
@@ -43,7 +37,7 @@ builder.Services.AddTransient<IEmployeeService, EmployeeService>();
 builder.Services.AddTransient<IConferenceRoomService, ConferenceRoomService>();
 builder.Services.AddTransient<IDeskService, DeskService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<Func<IEmployeeService>>(provider => () => provider.GetService<IEmployeeService>());
+//builder.Services.AddTransient<Func<IEmployeeService>>(provider => () => provider.GetService<IEmployeeService>());
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -136,9 +130,9 @@ WebApplication app = builder.Build();
 
 using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 {
-    var migrationRepository = serviceScope.ServiceProvider.GetService<IMigrationRepository>();
-    if (migrationRepository!=null)
-        migrationRepository.ExecuteMigrations(DbType.SQL);
+    var migrationService = serviceScope.ServiceProvider.GetService<MigrationService>();
+    if (migrationService != null)
+        migrationService.ExecuteMigrations(DbType.SQL);
 
     var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     DbInitializer.Initialize(context, builder.Configuration.GetValue<string>("AdminEmail"), builder.Configuration.GetValue<string>("AdminPassword"));
@@ -152,7 +146,10 @@ app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
 

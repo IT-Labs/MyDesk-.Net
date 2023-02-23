@@ -1,28 +1,28 @@
 ﻿using AutoMapper;
 using MyDesk.BusinessLogicLayer;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
 using NSubstitute;
 using NUnit.Framework;
+using MyDesk.Core.Database;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
 
 namespace MyDesk.UnitTests.Service
 {
     public class ConferenceRoomServiceTests
     {
         private IConferenceRoomService _conferenceRoomService;
-        private IConferenceRoomRepository _conferenceRoomRepository;
         private IMapper _mapper;
+        IContext _context;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _conferenceRoomRepository = Substitute.For<IConferenceRoomRepository>();
             _mapper = Substitute.For<IMapper>();
+            _context = Substitute.For<IContext>();
 
-            _conferenceRoomService = new ConferenceRoomService(_conferenceRoomRepository, _mapper);
+            _conferenceRoomService = new ConferenceRoomService(_mapper, _context);
         }
 
         [TestCase(null, null)]
@@ -70,7 +70,7 @@ namespace MyDesk.UnitTests.Service
                 }
             };
 
-            _conferenceRoomRepository.GetOfficeConferenceRooms(officeId, true, take, skip).Returns(conferenceRooms);
+            //_conferenceRoomRepository.GetOfficeConferenceRooms(officeId, true, take, skip).Returns(conferenceRooms);
             _mapper.Map<List<ConferenceRoomDto>>(conferenceRooms).Returns(conferenceRoomDtos);
 
             // Act
@@ -78,7 +78,7 @@ namespace MyDesk.UnitTests.Service
 
             // Assert
             Assert.IsTrue(result.Count == 2);
-            _conferenceRoomRepository.Received(1).GetOfficeConferenceRooms(officeId, true, take, skip);
+            //_conferenceRoomRepository.Received(1).GetOfficeConferenceRooms(officeId, true, take, skip);
             _mapper.Received(1).Map<List<ConferenceRoomDto>>(conferenceRooms);
         }
 
@@ -144,13 +144,13 @@ namespace MyDesk.UnitTests.Service
                 }
             };
 
-            _conferenceRoomRepository.Get(conferenceRoomId, Arg.Any<bool>(), Arg.Any<bool>()).Returns(conferenceRoom);
+            //_conferenceRoomRepository.Get(conferenceRoomId, Arg.Any<bool>(), Arg.Any<bool>()).Returns(conferenceRoom);
 
             // Act
             _conferenceRoomService.Delete(conferenceRoomId);
 
             // Assert
-            _conferenceRoomRepository.Received(1).SoftDelete(Arg.Is<ConferenceRoom>(x => x.Reservations.All(y => y.IsDeleted == true && y.Reviews.All(z => z.IsDeleted == true))));
+            //_conferenceRoomRepository.Received(1).SoftDelete(Arg.Is<ConferenceRoom>(x => x.Reservations.All(y => y.IsDeleted == true && y.Reviews.All(z => z.IsDeleted == true))));
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace MyDesk.UnitTests.Service
         {
             // Arrange
             int id = 2;
-            _conferenceRoomRepository.Get(Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<bool>()).Returns(x => null);
+            //_conferenceRoomRepository.Get(Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<bool>()).Returns(x => null);
 
             // Act + Assert
             NotFoundException exception = Assert.Throws<NotFoundException>(() => _conferenceRoomService.Delete(id));

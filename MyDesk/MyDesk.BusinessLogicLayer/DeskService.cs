@@ -1,52 +1,66 @@
 ﻿using AutoMapper;
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
-using System.Transactions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using MyDesk.Core.Database;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
+using MyDesk.Core.Interfaces.BusinessLogic;
 
 namespace MyDesk.BusinessLogicLayer
 {
     public class DeskService : IDeskService
     {
-        private readonly IOfficeRepository _officeRepository;
-        private readonly IDeskRepository _deskRepository;
-        private readonly ICategoriesRepository _categoriesRepository;
         private readonly IMapper _mapper;
+        private readonly IContext _context;
 
-        public DeskService(IOfficeRepository officeRepository,
-            IDeskRepository deskRepository,
-            ICategoriesRepository categoriesRepository,
-            IMapper mapper)
+        public DeskService(IMapper mapper,
+            IContext context)
         {
-            _officeRepository = officeRepository;
-            _deskRepository = deskRepository;
-            _categoriesRepository = categoriesRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         public List<DeskDto> GetOfficeDesks(int id, int? take = null, int? skip = null)
         {
-            List<Desk> desks = _deskRepository.GetOfficeDesks(id, includeCategory: true, includeReservations: true, includeEmployees: true, take: take, skip: skip);
+            
+            var query = _context
+                .AsQueryable<Desk>()
+                .Where(x => x.OfficeId == id && x.IsDeleted == false)
+                .Include(x => x.Categorie)
+                .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
+                    .ThenInclude(x => x.Employee);
+
+            var desks = (take.HasValue && skip.HasValue) ?
+                query.Skip(skip.Value).Take(take.Value).ToList() :
+                query.ToList();
+
             return _mapper.Map<List<DeskDto>>(desks);
         }
 
         public void Create(int officeId, int numberOfInstancesToCreate)
         {
-            Office existinOffice = _officeRepository.Get(officeId);
+            var existinOffice = _context
+                .AsQueryable<Office>()
+                .FirstOrDefault(x => x.Id == officeId && x.IsDeleted == false);
+
             if (existinOffice == null)
             {
                 throw new NotFoundException($"Office with ID: {officeId} not found.");
             }
 
-            int highestIndex = _deskRepository.GetHighestDeskIndexForOffice(officeId);
+            var highestIndex = _context
+                .AsQueryable<Desk>()
+                .Where(x => x.OfficeId == officeId && x.IsDeleted == false)
+                .OrderByDescending(x => x.IndexForOffice)
+                .Select(x => x.IndexForOffice)
+                .FirstOrDefault() ?? 0;
 
-            List<Desk> desksToInsert = new List<Desk>();
+            var desksToInsert = new List<Desk>();
 
             for (int i = 0; i < numberOfInstancesToCreate; i++)
             {
-                Desk desk = new Desk()
+                var desk = new Desk()
                 {
                     OfficeId = officeId,
                     IsDeleted = false,
@@ -57,54 +71,76 @@ namespace MyDesk.BusinessLogicLayer
                 desksToInsert.Add(desk);
             }
 
-            _deskRepository.BulkInsert(desksToInsert);
+            _context.Insert(desksToInsert);
         }
 
         public void Update(List<DeskDto> desks)
         {
-            using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var transaction = _context.BeginTransaction() as IDbContextTransaction)
             {
-                foreach (DeskDto deskToUpdate in desks)
+                try
                 {
-                    Desk desk = _deskRepository.Get(deskToUpdate.Id.Value);
-
-                    if (desk == null)
+                    foreach (var deskToUpdate in desks)
                     {
-                        continue;
-                    }
-
-                    Category existingDeskCategory = _categoriesRepository.Get(deskToUpdate.Category.DoubleMonitor, deskToUpdate.Category.NearWindow,
-                        deskToUpdate.Category.SingleMonitor, deskToUpdate.Category.Unavailable);
-                    if (existingDeskCategory != null)
-                    {
-                        desk.CategorieId = existingDeskCategory.Id;
-                        _deskRepository.Update(desk);
-                    }
-                    else
-                    {
-                        Category category = new Category()
+                        var desk = _context
+                            .AsQueryable<Desk>()
+                            .FirstOrDefault(x => deskToUpdate.Id.HasValue && x.Id == deskToUpdate.Id.Value && x.IsDeleted == false);
+                        if (desk == null)
                         {
-                            DoubleMonitor = deskToUpdate.Category.DoubleMonitor,
-                            SingleMonitor = deskToUpdate.Category.SingleMonitor,
-                            NearWindow = deskToUpdate.Category.NearWindow,
-                            Unavailable = deskToUpdate.Category.Unavailable
-                        };
+                            continue;
+                        }
 
-                        _categoriesRepository.Insert(category);
+                        var deskToUpdateCategory = deskToUpdate.Category;
+                        if (deskToUpdateCategory == null)
+                        {
+                            throw new NotFoundException($"DeskToUpdate.Category is null.");
+                        }
 
-                        desk.CategorieId = category.Id;
-                        _deskRepository.Update(desk);
+                        var existingDeskCategory = _context
+                            .AsQueryable<Category>()
+                            .FirstOrDefault(x => x.DoubleMonitor == deskToUpdateCategory.DoubleMonitor && 
+                                x.NearWindow == deskToUpdateCategory.NearWindow &&
+                                x.SingleMonitor == deskToUpdateCategory.SingleMonitor && 
+                                x.Unavailable == deskToUpdateCategory.Unavailable && 
+                                x.IsDeleted == false);
+                        if (existingDeskCategory != null)
+                        {
+                            desk.CategorieId = existingDeskCategory.Id;
+                            _context.Modify(desk);
+                        }
+                        else
+                        {
+                            Category category = new Category()
+                            {
+                                DoubleMonitor = deskToUpdateCategory.DoubleMonitor,
+                                SingleMonitor = deskToUpdateCategory.SingleMonitor,
+                                NearWindow = deskToUpdateCategory.NearWindow,
+                                Unavailable = deskToUpdateCategory.Unavailable
+                            };
+
+                            _context.Insert(category);
+                            desk.CategorieId = category.Id;
+                            _context.Modify(desk);
+                        }
                     }
                 }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
 
-                transaction.Complete();
+                transaction.Commit();
             }
         }
 
         public void Delete(int id)
         {
-            Desk desk = _deskRepository.Get(id, includeReservations: true, includeReviews: true);
-
+            var desk = _context
+                .AsQueryable<Desk>()
+                .Include(x => x.Reservations.Where(y => y.IsDeleted == false))
+                    .ThenInclude(x => x.Reviews.Where(y => y.IsDeleted == false))
+                .FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
             if (desk == null)
             {
                 throw new NotFoundException($"Desk with ID: {id} not found.");
@@ -113,13 +149,14 @@ namespace MyDesk.BusinessLogicLayer
             foreach (Reservation reservation in desk.Reservations)
             {
                 reservation.IsDeleted = true;
-                foreach (Review review in reservation.Reviews)
+                foreach (var review in reservation.Reviews)
                 {
                     review.IsDeleted = true;
                 }
             }
 
-            _deskRepository.SoftDelete(desk);
+            desk.IsDeleted = true;
+            _context.Modify(desk);
         }
     }
 }

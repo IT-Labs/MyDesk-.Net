@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Utils;
+using MyDesk.Core.Interfaces.BusinessLogic;
+using MyDesk.Core.DTO;
+using MyDesk.BusinessLogicLayer.Utils;
 
 namespace MyDesk.Application.Controllers
 {

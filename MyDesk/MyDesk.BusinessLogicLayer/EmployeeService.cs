@@ -1,60 +1,65 @@
 ﻿using AutoMapper;
 using MyDesk.Data.Interfaces.BusinessLogic;
-using MyDesk.Data.Interfaces.Repository;
-using MyDesk.Data.DTO;
-using MyDesk.Data.Entities;
-using MyDesk.Data.Exceptions;
+using MyDesk.Core.DTO;
+using MyDesk.Core.Entities;
+using MyDesk.Core.Exceptions;
+using MyDesk.Core.Database;
 
 namespace MyDesk.BusinessLogicLayer
 {
     public class EmployeeService : IEmployeeService
     {
-        private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly IContext _context;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper)
+        public EmployeeService(IMapper mapper, IContext context)
         {
-            _employeeRepository = employeeRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         public void Create(EmployeeDto employeeDto)
         {
             Employee employee = _mapper.Map<Employee>(employeeDto);
-            _employeeRepository.Create(employee);
+            _context.Insert(employee);
         }
 
         public void SetEmployeeAsAdmin(int id)
         {
-            var employee = _employeeRepository.Get(id);
-
+           var employee = GetEmployeeById(id);
             if (employee == null)
             {
                 throw new NotFoundException($"Employee with ID:{id} not found.");
             }
 
             employee.IsAdmin = true;
-            _employeeRepository.Update(employee);
+            _context.Modify(employee);
         }
 
         public List<EmployeeDto> GetAll(int? take = null, int? skip = null)
         {
-            List<Employee> employees = _employeeRepository.GetAll(take: take, skip: skip);
-            List<EmployeeDto> result = _mapper.Map<List<EmployeeDto>>(employees);
+            var query = _context
+                .AsQueryable<Employee>()
+                .Where(x => x.IsDeleted == false)
+                .DistinctBy(x => x.Email);
 
-            return result.DistinctBy(x => x.Email).ToList();
+            var employees = (take.HasValue && skip.HasValue) ?
+                query.Skip(skip.Value).Take(take.Value).ToList() :
+                query.ToList();
+
+            var result = _mapper.Map<List<EmployeeDto>>(employees);
+            return result;
         }
 
         public EmployeeDto? GetByEmail(string email)
         {
-            var employee = _employeeRepository.GetByEmail(email);
+            var employee = GetEmployeeByEmail(email);
             return employee == null ? null : _mapper.Map<EmployeeDto>(employee);
         }
 
         public EmployeeDto GetByEmailAndPassword(string email, string password)
         {
-            var employee = _employeeRepository.GetByEmail(email);
-
+            var employee = GetEmployeeByEmail(email);
             if (employee == null || !BCrypt.Net.BCrypt.Verify(password, employee.Password))
             {
                 throw new NotFoundException($"Employee with email: {email} not found.");
@@ -62,6 +67,7 @@ namespace MyDesk.BusinessLogicLayer
 
             return _mapper.Map<EmployeeDto>(employee);
         }
+
         public void UpdateEmployee(EmployeeDto employeeDto)
         {
             if (employeeDto.Id == null)
@@ -69,7 +75,7 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Employee Id is not provided");
             }
 
-            var employee = _employeeRepository.Get(employeeDto.Id.Value);
+            var employee = GetEmployeeById(employeeDto.Id.Value);
 
             if (employee == null)
             {
@@ -86,29 +92,41 @@ namespace MyDesk.BusinessLogicLayer
                 throw new NotFoundException($"Cannot reconfigure IsSSOAccount flag.");
             }
 
-            if (employeeDto.Email != null)
+            if (!string.IsNullOrWhiteSpace(employeeDto.Email))
             {
-                var existingEmployeee = _employeeRepository.GetByEmail(employeeDto.Email ?? String.Empty);
-
+                var existingEmployeee = GetEmployeeByEmail(employeeDto.Email);
                 if (existingEmployeee != null && existingEmployeee.Id != employeeDto?.Id)
                 {
                     throw new ConflictException("There is already and employee with same email.");
                 }
             }
 
-            if (employeeDto.JobTitle != null)
+            if (!string.IsNullOrWhiteSpace(employeeDto.JobTitle))
                 employee.JobTitle = employeeDto.JobTitle;
-            if (employeeDto.Email != null)
+            if (!string.IsNullOrWhiteSpace(employeeDto.Email))
                 employee.Email = employeeDto.Email;
-            if (employeeDto.FirstName != null)
+            if (!string.IsNullOrWhiteSpace(employeeDto.FirstName))
                 employee.FirstName = employeeDto.FirstName;
-            if (employeeDto.Surname != null)
+            if (!string.IsNullOrWhiteSpace(employeeDto.Surname))
                 employee.LastName = employeeDto.Surname;
             if (employeeDto.IsAdmin != null)
                 employee.IsAdmin = employeeDto.IsAdmin;
 
-            _employeeRepository.Update(employee);
+            _context.Modify(employee);
         }
 
+        private Employee? GetEmployeeByEmail(string email)
+        {
+            return _context
+                .AsQueryable<Employee>()
+                .FirstOrDefault(x => x.Email.ToLower() == email.ToLower() && x.IsDeleted == false);
+        }
+
+        private Employee? GetEmployeeById(int id)
+        {
+            return _context
+                .AsQueryable<Employee>()
+                .FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+        }
     }
 }
