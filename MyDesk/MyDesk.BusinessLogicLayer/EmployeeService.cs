@@ -40,8 +40,7 @@ namespace MyDesk.BusinessLogicLayer
         {
             var query = _context
                 .AsQueryable<Employee>()
-                .Where(x => x.IsDeleted == false)
-                .DistinctBy(x => x.Email);
+                .Where(x => x.IsDeleted == false);
 
             var employees = (take.HasValue && skip.HasValue) ?
                 query.Skip(skip.Value).Take(take.Value).ToList() :

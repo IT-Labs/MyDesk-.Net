@@ -29,7 +29,7 @@ namespace MyDesk.BusinessLogicLayer
             var existingOffice = GetOfficeByName(officeDto.Name);
             if (existingOffice != null)
             {
-                throw new ConflictException("There is allready office with the same name");
+                throw new ConflictException("There is already office with the same name");
             }
 
             var office = new Office()
